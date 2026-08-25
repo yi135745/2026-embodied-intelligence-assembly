@@ -1,2 +1,27 @@
-# 2026-embodied-intelligence-assembly
-AUBO robot assembly competition project. Baseline version backup. 
+## 技术实现
+
+本项目基于机器视觉与机器人控制技术，实现具身智能精密装配流程。
+
+主要技术栈：
+
+- **海康 MVS**
+  - 工业相机采集图像
+  - 相机参数配置与实时取图
+
+- **OpenCV**
+  - 图像预处理
+  - HSV颜色空间分割
+  - 目标轮廓检测
+  - 方块中心点定位
+  - 像素坐标提取与视觉标定转换
+
+- **大语言模型 API**
+  - 任务卡内容识别
+  - 装配指令解析
+  - 自动生成装配步骤规划
+
+- **AUBO SDK**
+  - 机器人状态读取
+  - TCP位姿获取
+  - 机械臂运动控制
+  - 工具端IO控制（吸盘控制）
