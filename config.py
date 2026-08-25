@@ -30,6 +30,14 @@ def _load_local_secrets() -> dict:
 _LOCAL_SECRETS = _load_local_secrets()
 
 # ==============================
+# 0. 项目路径：所有路径以项目根为锚点，换机器无需改动
+# ==============================
+PROJECT_ROOT = Path(__file__).resolve().parent
+RESOURCES_DIR = PROJECT_ROOT / "resources"
+DATA_DIR = PROJECT_ROOT / "data"
+OUTPUT_DIR = PROJECT_ROOT / "output"
+
+# ==============================
 # 1. 语音唤醒 / 录音 / 识别
 # ==============================
 WAKE_WORD = "小具同学"                  # 唤醒词
@@ -41,7 +49,7 @@ RETURN_REPLY = "任务已完成，请再次呼叫小具同学"  # 任务返回�
 CHUNK = 1024
 CHANNELS = 1
 RATE = 16000
-TEMP_WAV_FILE = "temp_voice_command.wav"
+TEMP_WAV_FILE = str(OUTPUT_DIR / "temp_voice_command.wav")
 
 # VAD 录音参数：
 # THRESHOLD 越大越不容易被环境噪声触发；SILENCE_LIMIT 为检测到人声后连续静音多少秒停止。
@@ -49,10 +57,8 @@ THRESHOLD = 300
 SILENCE_LIMIT = 2
 MAX_DURATION = 15
 
-# FunASR 本地模型目录
-ASR_MODEL_DIR = (
-    r"E:\project_test\project_all\resources\modelscope\hub\models\iic\SenseVoiceSmall"
-)
+# FunASR 本地模型目录（相对项目根：resources/modelscope/，已 gitignore，需自行放置模型）
+ASR_MODEL_DIR = str(RESOURCES_DIR / "modelscope" / "hub" / "models" / "iic" / "SenseVoiceSmall")
 
 # 语音识别热词纠错表：左 ASR 可能识别错的文本 -> 右程序标准命令。
 ASR_CORRECTION_DICT = {
@@ -119,14 +125,15 @@ TTS_RATE = 150  # 正常语速
 # 3. 海康 MVS 相机
 # ==============================
 CAMERA_IP = "192.168.1.100"   # 实际摄像头 IP，需按现场修改
-MVS_SDK_DIR = r"E:\software\mvs\MVS\Development\Samples\Python"  # 海康 MVS Python 例程地址
-MVS_CAPTURE_NAME = "hik_mvs_capture.jpg"   # 实机拍照保存文件名
+# 海康 MVS Python 例程地址：外部软件安装目录，换机器需改成这台机器上 MVS 的 Samples\Python 路径
+MVS_SDK_DIR = r"E:\software\mvs\MVS\Development\Samples\Python"
+MVS_CAPTURE_NAME = str(OUTPUT_DIR / "hik_mvs_capture.jpg")   # 实机拍照保存文件名
 MVS_DEVICE_INDEX = 0
 MVS_TIMEOUT_MS = 3000          # 取一帧超时（毫秒）
 MVS_EXPOSURE_TIME = -1.0       # 默认曝光时间（微秒），<=0 表示不设置
 MVS_GAIN = -1.0                # 默认增益，<0 表示不设置
 
-LOCAL_TEST_IMAGE_NAME = "任务卡1.png"   # 测试用图片：目录下存在时优先读取，否则实机拍摄
+LOCAL_TEST_IMAGE_NAME = str(PROJECT_ROOT / "任务卡1.png")   # 测试用图片：目录下存在时优先读取，否则实机拍摄
 DEBUG_IMAGE = None                      # 无相机调试图片路径（None 表示不启用）
 
 # ==============================
@@ -155,13 +162,13 @@ TASK2_TRAY_DEBUG_IMAGE = None
 TASK2_CARD_CAPTURE_NAME = "task2_card.jpg"
 TASK2_BLOCK_CAPTURE_NAME = "task2_blocks.jpg"
 TASK2_TRAY_CAPTURE_NAME = "task2_trays.jpg"
-TASK2_OUTPUT_DIR = "output/task2"
-TASK2_TUNING_FILE = "task2_tuning.json"  # 独立调参工具保存；存在时自动覆盖下列默认参数
-TASK2_OFFSET_FILE = "task2_offsets_v2.json"  # 坐标逻辑修正后的偏差文件；旧文件保留但不再加载
-TASK2_VERIFIED_TRAY_FILE = "task2_verified_trays.json"  # 独立人工验收后的托盘坐标
+TASK2_OUTPUT_DIR = str(OUTPUT_DIR / "task2")
+TASK2_TUNING_FILE = str(DATA_DIR / "task2_tuning.json")  # 独立调参工具保存；存在时自动覆盖下列默认参数
+TASK2_OFFSET_FILE = str(DATA_DIR / "task2_offsets_v2.json")  # 坐标逻辑修正后的偏差文件
+TASK2_VERIFIED_TRAY_FILE = str(DATA_DIR / "task2_verified_trays.json")  # 独立人工验收后的托盘坐标
 # True：必须读取预处理验收文件，不再移动到托盘拍照或实时识别；文件缺失则报错。
 # False：正式任务现场移动到托盘拍照位，重新拍照并实时识别。
-TASK2_USE_VERIFIED_TRAYS = True  # 当前尚无人工验收文件，先使用现场识别
+TASK2_USE_VERIFIED_TRAYS = True  # 读取 data/task2_verified_trays.json；换机器后必须先重新验收再抓放
 
 TASK2_HSV_RANGES = {
     # 当前实拍中紫色H约173，属于HSV环回端；红色只保留0附近，避免抢走紫色。
@@ -198,7 +205,7 @@ TASK2_COLOR_MIN_RECT_FILL = 0.55     # 轮廓面积/最小外接矩形面积
 TASK2_COLOR_MAX_AREA_JUMP = 1.8      # 最大候选若远大于次大候选，判为背景区域
 TASK2_COLOR_MAX_CANDIDATES = 10      # 保留额外候选，由联合评分排除台外同色杂物
 TASK2_COLOR_BAD_AREA_RATIO = 0.25    # 某轮廓面积低于中位数该比例时视为只识别到边缘
-TASK2_CALIBRATION_FILE = r"resources\visionmaster_task2_calibration.xml"  # VisionMaster 九点标定 XML，现场替换
+TASK2_CALIBRATION_FILE = str(RESOURCES_DIR / "visionmaster_task2_calibration.xml")  # VisionMaster 九点标定 XML，现场替换
 TASK2_CALIBRATION_WORLD_SCALE_MM = 10.0  # 当前VM世界坐标-1/0/1使用cm，转成mm
 TASK2_REQUIRE_ALL_COLORS = True
 TASK2_EXECUTE_ROBOT = True

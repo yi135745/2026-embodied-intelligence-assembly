@@ -124,16 +124,6 @@ class CoordinateTransformer:
         return [origin[0] + world[0] + offset[0], origin[1] + world[1] + offset[1], float(z)] + orientation
 
 
-def preprocess_card(image_path) -> np.ndarray:
-    """生成适合 OCR/API 的高对比任务卡图，原图不会被覆盖。"""
-    image = cv2.imread(str(image_path))
-    if image is None:
-        raise RuntimeError("无法读取任务卡图片：" + str(image_path))
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    gray = cv2.GaussianBlur(gray, (3, 3), 0)
-    return cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 31, 11)
-
-
 class ColorObjectDetector:
     """使用 HSV 阈值和轮廓检测六色方块或托盘区域。"""
 

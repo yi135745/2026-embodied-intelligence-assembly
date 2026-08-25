@@ -8,6 +8,7 @@ import base64
 import io
 import json
 import mimetypes
+from datetime import datetime
 from pathlib import Path
 from socket import timeout as SOCKET_TIMEOUT
 from urllib import error, request
@@ -174,10 +175,10 @@ class LLM:
         raw_text = text.strip()
         log_path = None
         if output_dir is not None:
-            log_path = Path(output_dir) / ("task2_llm_%s.txt" % __import__("datetime").datetime.now().strftime("%Y%m%d_%H%M%S"))
+            log_path = Path(output_dir) / ("task2_llm_%s.txt" % datetime.now().strftime("%Y%m%d_%H%M%S"))
             log_path.write_text(
                 "timestamp: %s\nmodel: %s\n\n[RAW_OUTPUT]\n%s\n"
-                % (__import__("datetime").datetime.now().isoformat(timespec="seconds"), self.model, raw_text),
+                % (datetime.now().isoformat(timespec="seconds"), self.model, raw_text),
                 encoding="utf-8",
             )
         text = raw_text.removeprefix("```json").removesuffix("```").strip()

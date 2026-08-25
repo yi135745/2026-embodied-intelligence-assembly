@@ -15,14 +15,11 @@ AUBO_SPEED = 0.03
 AUBO_ACCELERATION = 0.03
 
 # 吸盘原地启停实机测试。默认只允许读取IO；改为True后仍需命令--run和现场文字确认。
-SUCTION_ENABLE_OUTPUT_TEST = True
+SUCTION_ENABLE_OUTPUT_TEST = False
 SUCTION_HOLD_SECONDS = 3.0
 
-# 外部格式样本，仅用于解析器单元测试。
-CALIBRATION_SAMPLE_FILE = Path(r"E:\暂存\2026具身智能比赛\标定格式式样.xml")
-
 # 独立API连通测试。
-API_KEY = "sk-ws-H.EYHLPXH.NIq5.MEUCIQDvTpmg1zJnmJmzpnbNMyyo26ZhXIgRE5PaDe7cyHT6cwIge3AWv8W1hMvLjz_h1uG68A-CBmt5F0iXP2XqK99u-XU"
+API_KEY = ""  # 用环境变量 DASHSCOPE_API_KEY 提供，勿提交密钥
 API_URL = "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions"
 API_MODEL = "qwen-vl-max"
 API_TEST_IMAGE = TEST_DIR / "test.jpg"

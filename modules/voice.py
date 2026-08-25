@@ -171,6 +171,7 @@ class Voice:
             stream.close()
             audio.terminate()
 
+        output_file.parent.mkdir(parents=True, exist_ok=True)
         with wave.open(str(output_file), "wb") as wav_file:
             wav_file.setnchannels(config.CHANNELS)
             wav_file.setsampwidth(sample_width)

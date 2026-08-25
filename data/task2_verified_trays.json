@@ -1,7 +1,7 @@
 {
   "verified_at": "2026-08-25T08:32:22",
-  "source_image": "E:\\project_test\\project_all\\output\\task2\\tray_verification\\verified_tray_raw.jpg",
-  "annotated_image": "E:\\project_test\\project_all\\output\\task2\\tray_verification\\verified_tray_detected.jpg",
+  "source_image": "",
+  "annotated_image": "",
   "tray_view_pose": [
     -399.28,
     178.35,

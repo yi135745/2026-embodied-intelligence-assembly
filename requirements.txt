@@ -62,7 +62,7 @@ pillow==12.3.0
 platformdirs==4.11.3
 pooch==1.9.0
 protobuf==7.36.0
-pyaubo-sdk @ file:///E:/%E6%9A%82%E5%AD%98/%E5%B7%A5%E7%A8%8B/Project1/resources/pyaubo_sdk-0.24.1-cp310-cp310-win_amd64.whl#sha256=d531e49a7d94daadbfae0602c418f0707ddcd09616a3377f24fc75f387179da3
+pyaubo-sdk @ file:./resources/pyaubo_sdk-0.24.1-cp310-cp310-win_amd64.whl
 PyAudio==0.2.14
 pycparser==3.0
 pycryptodome==3.23.0

@@ -1,16 +1,18 @@
+import os
 import requests
 import base64
 import json
+from pathlib import Path
 
 
-API_KEY = "sk-ws-H.EYHLPXH.5uKG.MEUCIQDE2kTCCAta9ejK0FGoO9fXxECCx-hW5Gt5CszRP_-83AIgTFEgMp69iegDHhLrZ6O7DILC7z64SJBhugbFq57ZCws"  # 千问大模型密钥（用环境变量，不要写进这里）
+API_KEY = os.getenv("DASHSCOPE_API_KEY", "")  # 千问大模型密钥（用环境变量，不要写进这里）
 
 # 注意：这里写完整接口
 URL = "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions"
 
 MODEL = "qwen-vl-max"
 
-IMAGE_PATH = r"E:\project_test\project_all\test\test.jpg"
+IMAGE_PATH = Path(__file__).parent / "test.jpg"
 
 
 def image_to_base64(path):

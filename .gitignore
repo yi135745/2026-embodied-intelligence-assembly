@@ -12,4 +12,7 @@ temp/
 # audio temp
 *.wav
 
+# 任务二调参产物（机器/光照相关，本地生成）
+data/task2_tuning.json
+
 resources/modelscope/
