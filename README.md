@@ -125,6 +125,13 @@ resources/modelscope/hub/models/iic/SenseVoiceSmall/
 | 2 | `python task2_offset_calibrate.py` | `data/task2_offsets_v2.json` | 方块/托盘 XY 偏移 + 抓放 Z（示教器对准） |
 | 3 | `python task2_tray_verify.py` | `data/task2_verified_trays.json` | 人工验收托盘坐标 |
 
+标定要点（现场经验）：
+
+- **九点标定**：用 VisionMaster 生成标定文件，命名为 `visionmaster_task2_calibration.xml` 放入 `resources/`；标定原点用**基座坐标**（mm/rad）填进 `config.TASK2_*_CALIBRATION_ORIGIN_POSE`。**方块拍照点与托盘拍照点在基座坐标下的 Z 高度、rz（相机旋转轴）必须一致**，否则两块区域无法共用同一标定矩阵。
+- **抓放 Z**：`TASK2_BLOCK_PICK_Z` 推荐 28mm——**偏高吸不住、偏低会撞**。`task2_offset_calibrate.py` 自动生成的 JSON 会覆盖 config 里的 Z；想手动定 Z 就把 `config.TASK2_MANUAL_Z_OVERRIDE = True`（XY 偏移仍自动读 JSON，无需手改 JSON）。
+- **颜色识别**：HSV 阈值手调不友好，最终方案是「HSV + 加权联合评分」（HSV 覆盖率 + 色相距离 + Lab 距离）共同区分六色，由 `TASK2_COLOR_FALLBACK_ENABLED` 在 HSV 检测异常时自动兜底。
+- **托盘验收**：`task2_tray_verify.py` 是为调试时提前人工验收固定托盘、避免后续意外而做的优化项。
+
 > 建议的**安全调试顺序**：先把 `config.TASK2_EXECUTE_ROBOT = False` 只测视觉（不动机械臂），视觉通了再标定，最后改回 `True` 开真抓放。
 
 ## 8. 确认开关（已默认 True，代表正式运行模式）
@@ -137,6 +144,7 @@ resources/modelscope/hub/models/iic/SenseVoiceSmall/
 | `TASK2_REQUIRE_ALL_COLORS` | `True` | 六色必须齐全，缺色报错 |
 | `TASK2_COLOR_FALLBACK_ENABLED` | `True` | HSV 检测异常时启用六色联合兜底 |
 | `TASK2_REQUIRE_OFFSET_FILE` | `True` | 必须有 `data/task2_offsets_v2.json` 才允许真实抓放（防误用旧坐标） |
+| `TASK2_MANUAL_Z_OVERRIDE` | `False` | 手动定抓放 Z（`True` 时用 config 的 Z 覆盖偏移文件里的 Z，XY 仍自动读 JSON） |
 | `TASK2_EXECUTE_ROBOT` | `True` | 执行真实机械臂抓放（临时调视觉时可改 `False`） |
 | `ROBOT_VACUUM_ENABLED` | `True` | 启用末端吸盘 Tool IO |
 
@@ -197,3 +205,7 @@ output/
 
 - [项目流程说明](docs/项目流程说明.md) — 完整流程与架构说明
 - [PPT 大纲](docs/PPT大纲.md) — 答辩演示提纲
+
+## 致谢与模型选型
+
+本项目开发得到了 Codex、ChatGPT、DeepSeek、Claude 等 AI 的辅助，特别鸣谢。大模型识别环节感谢通义千问（Qwen）提供的免费模型额度；本次任务对识别能力要求不强，早期模型（如 qwen_v1）已够用且耐用，出于成本考虑推荐使用早期大模型（可在 `config.MODEL` 按需调整）。

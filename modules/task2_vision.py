@@ -54,9 +54,16 @@ def load_task2_offsets(path=None) -> bool:
         "tray_xy_offset": "TASK2_TRAY_XY_OFFSET",
         "tray_place_z": "TASK2_TRAY_PLACE_Z",
     }
+    manual_z = getattr(config, "TASK2_MANUAL_Z_OVERRIDE", False)
+    z_keys = {"block_pick_z", "tray_place_z"}
     for json_key, config_key in mapping.items():
         if json_key in data:
+            if manual_z and json_key in z_keys:
+                continue
             setattr(config, config_key, data[json_key])
+    if manual_z:
+        print("已启用手动Z覆盖，忽略偏移文件里的Z：方块抓取Z=%.2f mm，托盘放置Z=%.2f mm" %
+              (config.TASK2_BLOCK_PICK_Z, config.TASK2_TRAY_PLACE_Z))
     print("已加载任务二偏差文件：" + str(offset_path))
     return True
 
