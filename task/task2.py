@@ -34,7 +34,7 @@ def _move_to_view(robot, pose, label):
         return
     if robot is None or not getattr(robot, "available", False):
         raise RuntimeError(label + "已配置，但机器人当前不可用。")
-    if not robot.move_to(pose):
+    if not robot.move_to_safe(pose):
         raise RuntimeError("移动到" + label + "失败。")
     time.sleep(max(0.0, float(config.TASK2_SETTLE_SECONDS)))
 

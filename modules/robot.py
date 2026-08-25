@@ -8,6 +8,7 @@
 """
 
 import time
+import math
 from typing import Optional
 
 try:
@@ -77,13 +78,26 @@ class Robot:
         return result
 
     def move_to(self, pose_mm_rad) -> bool:
-        """移动到目标位姿（XYZ毫米，RX/RY/RZ弧度），返回是否到位。"""
+        """执行一段TCP直线运动；跨区域运动应优先调用move_to_safe。"""
         if not self.available or self.robot_interface is None:
             print("机器人未连接，跳过运动执行。")
             return False
 
         if not isinstance(pose_mm_rad, (list, tuple)) or len(pose_mm_rad) != 6:
             print("机器人目标位姿必须是六个数值。")
+            return False
+        try:
+            pose_mm_rad = [float(value) for value in pose_mm_rad]
+        except (TypeError, ValueError):
+            print("机器人目标位姿包含非数值。")
+            return False
+        if not all(math.isfinite(value) for value in pose_mm_rad):
+            print("机器人目标位姿包含NaN或无穷大。")
+            return False
+        max_angle = float(config.ROBOT_MAX_ABS_ORIENTATION_RAD)
+        if any(abs(value) > max_angle for value in pose_mm_rad[3:]):
+            print("拒绝运动：姿态超过±%.3f rad，疑似把deg填入了rad配置：%s" %
+                  (max_angle, _format_pose(pose_mm_rad)))
             return False
         pose_text = _format_pose(pose_mm_rad)
         print("准备移动机器人到位姿：" + pose_text)
@@ -108,6 +122,45 @@ class Robot:
         except Exception as exc:
             print("机器人移动失败：" + str(exc))
             return False
+
+    def move_to_safe(self, target_pose, safe_z_mm=None) -> bool:
+        """跨区域安全移动：升高、原地转姿态、高位平移、原地下降。"""
+        if not isinstance(target_pose, (list, tuple)) or len(target_pose) != 6:
+            print("安全移动目标位姿必须包含六个数值。")
+            return False
+        target = [float(value) for value in target_pose]
+        current = self.get_current_pose()
+        configured_z = float(config.ROBOT_SAFE_TRANSIT_Z_MM if safe_z_mm is None else safe_z_mm)
+        safe_z = max(configured_z, current[2], target[2])
+        print("规划安全路径：当前Z %.3f -> 安全Z %.3f -> 目标Z %.3f" %
+              (current[2], safe_z, target[2]))
+
+        raised = list(current)
+        raised[2] = safe_z
+        rotated = list(raised)
+        rotated[3:] = target[3:]
+        translated = list(target)
+        translated[2] = safe_z
+
+        waypoints = []
+        if abs(current[2] - safe_z) > config.ROBOT_POSITION_TOLERANCE:
+            waypoints.append(("原地升至安全高度", raised))
+        if any(abs(raised[index] - rotated[index]) > 1e-6 for index in range(3, 6)):
+            waypoints.append(("安全高度原地旋转", rotated))
+        if (abs(rotated[0] - translated[0]) > config.ROBOT_POSITION_TOLERANCE or
+                abs(rotated[1] - translated[1]) > config.ROBOT_POSITION_TOLERANCE):
+            waypoints.append(("安全高度水平移动", translated))
+        if abs(safe_z - target[2]) > config.ROBOT_POSITION_TOLERANCE:
+            waypoints.append(("原地下降到目标高度", target))
+        if not waypoints:
+            waypoints.append(("移动到目标", target))
+
+        for label, waypoint in waypoints:
+            print("安全路径步骤：%s -> %s" % (label, _format_pose(waypoint)))
+            if not self.move_to(waypoint):
+                print("安全路径中止于：" + label)
+                return False
+        return True
 
     def _wait_until_arrives(self, target_pose) -> bool:
         """轮询 TCP 位姿，位置和姿态都接近目标位姿后才认为移动到位。"""

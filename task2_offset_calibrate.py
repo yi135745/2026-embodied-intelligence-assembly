@@ -45,7 +45,7 @@ def _calibrate_scene(scene, color, vision, robot, detector, output_dir, previous
         print("先从上一低位原地抬升到：" + _pose_text(safe_pose))
         if not robot.move_to(safe_pose):
             raise RuntimeError("从上一标定低位原地抬升失败。")
-    if not robot.move_to(view_pose):
+    if not robot.move_to_safe(view_pose):
         raise RuntimeError("自动移动到%s拍照位失败。" % kind)
     time.sleep(max(0.0, float(config.TASK2_SETTLE_SECONDS)))
     print("已到达%s拍照位，开始拍照。" % kind)

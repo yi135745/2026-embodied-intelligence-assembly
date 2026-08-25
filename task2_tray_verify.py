@@ -35,7 +35,7 @@ def main():
             if not robot.available:
                 raise RuntimeError("AUBO未连接，无法移动到托盘拍照位。")
             input("确认到托盘拍照位的路径安全后按回车自动移动...")
-            if not robot.move_to(config.TASK2_TRAY_VIEW_POSE):
+            if not robot.move_to_safe(config.TASK2_TRAY_VIEW_POSE):
                 raise RuntimeError("移动到托盘拍照位失败。")
             print("已到达托盘拍照位，开始拍照。")
 
