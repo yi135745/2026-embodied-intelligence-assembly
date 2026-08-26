@@ -109,6 +109,40 @@ class Robot:
             print("机器人移动失败：" + str(exc))
             return False
 
+    def move_to_safe(self, pose_mm_rad, safe_z=None) -> bool:
+        """安全移动到大范围目标位姿（XYZ毫米，RX/RY/RZ弧度）。
+
+        动作序列：原地升到安全Z -> 安全高度平移到目标XY并转到目标姿态 -> 下降到目标位姿。
+        仅用于拍照点之间等跨区域大范围转移，避免低空水平移动撞击台面物体；
+        抓放动作仍走 pick_and_place。
+        """
+        if not self.available or self.robot_interface is None:
+            print("机器人未连接，跳过安全运动。")
+            return False
+        if not isinstance(pose_mm_rad, (list, tuple)) or len(pose_mm_rad) != 6:
+            print("机器人安全移动目标位姿必须是六个数值。")
+            return False
+
+        target = [float(value) for value in pose_mm_rad]
+        safe = float(config.ROBOT_SAFE_Z if safe_z is None else safe_z)
+        try:
+            current = self.get_current_pose()
+        except Exception as exc:
+            print("读取当前位姿失败，无法规划安全路径：" + str(exc))
+            return False
+
+        # 若当前已高于安全Z，则不下降，用当前高度作为过渡高度。
+        lift_z = max(float(current[2]), safe)
+        rise = [current[0], current[1], lift_z, current[3], current[4], current[5]]
+        hover = [target[0], target[1], lift_z, target[3], target[4], target[5]]
+        descend = [target[0], target[1], target[2], target[3], target[4], target[5]]
+
+        for stage, pose in (("上升", rise), ("平移旋转", hover), ("下降", descend)):
+            if not self.move_to(pose):
+                print("安全移动在%s阶段失败，已终止。" % stage)
+                return False
+        return True
+
     def _wait_until_arrives(self, target_pose) -> bool:
         """轮询 TCP 位姿，位置和姿态都接近目标位姿后才认为移动到位。"""
         start_time = time.monotonic()

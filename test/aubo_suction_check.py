@@ -4,7 +4,7 @@
     python test/aubo_suction_check.py
 
 原地启停测试：
-    1. 在test/test_config.py设置SUCTION_ENABLE_OUTPUT_TEST=True
+    1. 在config.py设置SUCTION_ENABLE_OUTPUT_TEST=True
     2. 运行 python test/aubo_suction_check.py --run
     3. 按提示输入1，分步观察吸盘吸取和泄压动作
 """
@@ -19,7 +19,6 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
 import config  # noqa: E402
-import test_config  # noqa: E402
 from modules.robot import Robot  # noqa: E402
 
 
@@ -78,10 +77,10 @@ def main():
         print("静态读取测试完成，未写入任何工具IO。")
 
         if not args.run:
-            print("如需原地启停测试，请完成test_config安全开关后添加--run。")
+            print("如需原地启停测试，请完成config安全开关后添加--run。")
             return 0
-        if not test_config.SUCTION_ENABLE_OUTPUT_TEST:
-            print("test_config.SUCTION_ENABLE_OUTPUT_TEST=False，已拒绝写IO。")
+        if not config.SUCTION_ENABLE_OUTPUT_TEST:
+            print("config.SUCTION_ENABLE_OUTPUT_TEST=False，已拒绝写IO。")
             return 2
 
         print("\n--- 原地启停测试 ---")

@@ -1,11 +1,17 @@
-import os
-import requests
 import base64
 import json
+import sys
 from pathlib import Path
 
+import requests
 
-API_KEY = os.getenv("DASHSCOPE_API_KEY", "")  # 千问大模型密钥（用环境变量，不要写进这里）
+# 直接运行本文件时，将项目根目录加入模块搜索路径，复用 config 的密钥读取逻辑。
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(PROJECT_ROOT))
+
+import config  # noqa: E402
+
+API_KEY = config.DASHSCOPE_API_KEY  # 从 secrets.json / 环境变量读取，与正式代码一致
 
 # 注意：这里写完整接口
 URL = "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions"

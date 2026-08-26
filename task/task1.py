@@ -42,7 +42,7 @@ def task1_run(voice, vision, robot, llm):
     """
     # ── 阶段 1：机器人移动到任务卡拍照位 ────────────────
     # 功能：机器人到位后相机才能拍到任务卡；连接/移动失败时兜底跳过，继续采集
-    arrived = robot.move_to(config.ROBOT_TARGET)
+    arrived = robot.move_to_safe(config.ROBOT_TARGET)
     if not arrived:
         voice.speak("机器人未到位，改为直接采集")
 

@@ -124,7 +124,7 @@ TTS_RATE = 150  # 正常语速
 # ==============================
 # 3. 海康 MVS 相机
 # ==============================
-CAMERA_IP = "192.168.1.100"   # 实际摄像头 IP，需按现场修改
+CAMERA_IP = "192.168.1.20"   # 实际摄像头 IP，需按现场修改
 # 海康 MVS Python 例程地址：外部软件安装目录，换机器需改成这台机器上 MVS 的 Samples\Python 路径
 MVS_SDK_DIR = r"E:\software\mvs\MVS\Development\Samples\Python"
 MVS_CAPTURE_NAME = str(OUTPUT_DIR / "hik_mvs_capture.jpg")   # 实机拍照保存文件名
@@ -207,8 +207,8 @@ TASK2_COLOR_MAX_CANDIDATES = 10      # 保留额外候选，由联合评分排�
 TASK2_COLOR_BAD_AREA_RATIO = 0.25    # 某轮廓面积低于中位数该比例时视为只识别到边缘
 TASK2_CALIBRATION_FILE = str(RESOURCES_DIR / "visionmaster_task2_calibration.xml")  # VisionMaster 九点标定 XML，现场替换
 TASK2_CALIBRATION_WORLD_SCALE_MM = 10.0  # 当前VM世界坐标-1/0/1使用cm，转成mm
-TASK2_REQUIRE_ALL_COLORS = True
-TASK2_EXECUTE_ROBOT = True
+TASK2_REQUIRE_ALL_COLORS = False  # True：必须识别到六色方块和六色托盘，否则报错；False：允许缺色，现场可调
+TASK2_EXECUTE_ROBOT = False  # True：执行抓放；False：只拍照识别，不移动机器人
 TASK2_REQUIRE_OFFSET_FILE = True  # 坐标逻辑调整后，未生成V2偏差文件时禁止真实抓放
 
 # 三区拍照参数。None 表示沿用全局 MVS_EXPOSURE_TIME / MVS_GAIN。
@@ -273,8 +273,15 @@ TOOL_IO_RELEASE_WAIT_SEC = 0.8
 TOOL_IO_READBACK_TIMEOUT_SEC = 1.0
 TOOL_IO_READBACK_INTERVAL_SEC = 0.05
 
+# 吸盘原地启停实机测试开关（test/aubo_suction_check.py --run 使用）。
+# False：只读 IO，不写输出；改为 True 后仍需 --run 和现场文字确认才真正动作。
+SUCTION_ENABLE_OUTPUT_TEST = True
+
 ROBOT_SPEED = 0.3
 ROBOT_ACCELERATION = 0.3
+# 大范围转移的安全高度（mm）：拍照点之间等跨区域移动时，机械臂先升到该Z再平移/旋转，避免撞击台面物体。
+# 经现场测试约 500mm；按实际工位抬高/降低此值。
+ROBOT_SAFE_Z = 500.0
 ROBOT_WAIT_TIMEOUT = 120.0               # 跨区域长距离运动到位超时（秒）
 ROBOT_POSITION_TOLERANCE = 2.0           # 位置容差（mm）
 ROBOT_ORIENTATION_TOLERANCE = 1.0        # 姿态容差（度）
