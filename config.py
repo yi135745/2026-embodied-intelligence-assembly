@@ -168,7 +168,7 @@ TASK2_OFFSET_FILE = str(DATA_DIR / "task2_offsets_v2.json")  # 坐标逻辑修�
 TASK2_VERIFIED_TRAY_FILE = str(DATA_DIR / "task2_verified_trays.json")  # 独立人工验收后的托盘坐标
 # True：必须读取预处理验收文件，不再移动到托盘拍照或实时识别；文件缺失则报错。
 # False：正式任务现场移动到托盘拍照位，重新拍照并实时识别。
-TASK2_USE_VERIFIED_TRAYS = True  # 读取 data/task2_verified_trays.json；换机器后必须先重新验收再抓放
+TASK2_USE_VERIFIED_TRAYS = False  # 读取 data/task2_verified_trays.json；换机器后必须先重新验收再抓放，False 时现场拍照实时识别。
 
 TASK2_HSV_RANGES = {
     # 当前实拍中紫色H约173，属于HSV环回端；红色只保留0附近，避免抢走紫色。
@@ -208,7 +208,7 @@ TASK2_COLOR_BAD_AREA_RATIO = 0.25    # 某轮廓面积低于中位数该比例�
 TASK2_CALIBRATION_FILE = str(RESOURCES_DIR / "visionmaster_task2_calibration.xml")  # VisionMaster 九点标定 XML，现场替换
 TASK2_CALIBRATION_WORLD_SCALE_MM = 10.0  # 当前VM世界坐标-1/0/1使用cm，转成mm
 TASK2_REQUIRE_ALL_COLORS = False  # True：必须识别到六色方块和六色托盘，否则报错；False：允许缺色，现场可调
-TASK2_EXECUTE_ROBOT = False  # True：执行抓放；False：只拍照识别，不移动机器人
+TASK2_EXECUTE_ROBOT = True  # True：执行抓放；False：只拍照识别，不移动机器人
 TASK2_REQUIRE_OFFSET_FILE = True  # 坐标逻辑调整后，未生成V2偏差文件时禁止真实抓放
 
 # 三区拍照参数。None 表示沿用全局 MVS_EXPOSURE_TIME / MVS_GAIN。
@@ -231,7 +231,7 @@ TASK2_BLOCK_PICK_Z = 28.00
 TASK2_TRAY_PLACE_Z = 30.00
 # True：以 config 里的 TASK2_BLOCK_PICK_Z / TASK2_TRAY_PLACE_Z 为准，忽略偏移文件里自动测量的 Z（XY 偏移仍自动读 JSON）。
 # False：优先使用偏移文件里自动测量的 Z（默认）。现场发现自动测的 Z 偏高吸不住 / 偏低会撞时，改成 True 手动定 Z。
-TASK2_MANUAL_Z_OVERRIDE = False
+TASK2_MANUAL_Z_OVERRIDE = True
 TASK2_PICK_ORIENTATION_RAD = None
 TASK2_PLACE_ORIENTATION_RAD = None
 TASK2_LIFT_DISTANCE_MM = 80.0
@@ -263,7 +263,7 @@ TASK2_TRAY_VIEW_POSE = [-399.28, 178.35, 259.52, 0.000, 0.000, 0.317]
 
 # 已实机测试的末端吸盘Tool IO；不是控制柜Standard DO。
 ROBOT_VACUUM_ENABLED = True
-TOOL_IO_VOLTAGE = 24
+TOOL_IO_VOLTAGE = 12
 TOOL_IO_VENT_INDEX = 0
 TOOL_IO_PUMP_INDEX = 1
 TOOL_IO_VENT_OPEN_LEVEL = True
