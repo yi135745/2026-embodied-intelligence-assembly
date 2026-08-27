@@ -16,8 +16,9 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import config
-from modules.task2_vision import (ColorObjectDetector, VisionTarget, load_task2_offsets,
+from modules.task2_vision import (ColorObjectDetector, load_task2_offsets,
                                   load_task2_tuning, validate_six_colors)
+from modules.pose_records import apply_aubo_pose_records
 
 
 def _capture(vision, output_dir, name, debug_image, exposure_time=None, gain=None):
@@ -45,29 +46,11 @@ def _build_plan(steps, blocks, trays):
     return [{"step": step["step"], "block_color": step["block_color"], "tray_color": step["tray_color"], "pick": block_map[step["block_color"]].to_dict(), "place": tray_map[step["tray_color"]].to_dict(), "robot_status": "pending_calibration_and_aubo"} for step in steps]
 
 
-def _load_verified_trays():
-    path = Path(config.TASK2_VERIFIED_TRAY_FILE)
-    if not config.TASK2_USE_VERIFIED_TRAYS:
-        return None
-    if not path.exists():
-        raise RuntimeError(
-            "已配置TASK2_USE_VERIFIED_TRAYS=True，但找不到%s；"
-            "请先运行task2_tray_verify.py人工验收，或在config.py改为False使用现场识别。" % path
-        )
-    data = json.loads(path.read_text(encoding="utf-8"))
-    trays = [VisionTarget(**item) for item in data.get("targets", [])]
-    validate_six_colors(trays, "人工验收托盘")
-    if any(item.robot_pose is None for item in trays):
-        raise RuntimeError("人工验收托盘文件中存在空机器人坐标，请重新验收。")
-    print("已使用人工验收托盘：%s（%s）" % (path, data.get("verified_at", "时间未知")))
-    print("警告：必须确保托盘自验收后没有移动。")
-    return trays
-
-
 def task2_run(voice, vision, robot, llm):
     """识别任务卡和目标，并在坐标完整时执行六步抓放。"""
     output_dir = Path(config.TASK2_OUTPUT_DIR)
     output_dir.mkdir(parents=True, exist_ok=True)
+    apply_aubo_pose_records()
     load_task2_tuning()
     load_task2_offsets()
     detector = ColorObjectDetector()
@@ -86,13 +69,11 @@ def task2_run(voice, vision, robot, llm):
                                config.TASK2_BLOCK_EXPOSURE_TIME, config.TASK2_BLOCK_GAIN)
         blocks, block_debug = detector.detect(block_image, "方块", output_dir, "blocks")
         cv2.imwrite(str(output_dir / "blocks_detected.jpg"), block_debug)
-        trays = _load_verified_trays()
-        if trays is None:
-            _move_to_view(robot, config.TASK2_TRAY_VIEW_POSE, "托盘拍照位")
-            tray_image = _capture(vision, output_dir, config.TASK2_TRAY_CAPTURE_NAME, config.TASK2_TRAY_DEBUG_IMAGE,
-                                  config.TASK2_TRAY_EXPOSURE_TIME, config.TASK2_TRAY_GAIN)
-            trays, tray_debug = detector.detect(tray_image, "托盘", output_dir, "trays")
-            cv2.imwrite(str(output_dir / "trays_detected.jpg"), tray_debug)
+        _move_to_view(robot, config.TASK2_TRAY_VIEW_POSE, "托盘拍照位")
+        tray_image = _capture(vision, output_dir, config.TASK2_TRAY_CAPTURE_NAME, config.TASK2_TRAY_DEBUG_IMAGE,
+                              config.TASK2_TRAY_EXPOSURE_TIME, config.TASK2_TRAY_GAIN)
+        trays, tray_debug = detector.detect(tray_image, "托盘", output_dir, "trays")
+        cv2.imwrite(str(output_dir / "trays_detected.jpg"), tray_debug)
         if config.TASK2_REQUIRE_ALL_COLORS:
             validate_six_colors(blocks, "方块")
             validate_six_colors(trays, "托盘")

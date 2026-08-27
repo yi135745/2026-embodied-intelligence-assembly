@@ -10,17 +10,12 @@ import cv2
 
 import config
 from modules.robot import Robot
+from modules.pose_records import apply_aubo_pose_records
 from modules.task2_vision import ColorObjectDetector, load_task2_tuning
 from modules.vision import Vision
 
 
 COLORS = ("红色", "橙色", "黄色", "绿色", "蓝色", "紫色")
-
-
-def _origin_for_scene(scene):
-    specific = (config.TASK2_BLOCK_CALIBRATION_ORIGIN_POSE if scene == "block"
-                else config.TASK2_TRAY_CALIBRATION_ORIGIN_POSE)
-    return specific or config.TASK2_CALIBRATION_ORIGIN_POSE
 
 
 def _pose_text(pose):
@@ -29,10 +24,9 @@ def _pose_text(pose):
 
 def _calibrate_scene(scene, color, vision, robot, detector, output_dir, previous_low_pose=None):
     kind = "方块" if scene == "block" else "托盘"
-    origin = _origin_for_scene(scene)
     view_pose = config.TASK2_BLOCK_VIEW_POSE if scene == "block" else config.TASK2_TRAY_VIEW_POSE
-    if origin is None or view_pose is None:
-        raise RuntimeError("请先在config.py填写%s区域标定原点和拍照位。" % kind)
+    if view_pose is None:
+        raise RuntimeError("aubo_poses.json中缺少%s区域拍照位。" % kind)
 
     print("\n========== %s区域偏移标定 ==========" % kind)
     print("程序将自动移动到%s拍照位：%s" % (kind, _pose_text(view_pose)))
@@ -57,7 +51,10 @@ def _calibrate_scene(scene, color, vision, robot, detector, output_dir, previous
         exposure_time=getattr(config, "TASK2_%s_EXPOSURE_TIME" % prefix),
         gain=getattr(config, "TASK2_%s_GAIN" % prefix),
     )
-    targets, annotated = detector.detect(image_path, kind, output_dir, scene)
+    # 正在生成新偏移时不能依赖或校验旧偏移JSON；这里只需要像素中心。
+    targets, annotated = detector.detect(
+        image_path, kind, output_dir, scene, include_robot_pose=False
+    )
     annotated_path = output_dir / (scene + "_offset_detected.jpg")
     cv2.imwrite(str(annotated_path), annotated)
     target = next((item for item in targets if item.color == color), None)
@@ -65,40 +62,43 @@ def _calibrate_scene(scene, color, vision, robot, detector, output_dir, previous
         raise RuntimeError("没有识别到%s%s，请先完成颜色调参。" % (color, kind))
 
     world_xy = detector.transformer.pixel_to_world(*target.pixel_center)
-    predicted_x = float(origin[0]) + world_xy[0]
-    predicted_y = float(origin[1]) + world_xy[1]
+    predicted_x = float(view_pose[0]) + world_xy[0]
+    predicted_y = float(view_pose[1]) + world_xy[1]
     print("参考目标：%s%s" % (color, kind))
     print("像素中心：[%.3f, %.3f]" % target.pixel_center)
     print("矩阵相对XY：[%.3f, %.3f] mm" % world_xy)
     print("未补偿预测XY：[%.3f, %.3f] mm" % (predicted_x, predicted_y))
     print("标注图：" + str(annotated_path.resolve()))
 
-    input("保持目标不动，用示教器将吸盘移到目标真实中心和正确Z高度，确认后按回车读取基座TCP...")
+    input("保持目标不动，用示教器将吸盘移到目标真实XY中心；Z仅为方便对准且不会写入，确认后按回车读取基座TCP...")
     actual_pose = robot.get_current_pose()
     answer = input("读取位姿%s，确认采用请直接回车；输入n取消：" % _pose_text(actual_pose)).strip().lower()
     if answer == "n":
         raise RuntimeError("用户取消%s区域标定。" % kind)
 
     offset = [actual_pose[0] - predicted_x, actual_pose[1] - predicted_y]
-    print("%s区域：XY偏移=[%.3f, %.3f] mm，Z=%.3f mm" %
-          (kind, offset[0], offset[1], actual_pose[2]))
-    return {
+    print("%s区域：XY偏移=[%.3f, %.3f] mm；读取到的Z不写入、不使用。" %
+          (kind, offset[0], offset[1]))
+    record = {
         "%s_reference_color" % scene: color,
         "%s_pixel_center" % scene: list(target.pixel_center),
+        "%s_origin_xy" % scene: list(view_pose[:2]),
+        "%s_view_orientation_rad" % scene: list(view_pose[3:]),
         "%s_predicted_xy" % scene: [predicted_x, predicted_y],
-        "%s_actual_pose" % scene: actual_pose,
         "%s_actual_xy" % scene: actual_pose[:2],
         "%s_xy_offset" % scene: offset,
-        "block_pick_z" if scene == "block" else "tray_place_z": actual_pose[2],
     }
+    # 完整位姿仅在本次进程内用于下一段运动前原地抬升，不写入偏移JSON。
+    return record, actual_pose
 
 
 def main():
     parser = argparse.ArgumentParser(description="连续标定方块区和托盘区，AUBO SDK自动读取实际基座坐标")
-    parser.add_argument("--block-color", choices=COLORS, default="黄色")
-    parser.add_argument("--tray-color", choices=COLORS, default="黄色")
+    parser.add_argument("--block-color", choices=COLORS, default="紫色")
+    parser.add_argument("--tray-color", choices=COLORS, default="紫色")
     args = parser.parse_args()
 
+    apply_aubo_pose_records()
     load_task2_tuning()
     output_dir = Path(config.TASK2_OUTPUT_DIR) / "offset_calibration"
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -108,12 +108,17 @@ def main():
     vision = Vision()
     detector = ColorObjectDetector()
     try:
-        data = {"updated_at": datetime.now().isoformat(timespec="seconds")}
-        block_data = _calibrate_scene("block", args.block_color, vision, robot, detector, output_dir)
+        data = {
+            "updated_at": datetime.now().isoformat(timespec="seconds"),
+            "calibration_world_scale_mm": float(config.TASK2_CALIBRATION_WORLD_SCALE_MM),
+        }
+        block_data, block_low_pose = _calibrate_scene(
+            "block", args.block_color, vision, robot, detector, output_dir
+        )
         data.update(block_data)
-        tray_data = _calibrate_scene(
+        tray_data, _tray_low_pose = _calibrate_scene(
             "tray", args.tray_color, vision, robot, detector, output_dir,
-            previous_low_pose=block_data["block_actual_pose"],
+            previous_low_pose=block_low_pose,
         )
         data.update(tray_data)
 

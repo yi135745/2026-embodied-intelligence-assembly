@@ -13,6 +13,9 @@ import numpy as np
 import config
 
 
+_TASK2_XY_CALIBRATION = None
+
+
 def load_task2_tuning(path=None) -> bool:
     """加载调参工具生成的JSON；文件不存在时继续使用config默认值。"""
     tuning_path = Path(path or config.TASK2_TUNING_FILE)
@@ -43,28 +46,53 @@ def load_task2_tuning(path=None) -> bool:
 
 
 def load_task2_offsets(path=None) -> bool:
-    """加载单点人工对准得到的方块/托盘XY补偿和抓放Z。"""
+    """加载唯一XY标定JSON；不读取、不修改Z或姿态。"""
+    global _TASK2_XY_CALIBRATION
     offset_path = Path(path or config.TASK2_OFFSET_FILE)
     if not offset_path.exists():
+        _TASK2_XY_CALIBRATION = None
         return False
     data = json.loads(offset_path.read_text(encoding="utf-8"))
-    mapping = {
-        "block_xy_offset": "TASK2_BLOCK_XY_OFFSET",
-        "block_pick_z": "TASK2_BLOCK_PICK_Z",
-        "tray_xy_offset": "TASK2_TRAY_XY_OFFSET",
-        "tray_place_z": "TASK2_TRAY_PLACE_Z",
-    }
-    manual_z = getattr(config, "TASK2_MANUAL_Z_OVERRIDE", False)
-    z_keys = {"block_pick_z", "tray_place_z"}
-    for json_key, config_key in mapping.items():
-        if json_key in data:
-            if manual_z and json_key in z_keys:
-                continue
-            setattr(config, config_key, data[json_key])
-    if manual_z:
-        print("已启用手动Z覆盖，忽略偏移文件里的Z：方块抓取Z=%.2f mm，托盘放置Z=%.2f mm" %
-              (config.TASK2_BLOCK_PICK_Z, config.TASK2_TRAY_PLACE_Z))
-    print("已加载任务二偏差文件：" + str(offset_path))
+    saved_scale = data.get("calibration_world_scale_mm")
+    current_scale = float(config.TASK2_CALIBRATION_WORLD_SCALE_MM)
+    if saved_scale is None:
+        raise RuntimeError(
+            "任务二XY标定JSON未记录九点矩阵单位倍率，可能由旧配置生成；"
+            "请重新运行task2_offset_calibrate.py。"
+        )
+    if abs(float(saved_scale) - current_scale) > 1e-9:
+        raise RuntimeError(
+            "任务二XY标定JSON的九点矩阵倍率为%s，当前配置为%s；请重新标定。" %
+            (saved_scale, current_scale)
+        )
+    required = ("block_origin_xy", "block_xy_offset", "block_view_orientation_rad",
+                "tray_origin_xy", "tray_xy_offset", "tray_view_orientation_rad")
+    missing = [key for key in required if key not in data]
+    if missing:
+        raise RuntimeError("任务二XY标定JSON缺少字段：%s" % missing)
+    calibration = {}
+    for key in required:
+        value = data[key]
+        expected_length = 3 if key.endswith("orientation_rad") else 2
+        if not isinstance(value, list) or len(value) != expected_length:
+            raise RuntimeError("任务二XY标定字段%s必须是%d个数。" % (key, expected_length))
+        calibration[key] = [float(value[0]), float(value[1])]
+        if expected_length == 3:
+            calibration[key].append(float(value[2]))
+    for prefix, view_pose in (("block", config.TASK2_BLOCK_VIEW_POSE),
+                              ("tray", config.TASK2_TRAY_VIEW_POSE)):
+        if view_pose is None:
+            raise RuntimeError("尚未从aubo_poses.json加载%s拍照位。" % prefix)
+        saved_xy = calibration[prefix + "_origin_xy"]
+        saved_orientation = calibration[prefix + "_view_orientation_rad"]
+        xy_error = max(abs(saved_xy[i] - float(view_pose[i])) for i in range(2))
+        angle_error = max(abs(saved_orientation[i] - float(view_pose[i + 3])) for i in range(3))
+        if xy_error > 0.5 or angle_error > 0.005:
+            raise RuntimeError(
+                "%s拍照位已改变，但XY标定JSON仍属于旧位姿；请重新运行task2_offset_calibrate.py。" % prefix
+            )
+    _TASK2_XY_CALIBRATION = calibration
+    print("已加载任务二XY标定文件（Z仍取config）：" + str(offset_path))
     return True
 
 
@@ -100,10 +128,7 @@ class CoordinateTransformer:
 
     @property
     def ready(self) -> bool:
-        origins_ready = (config.TASK2_CALIBRATION_ORIGIN_POSE is not None or
-                         (config.TASK2_BLOCK_CALIBRATION_ORIGIN_POSE is not None and
-                          config.TASK2_TRAY_CALIBRATION_ORIGIN_POSE is not None))
-        return self.matrix is not None and origins_ready
+        return self.matrix is not None and load_task2_offsets()
 
     def pixel_to_world(self, pixel_x: float, pixel_y: float) -> Optional[Tuple[float, float]]:
         if self.matrix is None:
@@ -117,17 +142,21 @@ class CoordinateTransformer:
     def pixel_to_robot(self, pixel_x: float, pixel_y: float, kind: str) -> Optional[List[float]]:
         """返回机器人位姿，XYZ为mm，姿态为rad；未填写人工基准时返回None。"""
         world = self.pixel_to_world(pixel_x, pixel_y)
-        scene_origin = (config.TASK2_BLOCK_CALIBRATION_ORIGIN_POSE if kind == "方块"
-                        else config.TASK2_TRAY_CALIBRATION_ORIGIN_POSE)
-        origin = scene_origin or config.TASK2_CALIBRATION_ORIGIN_POSE
-        if world is None or origin is None:
+        global _TASK2_XY_CALIBRATION
+        if _TASK2_XY_CALIBRATION is None:
+            load_task2_offsets()
+        if world is None or _TASK2_XY_CALIBRATION is None:
             return None
-        offset = config.TASK2_BLOCK_XY_OFFSET if kind == "方块" else config.TASK2_TRAY_XY_OFFSET
+        prefix = "block" if kind == "方块" else "tray"
+        origin = _TASK2_XY_CALIBRATION[prefix + "_origin_xy"]
+        offset = _TASK2_XY_CALIBRATION[prefix + "_xy_offset"]
         z = config.TASK2_BLOCK_PICK_Z if kind == "方块" else config.TASK2_TRAY_PLACE_Z
-        orientation = config.TASK2_PICK_ORIENTATION_RAD if kind == "方块" else config.TASK2_PLACE_ORIENTATION_RAD
+        view_pose = config.TASK2_BLOCK_VIEW_POSE if kind == "方块" else config.TASK2_TRAY_VIEW_POSE
         if z is None:
             return None
-        orientation = list(origin[3:] if orientation is None else orientation)
+        if view_pose is None:
+            return None
+        orientation = list(view_pose[3:])
         return [origin[0] + world[0] + offset[0], origin[1] + world[1] + offset[1], float(z)] + orientation
 
 
@@ -137,7 +166,9 @@ class ColorObjectDetector:
     def __init__(self, transformer=None):
         self.transformer = transformer or CoordinateTransformer(config.TASK2_CALIBRATION_FILE)
 
-    def detect(self, image_path, kind: str, debug_dir=None, debug_prefix=None):
+    def detect(self, image_path, kind: str, debug_dir=None, debug_prefix=None,
+               include_robot_pose: bool = True):
+        """检测目标；偏移标定时可跳过依赖旧偏移JSON的机器人位姿换算。"""
         if kind not in ("方块", "托盘"):
             raise ValueError("kind 必须是方块或托盘")
         image = cv2.imread(str(image_path))
@@ -170,7 +201,9 @@ class ColorObjectDetector:
             contour = max(candidates, key=cv2.contourArea)
             rect = cv2.minAreaRect(contour)
             (cx, cy), _, angle = rect
-            target = VisionTarget(kind, color, (float(cx), float(cy)), float(cv2.contourArea(contour)), float(angle), self.transformer.pixel_to_robot(cx, cy, kind))
+            robot_pose = self.transformer.pixel_to_robot(cx, cy, kind) if include_robot_pose else None
+            target = VisionTarget(kind, color, (float(cx), float(cy)),
+                                  float(cv2.contourArea(contour)), float(angle), robot_pose)
             targets.append(target)
             box = cv2.boxPoints(rect).astype(np.int32)
             cv2.drawContours(annotated, [box], 0, (255, 255, 255), 2)
@@ -179,7 +212,9 @@ class ColorObjectDetector:
                         cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
         fallback = None
         if getattr(config, "TASK2_COLOR_FALLBACK_ENABLED", True):
-            fallback = self._combined_color_fallback(image, hsv, kind, hsv_ranges, color_masks, kernel)
+            fallback = self._combined_color_fallback(
+                image, hsv, kind, hsv_ranges, color_masks, kernel, include_robot_pose
+            )
         if fallback is not None:
             targets, annotated = fallback
             if debug_path:
@@ -197,7 +232,8 @@ class ColorObjectDetector:
         areas = np.asarray([target.area for target in targets], dtype=np.float64)
         return bool(areas.min() < np.median(areas) * float(config.TASK2_COLOR_BAD_AREA_RATIO))
 
-    def _combined_color_fallback(self, image, hsv, kind, hsv_ranges, color_masks, kernel):
+    def _combined_color_fallback(self, image, hsv, kind, hsv_ranges, color_masks, kernel,
+                                 include_robot_pose=True):
         """宽掩膜找六个物体，再用三种颜色证据进行六色一对一全局分配。"""
         broad = cv2.inRange(
             hsv,
@@ -278,8 +314,9 @@ class ColorObjectDetector:
             color = colors[color_index]
             rect = cv2.minAreaRect(contour)
             (cx, cy), _, angle = rect
+            robot_pose = self.transformer.pixel_to_robot(cx, cy, kind) if include_robot_pose else None
             target = VisionTarget(kind, color, (float(cx), float(cy)), float(cv2.contourArea(contour)),
-                                  float(angle), self.transformer.pixel_to_robot(cx, cy, kind))
+                                  float(angle), robot_pose)
             targets.append(target)
             box = cv2.boxPoints(rect).astype(np.int32)
             cv2.drawContours(annotated, [box], 0, (255, 255, 255), 2)

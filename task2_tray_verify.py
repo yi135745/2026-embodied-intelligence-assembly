@@ -1,4 +1,4 @@
-"""正式任务前单独检测并人工验收托盘；验收结果可由任务二直接复用。"""
+"""托盘HSV与中心识别独立调试工具；输出结果不接入正式任务。"""
 
 import argparse
 import json
@@ -9,6 +9,7 @@ import cv2
 
 import config
 from modules.robot import Robot
+from modules.pose_records import apply_aubo_pose_records
 from modules.task2_vision import (ColorObjectDetector, load_task2_offsets,
                                   load_task2_tuning, validate_six_colors)
 from modules.vision import Vision
@@ -23,6 +24,7 @@ def main():
     parser.add_argument("--no-show", action="store_true", help="不弹出OpenCV预览窗口")
     args = parser.parse_args()
 
+    apply_aubo_pose_records()
     load_task2_tuning()
     load_task2_offsets()
     output_dir = Path(config.TASK2_OUTPUT_DIR) / "tray_verification"
@@ -67,20 +69,29 @@ def main():
         if not args.no_show:
             cv2.destroyAllWindows()
         if answer != "yes":
-            print("已取消，正式任务不会更新托盘验收结果。")
+            print("已取消，本次不更新托盘调试记录。")
             return
 
         data = {
             "verified_at": datetime.now().isoformat(timespec="seconds"),
             "source_image": str(Path(image_path).resolve()),
             "annotated_image": str(annotated_path.resolve()),
-            "tray_view_pose": config.TASK2_TRAY_VIEW_POSE,
-            "targets": [item.to_dict() for item in targets],
+            # 只保存视觉调试结果，不保存或提供正式任务机器人坐标。
+            "targets": [
+                {
+                    "kind": item.kind,
+                    "color": item.color,
+                    "pixel_center": list(item.pixel_center),
+                    "area": item.area,
+                    "angle_deg": item.angle_deg,
+                }
+                for item in targets
+            ],
         }
         verified_path = Path(config.TASK2_VERIFIED_TRAY_FILE)
         verified_path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
-        print("托盘验收结果已保存：" + str(verified_path.resolve()))
-        print("正式任务将直接复用；托盘一旦移动，请重新运行本程序。")
+        print("托盘HSV/中心调试记录已保存：" + str(verified_path.resolve()))
+        print("该文件仅供人工检查，正式任务仍会现场重新拍照识别。")
     finally:
         if robot is not None:
             robot.disconnect()

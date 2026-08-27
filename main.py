@@ -13,6 +13,7 @@ from modules.voice import Voice
 from modules.vision import Vision
 from modules.robot import Robot
 from modules.llm import LLM
+from modules.pose_records import apply_aubo_pose_records
 
 from task.task1 import task1_run
 
@@ -24,6 +25,7 @@ except ImportError:
 
 
 def main():
+    apply_aubo_pose_records()
     voice = Voice()
     vision = Vision()
     robot = Robot()

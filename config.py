@@ -165,10 +165,10 @@ TASK2_TRAY_CAPTURE_NAME = "task2_trays.jpg"
 TASK2_OUTPUT_DIR = str(OUTPUT_DIR / "task2")
 TASK2_TUNING_FILE = str(DATA_DIR / "task2_tuning.json")  # 独立调参工具保存；存在时自动覆盖下列默认参数
 TASK2_OFFSET_FILE = str(DATA_DIR / "task2_offsets_v2.json")  # 坐标逻辑修正后的偏差文件
-TASK2_VERIFIED_TRAY_FILE = str(DATA_DIR / "task2_verified_trays.json")  # 独立人工验收后的托盘坐标
-# True：必须读取预处理验收文件，不再移动到托盘拍照或实时识别；文件缺失则报错。
-# False：正式任务现场移动到托盘拍照位，重新拍照并实时识别。
-TASK2_USE_VERIFIED_TRAYS = False  # 读取 data/task2_verified_trays.json；换机器后必须先重新验收再抓放，False 时现场拍照实时识别。
+TASK2_VERIFIED_TRAY_FILE = str(DATA_DIR / "task2_verified_trays.json")  # 仅供独立HSV/中心调试，正式任务不读取
+
+# AUBO四点位姿唯一数据源；不存在开关，任务运行时必须读取该文件。
+AUBO_POSE_JSON_FILE = str(DATA_DIR / "aubo_poses.json")
 
 TASK2_HSV_RANGES = {
     # 当前实拍中紫色H约173，属于HSV环回端；红色只保留0附近，避免抢走紫色。
@@ -206,7 +206,7 @@ TASK2_COLOR_MAX_AREA_JUMP = 1.8      # 最大候选若远大于次大候选，�
 TASK2_COLOR_MAX_CANDIDATES = 10      # 保留额外候选，由联合评分排除台外同色杂物
 TASK2_COLOR_BAD_AREA_RATIO = 0.25    # 某轮廓面积低于中位数该比例时视为只识别到边缘
 TASK2_CALIBRATION_FILE = str(RESOURCES_DIR / "visionmaster_task2_calibration.xml")  # VisionMaster 九点标定 XML，现场替换
-TASK2_CALIBRATION_WORLD_SCALE_MM = 10.0  # 当前VM世界坐标-1/0/1使用cm，转成mm
+TASK2_CALIBRATION_WORLD_SCALE_MM = 1.0  # 当前VM九点标定矩阵已直接输出mm
 TASK2_REQUIRE_ALL_COLORS = False  # True：必须识别到六色方块和六色托盘，否则报错；False：允许缺色，现场可调
 TASK2_EXECUTE_ROBOT = True  # True：执行抓放；False：只拍照识别，不移动机器人
 TASK2_REQUIRE_OFFSET_FILE = True  # 坐标逻辑调整后，未生成V2偏差文件时禁止真实抓放
@@ -221,19 +221,10 @@ TASK2_BLOCK_GAIN = None
 TASK2_TRAY_EXPOSURE_TIME = None
 TASK2_TRAY_GAIN = None
 
-# 标定坐标系原点对应的机器人位姿；XYZ为mm，RX/RY/RZ为rad。
-TASK2_CALIBRATION_ORIGIN_POSE = [-418.95, -90.18, 259.58, 0.000, 0.000, 0.317]
-TASK2_BLOCK_CALIBRATION_ORIGIN_POSE = [-422.35, -120.71, 259.54, 0.000, 0.000, 0.317]
-TASK2_TRAY_CALIBRATION_ORIGIN_POSE = [-399.28, 178.35, 259.52, 0.000, 0.000, 0.317]
-TASK2_BLOCK_XY_OFFSET = [0.0, 0.0]
-TASK2_TRAY_XY_OFFSET = [0.0, 0.0]
-TASK2_BLOCK_PICK_Z = 28.00
+# XY标定原点和XY偏移只保存在data/task2_offsets_v2.json，不在config保留副本。
+TASK2_BLOCK_PICK_Z = 25.00
 TASK2_TRAY_PLACE_Z = 30.00
-# True：以 config 里的 TASK2_BLOCK_PICK_Z / TASK2_TRAY_PLACE_Z 为准，忽略偏移文件里自动测量的 Z（XY 偏移仍自动读 JSON）。
-# False：优先使用偏移文件里自动测量的 Z（默认）。现场发现自动测的 Z 偏高吸不住 / 偏低会撞时，改成 True 手动定 Z。
-TASK2_MANUAL_Z_OVERRIDE = True
-TASK2_PICK_ORIENTATION_RAD = None
-TASK2_PLACE_ORIENTATION_RAD = None
+# Z只从本文件读取；抓取/放置姿态分别取aubo_poses.json中的方块/托盘拍照姿态。
 TASK2_LIFT_DISTANCE_MM = 80.0
 TASK2_SETTLE_SECONDS = 0.8
 TASK2_CARD_PROMPT = (
@@ -254,16 +245,17 @@ ROBOT_PASSWORD = "123456"
 ROBOT_TIMEOUT_MS = 5000                  # SDK 请求超时（毫秒）
 
 # 所有位姿统一为：[x,y,z,rx,ry,rz]，XYZ毫米，RX/RY/RZ弧度。（任务一位姿）
-ROBOT_TARGET = [-422.35, -120.71, 259.54, -0.001, -0.002, 0.136]
+ROBOT_TARGET = None  # 运行时强制从data/aubo_poses.json读取
 
 # 任务二三区拍照位；None时跳过移动，便于先测固定相机或调试图。
-TASK2_CARD_VIEW_POSE = [-172.88, -27.56, 259.54, 0.000, 0.000, 0.317]
-TASK2_BLOCK_VIEW_POSE = [-422.35, -120.71, 259.54, 0.000, 0.000, 0.317]
-TASK2_TRAY_VIEW_POSE = [-399.28, 178.35, 259.52, 0.000, 0.000, 0.317]
+TASK2_CARD_VIEW_POSE = None   # 运行时强制从data/aubo_poses.json读取
+TASK2_BLOCK_VIEW_POSE = None
+TASK2_TRAY_VIEW_POSE = None
 
 # 已实机测试的末端吸盘Tool IO；不是控制柜Standard DO。
 ROBOT_VACUUM_ENABLED = True
-TOOL_IO_VOLTAGE = 12
+TOOL_IO_VOLTAGE = 24
+TOOL_IO_CONFIGURE_VOLTAGE = True  # False时跳过公共电压设置，仅控制外部供电的IO0/IO1
 TOOL_IO_VENT_INDEX = 0
 TOOL_IO_PUMP_INDEX = 1
 TOOL_IO_VENT_OPEN_LEVEL = True
@@ -274,14 +266,14 @@ TOOL_IO_READBACK_TIMEOUT_SEC = 1.0
 TOOL_IO_READBACK_INTERVAL_SEC = 0.05
 
 # 吸盘原地启停实机测试开关（test/aubo_suction_check.py --run 使用）。
-# False：只读 IO，不写输出；改为 True 后仍需 --run 和现场文字确认才真正动作。
+# False：只读 IO，不写输出；改为 True 可在实机测试吸盘启停。
 SUCTION_ENABLE_OUTPUT_TEST = True
 
 ROBOT_SPEED = 0.3
 ROBOT_ACCELERATION = 0.3
 # 大范围转移的安全高度（mm）：拍照点之间等跨区域移动时，机械臂先升到该Z再平移/旋转，避免撞击台面物体。
 # 经现场测试约 500mm；按实际工位抬高/降低此值。
-ROBOT_SAFE_Z = 500.0
+ROBOT_SAFE_Z = 350
 ROBOT_WAIT_TIMEOUT = 120.0               # 跨区域长距离运动到位超时（秒）
 ROBOT_POSITION_TOLERANCE = 2.0           # 位置容差（mm）
 ROBOT_ORIENTATION_TOLERANCE = 1.0        # 姿态容差（度）

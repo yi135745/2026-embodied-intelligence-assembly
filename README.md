@@ -87,11 +87,14 @@ resources/modelscope/hub/models/iic/SenseVoiceSmall/
 | `ROBOT_IP` | 遨博机器人 IP | 实机 IP；注释里另有虚拟机器人 IP 供调试 |
 | `ROBOT_PORT` / `ROBOT_USER` / `ROBOT_PASSWORD` / `ROBOT_NAME` | 机器人连接参数 | 默认 `30004` / `aubo` / `123456` / `rob1`，按现场改 |
 | `ROBOT_TARGET` | 任务卡一拍照位（六维位姿） | **需示教标定** |
+| `ROBOT_SAFE_Z` | 跨区域转移安全高度（mm） | 拍照位之间移动先升到该高度再平移/转向，避免低空撞台面，见下方「安全运动」 |
 | `TASK2_CARD_VIEW_POSE` / `TASK2_BLOCK_VIEW_POSE` / `TASK2_TRAY_VIEW_POSE` | 任务二三区拍照位 | **需示教标定** |
 | `TASK2_CALIBRATION_ORIGIN_POSE` / `TASK2_BLOCK_CALIBRATION_ORIGIN_POSE` / `TASK2_TRAY_CALIBRATION_ORIGIN_POSE` | 三区标定原点位姿 | **需示教标定** |
 | `ASR_MODEL_DIR` | 语音识别模型目录 | 已按项目根推导，一般无需改 |
 
 > 位姿格式统一为 `[x, y, z, rx, ry, rz]`，XYZ 单位 mm、RX/RY/RZ 单位弧度。**仓库里的位姿值是实验室那台机器标出来的**，换机器/换工位后必须重新示教标定（见「第 7 步」）。
+
+> **安全运动（跨区域转移）**：机械臂在拍照位之间做大范围转移时走 `Robot.move_to_safe()`，而不是单点 `move_to()`——先原地升到安全高度 `ROBOT_SAFE_Z`（默认 500mm），在安全高度平移到目标 XY 并转到目标姿态，最后下降到目标位姿，避免低空水平移动撞到台面上的方块/托盘。**抓放动作仍走 `pick_and_place()`**，两者分工不同。
 
 ## 6. 配置密钥（secrets.json）
 
@@ -132,19 +135,19 @@ resources/modelscope/hub/models/iic/SenseVoiceSmall/
 
 > 建议的**安全调试顺序**：先把 `config.TASK2_EXECUTE_ROBOT = False` 只测视觉（不动机械臂），视觉通了再标定，最后改回 `True` 开真抓放。
 
-## 8. 确认开关（已默认 True，代表正式运行模式）
+## 8. 运行模式开关
 
-`config.py` 里与「直接跑通」相关的开关目前**都已设成 True**，配完现场参数即可直接运行：
+`config.py` 里与「直接跑通」相关的开关目前已按**现场抓放模式**配置好，配完现场参数即可直接运行：
 
 | 开关 | 值 | 作用 |
 |------|----|------|
-| `TASK2_USE_VERIFIED_TRAYS` | `True` | 任务二读人工验收托盘坐标（否则现场重新识别托盘） |
-| `TASK2_REQUIRE_ALL_COLORS` | `True` | 六色必须齐全，缺色报错 |
+| `TASK2_USE_VERIFIED_TRAYS` | `False` | 任务二现场拍照实时识别托盘（`True` 时改读人工验收文件） |
+| `TASK2_REQUIRE_ALL_COLORS` | `False` | 六色必须齐全校验（`True` 缺色报错；`False` 允许缺色，现场可调） |
 | `TASK2_COLOR_FALLBACK_ENABLED` | `True` | HSV 检测异常时启用六色联合兜底 |
 | `TASK2_REQUIRE_OFFSET_FILE` | `True` | 必须有 `data/task2_offsets_v2.json` 才允许真实抓放（防误用旧坐标） |
-| `TASK2_MANUAL_Z_OVERRIDE` | `False` | 手动定抓放 Z（`True` 时用 config 的 Z 覆盖偏移文件里的 Z，XY 仍自动读 JSON） |
+| `TASK2_MANUAL_Z_OVERRIDE` | `True` | 手动定抓放 Z（`True` 时用 config 的 Z 覆盖偏移文件里的 Z，XY 仍自动读 JSON） |
 | `TASK2_EXECUTE_ROBOT` | `True` | 执行真实机械臂抓放（临时调视觉时可改 `False`） |
-| `ROBOT_VACUUM_ENABLED` | `True` | 启用末端吸盘 Tool IO |
+| `ROBOT_VACUUM_ENABLED` | `True` | 启用末端吸盘 Tool IO（实机 12V） |
 
 ## 9. 运行
 

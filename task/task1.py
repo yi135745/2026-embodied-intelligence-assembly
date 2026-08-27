@@ -21,6 +21,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import config
+from modules.pose_records import apply_aubo_pose_records
 
 
 def task1_run(voice, vision, robot, llm):
@@ -40,6 +41,7 @@ def task1_run(voice, vision, robot, llm):
     输出：
         无。识别结果通过 voice.speak 直接播报，执行完毕后返回 main.py。
     """
+    apply_aubo_pose_records()
     # ── 阶段 1：机器人移动到任务卡拍照位 ────────────────
     # 功能：机器人到位后相机才能拍到任务卡；连接/移动失败时兜底跳过，继续采集
     arrived = robot.move_to_safe(config.ROBOT_TARGET)

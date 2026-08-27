@@ -1,8 +1,9 @@
 """机器人模块：遨博 AUBO 机械臂连接与直线运动。
 
 对外接口：
-    Robot.move_to(pose_mm_rad) -> bool  移动到位姿（XYZ毫米，姿态弧度），返回是否到位
-    Robot.disconnect()                  释放连接
+    Robot.move_to(pose_mm_rad) -> bool        移动到位姿（XYZ毫米，姿态弧度），返回是否到位
+    Robot.move_to_safe(pose_mm_rad) -> bool   安全移动到目标位姿（先升安全Z，再平移/转向，后下降）
+    Robot.disconnect()                         释放连接
 
 连接失败不抛异常，置 available=False（无臂模式），供任务流程兜底跳过运动。
 """
@@ -92,13 +93,19 @@ class Robot:
             target_rx, target_ry, target_rz = [float(value) for value in pose_mm_rad[3:]]
             target_pose = [target_x, target_y, target_z, target_rx, target_ry, target_rz]
 
-            self.robot_interface.getMotionControl().moveLine(
+            # AUBO签名：moveLine(pose, acceleration, velocity, blend_radius, duration)。
+            # duration=0时由速度/加速度自动计算轨迹时间；True会被当作1秒而不是阻塞开关。
+            result = self.robot_interface.getMotionControl().moveLine(
                 target_pose,
-                config.ROBOT_SPEED,
                 config.ROBOT_ACCELERATION,
+                config.ROBOT_SPEED,
                 0.0,
-                True,
+                0.0,
             )
+            print("AUBO moveLine SDK返回：%r" % result)
+            # 13表示目标路径过短、控制器忽略请求；仍由实际TCP到位检查决定成功与否。
+            if result not in (None, 0, 13):
+                raise RuntimeError("moveLine返回错误码：%r" % result)
             arrived = self._wait_until_arrives(target_pose)
             if arrived:
                 print("机器人已移动到位姿：" + pose_text)
@@ -201,21 +208,26 @@ class Robot:
             raise RuntimeError("%s回读不一致：期望%s，实际%s。" % (label, expected, actual))
 
     def configure_suction(self) -> bool:
-        """配置已实机验证的末端Tool IO：24V、输出方向、手动输出模式。"""
+        """配置已实机验证的末端Tool IO：12V、输出方向、手动输出模式。"""
         if not self.available or self.robot_interface is None:
             print("机器人未连接，无法配置吸盘Tool IO。")
             return False
         try:
             io_control = self.robot_interface.getIoControl()
-            self._require_zero_result(
-                io_control.setToolVoltageOutputDomain(int(config.TOOL_IO_VOLTAGE)),
-                "设置工具端电压",
-            )
-            self._wait_for_io_value(
-                lambda: int(io_control.getToolVoltageOutputDomain()),
-                int(config.TOOL_IO_VOLTAGE),
-                "工具端电压",
-            )
+            if config.TOOL_IO_CONFIGURE_VOLTAGE:
+                self._require_zero_result(
+                    io_control.setToolVoltageOutputDomain(int(config.TOOL_IO_VOLTAGE)),
+                    "设置工具端电压",
+                )
+                self._wait_for_io_value(
+                    lambda: int(io_control.getToolVoltageOutputDomain()),
+                    int(config.TOOL_IO_VOLTAGE),
+                    "工具端电压",
+                )
+            else:
+                actual_voltage = io_control.getToolVoltageOutputDomain()
+                print("跳过工具端公共电压设置，当前回读=%sV；仅控制外部供电的Tool IO。" %
+                      actual_voltage)
             for index, label in (
                 (config.TOOL_IO_VENT_INDEX, "泄压阀"),
                 (config.TOOL_IO_PUMP_INDEX, "真空泵"),
@@ -242,8 +254,10 @@ class Robot:
                                 (label, index, actual_state)
                             )
             self._suction_configured = True
-            print("吸盘末端Tool IO配置完成：%dV，泄压阀IO%d，气泵IO%d。" %
-                  (config.TOOL_IO_VOLTAGE, config.TOOL_IO_VENT_INDEX, config.TOOL_IO_PUMP_INDEX))
+            voltage_text = ("SDK设置%dV" % config.TOOL_IO_VOLTAGE
+                            if config.TOOL_IO_CONFIGURE_VOLTAGE else "跳过公共电压设置")
+            print("吸盘末端Tool IO配置完成：%s，泄压阀IO%d，气泵IO%d。" %
+                  (voltage_text, config.TOOL_IO_VENT_INDEX, config.TOOL_IO_PUMP_INDEX))
             return True
         except Exception as exc:
             self._suction_configured = False
