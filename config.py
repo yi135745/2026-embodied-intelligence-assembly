@@ -222,8 +222,8 @@ TASK2_TRAY_EXPOSURE_TIME = None
 TASK2_TRAY_GAIN = None
 
 # XY标定原点和XY偏移只保存在data/task2_offsets_v2.json，不在config保留副本。
-TASK2_BLOCK_PICK_Z = 20
-TASK2_TRAY_PLACE_Z = 22
+TASK2_BLOCK_PICK_Z = 173
+TASK2_TRAY_PLACE_Z = 180
 # Z只从本文件读取；抓取/放置姿态分别取aubo_poses.json中的方块/托盘拍照姿态。
 TASK2_LIFT_DISTANCE_MM = 80.0
 TASK2_SETTLE_SECONDS = 0.8
@@ -273,7 +273,7 @@ ROBOT_SPEED = 0.3
 ROBOT_ACCELERATION = 0.3
 # 大范围转移的安全高度（mm）：拍照点之间等跨区域移动时，机械臂先升到该Z再平移/旋转，避免撞击台面物体。
 # 经现场测试约 500mm；按实际工位抬高/降低此值。
-ROBOT_SAFE_Z = 300
+ROBOT_SAFE_Z = 400
 ROBOT_WAIT_TIMEOUT = 120.0               # 跨区域长距离运动到位超时（秒）
 ROBOT_POSITION_TOLERANCE = 2.0           # 位置容差（mm）
 ROBOT_ORIENTATION_TOLERANCE = 1.0        # 姿态容差（度）

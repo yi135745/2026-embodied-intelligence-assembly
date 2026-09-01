@@ -25,15 +25,28 @@ def main():
     if not robot.available:
         raise RuntimeError("AUBO未连接，无法测试IO。")
     try:
-        input("确认周围安全后按回车：开启气泵3秒...")
+        robot.print_tool_io_status("连接后的初始状态")
+        input("确认机器人已完全上电，按回车：按官方接口配置Tool IO...")
+        if not robot.configure_suction():
+            raise RuntimeError("Tool IO配置失败；请根据上方具体步骤排查。")
+        robot.print_tool_io_status("配置后、动作前")
+
+        input("按回车：关闭泄压阀并开启气泵3秒...")
         if not robot.vacuum_on():
-            raise RuntimeError("气泵开启调用失败。")
+            robot.print_tool_io_status("气泵开启失败后的状态")
+            raise RuntimeError("气泵开启失败；请保留上方返回码、方向、Runstate和位图。")
+        robot.print_tool_io_status("气泵开启后的状态")
         time.sleep(3.0)
         input("按回车：关闭气泵并开启泄压阀...")
         if not robot.vacuum_off():
-            raise RuntimeError("吸盘释放调用失败。")
+            robot.print_tool_io_status("吸盘释放失败后的状态")
+            raise RuntimeError("吸盘释放失败；请保留上方返回码、方向、Runstate和位图。")
+        robot.print_tool_io_status("测试结束状态")
         print("IO测试完成。请对照气泵声音、末端Tool IO状态和控制台回读结果。")
     finally:
+        if robot.available and robot._suction_configured:
+            print("退出前执行一次停泵和泄压。")
+            robot.vacuum_off()
         robot.disconnect()
 
 

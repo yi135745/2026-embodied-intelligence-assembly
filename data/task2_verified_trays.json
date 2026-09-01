@@ -1,5 +1,5 @@
 {
-  "verified_at": "2026-08-28T03:16:18",
+  "verified_at": "2026-08-30T12:49:42",
   "source_image": "E:\\project_test\\project_all\\output\\task2\\tray_verification\\verified_tray_raw.jpg",
   "annotated_image": "E:\\project_test\\project_all\\output\\task2\\tray_verification\\verified_tray_detected.jpg",
   "targets": [
@@ -7,61 +7,61 @@
       "kind": "托盘",
       "color": "红色",
       "pixel_center": [
-        2342.951171875,
-        647.849609375
+        905.5806884765625,
+        1321.918212890625
       ],
-      "area": 80932.5,
-      "angle_deg": 0.22646433115005493
+      "area": 62722.5,
+      "angle_deg": 89.64191436767578
     },
     {
       "kind": "托盘",
       "color": "橙色",
       "pixel_center": [
-        2335.90673828125,
-        1341.396240234375
+        905.3260498046875,
+        698.6707763671875
       ],
-      "area": 80023.0,
-      "angle_deg": 0.3580939471721649
+      "area": 63121.5,
+      "angle_deg": 89.72187042236328
     },
     {
       "kind": "托盘",
       "color": "黄色",
       "pixel_center": [
-        1555.6094970703125,
-        644.8878173828125
+        1607.4998779296875,
+        1314.9998779296875
       ],
-      "area": 77913.0,
-      "angle_deg": 0.5405101776123047
+      "area": 63161.0,
+      "angle_deg": -0.0
     },
     {
       "kind": "托盘",
       "color": "绿色",
       "pixel_center": [
-        1547.841552734375,
-        1332.813720703125
+        1606.0,
+        693.0
       ],
-      "area": 74281.5,
-      "angle_deg": 0.6820604205131531
+      "area": 61961.0,
+      "angle_deg": 90.0
     },
     {
       "kind": "托盘",
       "color": "蓝色",
       "pixel_center": [
-        782.5,
-        640.5
+        2309.999755859375,
+        1311.4998779296875
       ],
-      "area": 74763.0,
+      "area": 62677.0,
       "angle_deg": 90.0
     },
     {
       "kind": "托盘",
       "color": "紫色",
       "pixel_center": [
-        777.3209838867188,
-        1322.052001953125
+        118.5,
+        1979.5
       ],
-      "area": 73662.5,
-      "angle_deg": 0.5115559101104736
+      "area": 13552.5,
+      "angle_deg": 90.0
     }
   ]
 }

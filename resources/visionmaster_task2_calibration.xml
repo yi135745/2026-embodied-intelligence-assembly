@@ -2,13 +2,13 @@
 <CalibInfo>
     <CalibInputParam>
         <CalibParam ParamName="CreateCalibTime" DataType="string">
-            <ParamValue>2026-08-28 22:00:59</ParamValue>
+            <ParamValue>2026-08-30 12:34:18</ParamValue>
         </CalibParam>
         <CalibParam ParamName="CalibType" DataType="string">
             <ParamValue>NPointCalib</ParamValue>
         </CalibParam>
         <CalibParam ParamName="TransNum" DataType="int">
-            <ParamValue>45</ParamValue>
+            <ParamValue>9</ParamValue>
         </CalibParam>
         <CalibParam ParamName="RotNum" DataType="int">
             <ParamValue>0</ParamValue>
@@ -17,477 +17,117 @@
             <ParamValue>0</ParamValue>
         </CalibParam>
         <CalibParam ParamName="TransError" DataType="float">
-            <ParamValue>3.741687971</ParamValue>
+            <ParamValue>0.2420883557</ParamValue>
         </CalibParam>
         <CalibParam ParamName="RotError" DataType="float">
             <ParamValue>-999</ParamValue>
         </CalibParam>
         <CalibParam ParamName="TransWorldError" DataType="float">
-            <ParamValue>0.4255518124</ParamValue>
+            <ParamValue>0.02836076153</ParamValue>
         </CalibParam>
         <CalibParam ParamName="RotWorldError" DataType="float">
             <ParamValue>-999</ParamValue>
         </CalibParam>
         <CalibParam ParamName="PixelPrecisionX" DataType="float">
-            <ParamValue>3.394908157</ParamValue>
+            <ParamValue>0.146113119</ParamValue>
         </CalibParam>
         <CalibParam ParamName="PixelPrecisionY" DataType="float">
-            <ParamValue>1.573158442</ParamValue>
+            <ParamValue>0.1930226112</ParamValue>
         </CalibParam>
         <CalibParam ParamName="PixelPrecision" DataType="float">
-            <ParamValue>3.741687971</ParamValue>
+            <ParamValue>0.2420883557</ParamValue>
         </CalibParam>
         <CalibPointFListParam ParamName="ImagePointLst" DataType="CalibPointList">
             <PointF>
-                <X>1304.499878</X>
-                <Y>1104</Y>
+                <X>1512.5</X>
+                <Y>796</Y>
                 <R>0</R>
             </PointF>
             <PointF>
-                <X>1440</X>
-                <Y>1109.5</Y>
+                <X>1514</X>
+                <Y>924</Y>
                 <R>0</R>
             </PointF>
             <PointF>
-                <X>1576</X>
-                <Y>1116.5</Y>
+                <X>1516.077881</X>
+                <Y>1051.791748</Y>
                 <R>0</R>
             </PointF>
             <PointF>
-                <X>1583.5</X>
-                <Y>983</Y>
+                <X>1644.739136</X>
+                <Y>1049.891724</Y>
                 <R>0</R>
             </PointF>
             <PointF>
-                <X>1448</X>
-                <Y>976</Y>
+                <X>1642.749268</X>
+                <Y>922.1066895</Y>
                 <R>0</R>
             </PointF>
             <PointF>
-                <X>1312</X>
-                <Y>970</Y>
+                <X>1641</X>
+                <Y>794.5</Y>
                 <R>0</R>
             </PointF>
             <PointF>
-                <X>1318.499878</X>
-                <Y>836.4998779</Y>
+                <X>1769</X>
+                <Y>791.999939</Y>
                 <R>0</R>
             </PointF>
             <PointF>
-                <X>1454</X>
-                <Y>843</Y>
+                <X>1771</X>
+                <Y>920.5</Y>
                 <R>0</R>
             </PointF>
             <PointF>
-                <X>1590</X>
-                <Y>849.9998779</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>803.0287476</X>
-                <Y>1039.723022</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>872.3853149</X>
-                <Y>1043.294312</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>941.8341064</X>
-                <Y>1046.31665</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>935.960144</X>
-                <Y>975.8865356</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>875.7941895</X>
-                <Y>971.9102783</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>805.453064</X>
-                <Y>969.1643066</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>809.1807861</X>
-                <Y>897.1936646</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>878.6590576</X>
-                <Y>901.2276611</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>943.4818726</X>
-                <Y>903.3549805</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>1959.459351</X>
-                <Y>1068.342041</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>2027.519531</X>
-                <Y>1071.506348</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>2097.574219</X>
-                <Y>1074.27356</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>2101.516357</X>
-                <Y>1005.501099</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>2033.177002</X>
-                <Y>1000.667358</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>1963.460938</X>
-                <Y>998.7693481</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>1969.115601</X>
-                <Y>926.7841187</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>2037.070068</X>
-                <Y>931.3793945</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>2106.449463</X>
-                <Y>933.3093262</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>1392.710938</X>
-                <Y>593.0456543</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>1464.586792</X>
-                <Y>596.9667969</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>1537.666504</X>
-                <Y>599.7236328</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>1540.874268</X>
-                <Y>529.3895264</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>1469.033081</X>
-                <Y>524.105957</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>1396.114868</X>
-                <Y>521.6046143</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>1399.939331</X>
-                <Y>448.2852173</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>1472.371216</X>
-                <Y>452.6649475</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>1544.955078</X>
-                <Y>455.431488</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>1372.977295</X>
-                <Y>1516.012085</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>1443.525269</X>
-                <Y>1524.384888</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>1515.882324</X>
-                <Y>1526.330444</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>1519.369019</X>
-                <Y>1459.910645</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>1448.263184</X>
-                <Y>1455.833984</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>1375.73291</X>
-                <Y>1453.753906</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>1380.086182</X>
-                <Y>1383.259521</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>1450.930908</X>
-                <Y>1387.58667</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>1523.364624</X>
-                <Y>1389.609985</Y>
+                <X>1773</X>
+                <Y>1048</Y>
                 <R>0</R>
             </PointF>
         </CalibPointFListParam>
         <CalibPointFListParam ParamName="WorldPointLst" DataType="CalibPointList">
             <PointF>
-                <X>12.96720921</X>
-                <Y>-80.17179066</Y>
+                <X>15.00311792</X>
+                <Y>15.00085261</Y>
                 <R>0</R>
             </PointF>
             <PointF>
-                <X>-2.030240906</X>
-                <Y>-80.18179135</Y>
+                <X>-0.002036351756</X>
+                <Y>14.99791306</Y>
                 <R>0</R>
             </PointF>
             <PointF>
-                <X>-17.03741217</X>
-                <Y>-80.17358723</Y>
+                <X>-15.00387634</X>
+                <Y>15.00049382</Y>
                 <R>0</R>
             </PointF>
             <PointF>
-                <X>-17.03069862</X>
-                <Y>-95.17792321</Y>
+                <X>-15.00030155</X>
+                <Y>-0.004734466461</Y>
                 <R>0</R>
             </PointF>
             <PointF>
-                <X>-2.0280472</X>
-                <Y>-95.17003043</Y>
+                <X>0.00260102575</X>
+                <Y>0.001383701142</Y>
                 <R>0</R>
             </PointF>
             <PointF>
-                <X>12.9665354</X>
-                <Y>-95.16846825</Y>
+                <X>15.0016142</X>
+                <Y>0.0006837392943</Y>
                 <R>0</R>
             </PointF>
             <PointF>
-                <X>12.96529155</X>
-                <Y>-110.1735928</Y>
+                <X>14.99962768</X>
+                <Y>-15.00527768</Y>
                 <R>0</R>
             </PointF>
             <PointF>
-                <X>-2.031583478</X>
-                <Y>-110.1758984</Y>
+                <X>-0.003525049651</X>
+                <Y>-15.00046434</Y>
                 <R>0</R>
             </PointF>
             <PointF>
-                <X>-17.03093856</X>
-                <Y>-110.1784855</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>70.87002945</X>
-                <Y>-84.94308589</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>62.86937668</X>
-                <Y>-84.94771928</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>54.87145041</X>
-                <Y>-84.94763175</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>54.8676704</X>
-                <Y>-92.94086564</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>62.87202251</X>
-                <Y>-92.93915</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>70.86779491</X>
-                <Y>-92.93858302</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>70.86787243</X>
-                <Y>-100.9410219</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>62.8687328</X>
-                <Y>-100.9482614</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>54.87260999</X>
-                <Y>-100.9498286</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>-62.21116728</X>
-                <Y>-87.49024</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>-70.21104038</X>
-                <Y>-87.49791774</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>-78.21138169</X>
-                <Y>-87.49724634</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>-78.21388759</X>
-                <Y>-95.49264554</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>-70.2074739</X>
-                <Y>-95.49040242</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>-62.21109928</X>
-                <Y>-95.48910852</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>-62.21224745</X>
-                <Y>-103.4915595</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>-70.211999</X>
-                <Y>-103.4980914</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>-78.20961226</X>
-                <Y>-103.5001527</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>5.964516569</X>
-                <Y>-138.0341491</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>-2.034864303</X>
-                <Y>-138.0401938</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>-10.03385536</X>
-                <Y>-138.0417966</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>-10.03656617</X>
-                <Y>-146.0333025</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>-2.032143764</X>
-                <Y>-146.031738</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>5.966174604</X>
-                <Y>-146.0312885</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>5.96358834</X>
-                <Y>-154.0335275</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>-2.035529409</X>
-                <Y>-154.0407215</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>-10.03124039</X>
-                <Y>-154.0412789</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>4.085038079</X>
-                <Y>-33.19274774</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>-3.913999014</X>
-                <Y>-33.19911459</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>-11.91395559</X>
-                <Y>-33.20104262</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>-11.91543551</X>
-                <Y>-41.19251984</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>-3.912245772</X>
-                <Y>-41.18810446</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>4.084749668</X>
-                <Y>-41.18902591</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>4.085536995</X>
-                <Y>-49.19080426</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>-3.91369095</X>
-                <Y>-49.19935573</Y>
-                <R>0</R>
-            </PointF>
-            <PointF>
-                <X>-11.90985401</X>
-                <Y>-49.20085013</Y>
+                <X>-15.0029911</X>
+                <Y>-15.00026072</Y>
                 <R>0</R>
             </PointF>
         </CalibPointFListParam>
@@ -510,14 +150,14 @@
             <RotCenterWorldR>-999</RotCenterWorldR>
         </PointF>
         <CalibFloatListParam ParamName="CalibMatrix" DataType="FloatList">
-            <ParamValue>-0.108972935538</ParamValue>
-            <ParamValue>-0.00439682858078</ParamValue>
-            <ParamValue>160.299083144</ParamValue>
-            <ParamValue>-0.00237684025896</ParamValue>
-            <ParamValue>0.108124801414</ParamValue>
-            <ParamValue>-192.848092939</ParamValue>
-            <ParamValue>-2.57882710815e-05</ParamValue>
-            <ParamValue>-1.11276077592e-05</ParamValue>
+            <ParamValue>-0.00172056253312</ParamValue>
+            <ParamValue>-0.117035513047</ParamValue>
+            <ParamValue>110.741021224</ParamValue>
+            <ParamValue>-0.116535784118</ParamValue>
+            <ParamValue>0.00171819219778</ParamValue>
+            <ParamValue>189.847705851</ParamValue>
+            <ParamValue>-2.13486043261e-06</ParamValue>
+            <ParamValue>1.34537835163e-06</ParamValue>
             <ParamValue>1</ParamValue>
         </CalibFloatListParam>
     </CalibOutputParam>

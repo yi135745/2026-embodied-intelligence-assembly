@@ -206,24 +206,71 @@ class Robot:
             actual = reader()
         if actual != expected:
             raise RuntimeError("%s回读不一致：期望%s，实际%s。" % (label, expected, actual))
+        return actual
+
+    def get_tool_io_status(self) -> dict:
+        """按官方 IoControl 接口读取吸盘相关 Tool IO 状态。"""
+        if not self.available or self.robot_interface is None:
+            raise RuntimeError("机器人未连接，无法读取Tool IO状态。")
+        io_control = self.robot_interface.getIoControl()
+        status = {
+            "voltage": int(io_control.getToolVoltageOutputDomain()),
+            "outputs_mask": int(io_control.getToolDigitalOutputs()),
+            "channels": {},
+        }
+        for index, label in (
+            (int(config.TOOL_IO_VENT_INDEX), "泄压阀"),
+            (int(config.TOOL_IO_PUMP_INDEX), "真空泵"),
+        ):
+            channel = {
+                "label": label,
+                "is_input": bool(io_control.isToolIoInput(index)),
+                "output": bool(io_control.getToolDigitalOutput(index)),
+            }
+            if hasattr(io_control, "getToolDigitalOutputRunstate"):
+                channel["runstate"] = io_control.getToolDigitalOutputRunstate(index)
+            status["channels"][index] = channel
+        return status
+
+    def print_tool_io_status(self, title="Tool IO状态") -> dict:
+        """打印现场诊断需要的电压、方向、Runstate、输出和整组位图。"""
+        status = self.get_tool_io_status()
+        print("--- %s ---" % title)
+        print("工具端电压回读：%dV" % status["voltage"])
+        print("工具端数字输出位图：0x%X (%d)" %
+              (status["outputs_mask"], status["outputs_mask"]))
+        for index, channel in status["channels"].items():
+            print("TOOL_IO[%d] %s：方向=%s，Runstate=%s，输出=%s" % (
+                index,
+                channel["label"],
+                "输入" if channel["is_input"] else "输出",
+                channel.get("runstate", "SDK不支持读取"),
+                channel["output"],
+            ))
+        return status
 
     def configure_suction(self) -> bool:
-        """配置已实机验证的末端Tool IO：12V、输出方向、手动输出模式。"""
+        """按官方IoControl接口配置电压、输出方向和None手动输出模式。"""
         if not self.available or self.robot_interface is None:
             print("机器人未连接，无法配置吸盘Tool IO。")
             return False
         try:
             io_control = self.robot_interface.getIoControl()
             if config.TOOL_IO_CONFIGURE_VOLTAGE:
-                self._require_zero_result(
-                    io_control.setToolVoltageOutputDomain(int(config.TOOL_IO_VOLTAGE)),
-                    "设置工具端电压",
-                )
-                self._wait_for_io_value(
-                    lambda: int(io_control.getToolVoltageOutputDomain()),
-                    int(config.TOOL_IO_VOLTAGE),
-                    "工具端电压",
-                )
+                requested_voltage = int(config.TOOL_IO_VOLTAGE)
+                if requested_voltage not in (0, 12, 24):
+                    raise ValueError("官方SDK仅允许工具端电压为0、12或24V，当前为%dV。" %
+                                     requested_voltage)
+                voltage_result = io_control.setToolVoltageOutputDomain(requested_voltage)
+                self._require_zero_result(voltage_result, "设置工具端电压")
+                actual_voltage = int(io_control.getToolVoltageOutputDomain())
+                print("设置工具端电压：请求=%dV，SDK返回=%s，回读=%dV" %
+                      (requested_voltage, voltage_result, actual_voltage))
+                if actual_voltage != requested_voltage:
+                    print(
+                        "警告：控制器接受了电压设置（SDK返回0），但电压回读不一致；"
+                        "继续测试Tool IO数字输出，请同时观察示教器与气泵实物。"
+                    )
             else:
                 actual_voltage = io_control.getToolVoltageOutputDomain()
                 print("跳过工具端公共电压设置，当前回读=%sV；仅控制外部供电的Tool IO。" %
@@ -236,28 +283,32 @@ class Robot:
                     io_control.setToolIoInput(int(index), False),
                     "配置%s Tool IO为输出" % label,
                 )
-                if hasattr(io_control, "isToolIoInput") and io_control.isToolIoInput(int(index)):
-                    raise RuntimeError("%s TOOL_IO[%d]仍处于输入模式。" % (label, index))
-                if hasattr(io_control, "setToolDigitalOutputRunstate"):
-                    if StandardOutputRunState is None:
-                        raise RuntimeError("SDK缺少StandardOutputRunState，无法切换手动输出模式。")
-                    manual_state = StandardOutputRunState.__members__["None"]
-                    self._require_zero_result(
-                        io_control.setToolDigitalOutputRunstate(int(index), manual_state),
-                        "设置%s为手动输出模式" % label,
+                self._wait_for_io_value(
+                    lambda index=int(index): bool(io_control.isToolIoInput(index)),
+                    False,
+                    "%s TOOL_IO[%d]方向" % (label, index),
+                )
+                if StandardOutputRunState is None:
+                    raise RuntimeError("SDK缺少StandardOutputRunState，无法切换None手动输出模式。")
+                manual_state = StandardOutputRunState.__members__["None"]
+                self._require_zero_result(
+                    io_control.setToolDigitalOutputRunstate(int(index), manual_state),
+                    "设置%s输出Runstate=None" % label,
+                )
+                if hasattr(io_control, "getToolDigitalOutputRunstate"):
+                    self._wait_for_io_value(
+                        lambda index=int(index): int(
+                            io_control.getToolDigitalOutputRunstate(index)
+                        ),
+                        int(manual_state),
+                        "%s TOOL_IO[%d] Runstate" % (label, index),
                     )
-                    if hasattr(io_control, "getToolDigitalOutputRunstate"):
-                        actual_state = io_control.getToolDigitalOutputRunstate(int(index))
-                        if int(actual_state) != int(manual_state):
-                            raise RuntimeError(
-                                "%s TOOL_IO[%d]输出模式不是None：%s" %
-                                (label, index, actual_state)
-                            )
             self._suction_configured = True
             voltage_text = ("SDK设置%dV" % config.TOOL_IO_VOLTAGE
                             if config.TOOL_IO_CONFIGURE_VOLTAGE else "跳过公共电压设置")
             print("吸盘末端Tool IO配置完成：%s，泄压阀IO%d，气泵IO%d。" %
                   (voltage_text, config.TOOL_IO_VENT_INDEX, config.TOOL_IO_PUMP_INDEX))
+            self.print_tool_io_status("配置完成后的官方接口回读")
             return True
         except Exception as exc:
             self._suction_configured = False
@@ -268,13 +319,14 @@ class Robot:
         io_control = self.robot_interface.getIoControl()
         result = io_control.setToolDigitalOutput(int(channel), bool(value))
         self._require_zero_result(result, "写入%s" % label)
-        print("AUBO末端TOOL_IO[%d] <- %s（%s），SDK返回：%s" %
-              (channel, bool(value), label, result))
-        self._wait_for_io_value(
+        actual = self._wait_for_io_value(
             lambda: bool(io_control.getToolDigitalOutput(int(channel))),
             bool(value),
             label + "输出",
         )
+        outputs_mask = int(io_control.getToolDigitalOutputs())
+        print("AUBO末端TOOL_IO[%d] <- %s（%s），SDK返回=%s，单路回读=%s，整组位图=0x%X" %
+              (channel, bool(value), label, result, actual, outputs_mask))
 
     def set_suction(self, enabled: bool) -> bool:
         """True吸取；False停泵、短暂泄压，然后关闭泄压阀。"""

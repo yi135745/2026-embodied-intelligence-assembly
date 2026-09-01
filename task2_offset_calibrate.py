@@ -94,8 +94,8 @@ def _calibrate_scene(scene, color, vision, robot, detector, output_dir, previous
 
 def main():
     parser = argparse.ArgumentParser(description="连续标定方块区和托盘区，AUBO SDK自动读取实际基座坐标")
-    parser.add_argument("--block-color", choices=COLORS, default="紫色")
-    parser.add_argument("--tray-color", choices=COLORS, default="紫色")
+    parser.add_argument("--block-color", choices=COLORS, default="红色")
+    parser.add_argument("--tray-color", choices=COLORS, default="红色")
     args = parser.parse_args()
 
     apply_aubo_pose_records()

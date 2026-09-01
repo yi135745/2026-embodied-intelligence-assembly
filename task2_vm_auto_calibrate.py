@@ -149,7 +149,7 @@ def _write_vm_xml(template_path, output_path, image_points, world_points, matrix
 
 def main():
     parser = argparse.ArgumentParser(description="AUBO移动相机九点标定，输出VisionMaster兼容XML")
-    parser.add_argument("--color", choices=COLORS, default="紫色", help="固定参考方块颜色")
+    parser.add_argument("--color", choices=COLORS, default="红色", help="固定参考方块颜色")
     parser.add_argument("--step-mm", type=float, default=15.0, help="九点相邻间距，默认15mm")
     parser.add_argument("--max-z-diff-mm", type=float, default=2.0,
                         help="方块/托盘拍照位最大Z差，默认2mm")
