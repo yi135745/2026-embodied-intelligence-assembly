@@ -4,7 +4,7 @@
     - CAMERA_IP       海康相机 IP
     - ROBOT_IP        遨博机器人 IP（以及端口/用户名/密码）
     - ROBOT_TARGET    任务卡 1 拍照位（六维位姿，需示教标定）
-    - ASR_MODEL_DIR   FunASR/SenseVoiceSmall 本地模型目录
+    - VOICE_BACKEND / AI_BOX_URL  语音后端及AI盒子HTTP地址
     - DASHSCOPE_API_KEY 大模型密钥（用环境变量，不要写进这里）
 """
 
@@ -45,6 +45,18 @@ READY_REPLY = "我已就绪，请下达指令"    # 唤醒后就绪播报
 TASK1_COMMAND = "任务一"                # 进入任务一的提示词
 TASK2_COMMAND = "任务二"                # 进入任务二的提示词
 RETURN_REPLY = "任务已完成，请再次呼叫小具同学"  # 任务返回后的提示播报
+
+# 国赛默认由盒子录音/识别/播放；local显式切回省赛电脑麦克风/扬声器。
+VOICE_BACKEND = os.getenv("VOICE_BACKEND", "ai_box")
+AI_BOX_URL = os.getenv("AI_BOX_URL", "http://192.168.1.11:8765")
+AI_BOX_HEALTH_TIMEOUT = 5.0
+AI_BOX_ASR_TIMEOUT = 90.0       # 含录音、首次模型初始化；超时不自动重发
+AI_BOX_TTS_TIMEOUT = 120.0
+AI_BOX_START_TIMEOUT = 5.0
+AI_BOX_MAX_RECORD_SECONDS = 15.0
+AI_BOX_VAD_THRESHOLD = 0.5
+# 盒子原生关键词模型为“小E同学”。当前走prewoken ASR后匹配WAKE_WORD，
+# 不改服务端模型；不支持播报中唤醒打断。下面录音/模型参数仅供local后端。
 
 CHUNK = 1024
 CHANNELS = 1
@@ -188,8 +200,17 @@ TASK2_BLOCK_HSV_RANGES = {
     "绿色": [((55, 50, 25), (90, 255, 255))],
     "蓝色": [((95, 60, 25), (119, 255, 255))],
     "紫色": [((120, 50, 25), (145, 255, 255))],
+    # 国赛新增三色：初始调参值，须用现场实物/光照重新验收。
+    "青色": [((80, 60, 40), (94, 255, 255))],
+    "粉色": [((145, 35, 100), (174, 180, 255))],
+    "棕色": [((5, 70, 20), (20, 255, 115))],
 }
 TASK2_TRAY_HSV_RANGES = dict(TASK2_HSV_RANGES)
+TASK2_TRAY_COLORS = ("红色", "橙色", "黄色", "绿色", "蓝色", "紫色")
+TASK2_EXTRA_BLOCK_COLORS = ("青色", "粉色", "棕色")
+TASK2_BLOCK_COLORS = TASK2_TRAY_COLORS + TASK2_EXTRA_BLOCK_COLORS
+# None：按卡面接受1~3个叠放动作；规则明确后设1/2/3。0仅供省赛六步回归。
+TASK2_EXPECTED_STACK_COUNT = None
 TASK2_MIN_CONTOUR_AREA = 300
 TASK2_MAX_CONTOUR_AREA = 200000
 TASK2_MORPH_KERNEL = 5
@@ -204,10 +225,11 @@ TASK2_COLOR_MAX_ASPECT_RATIO = 1.8   # 排除灯带、线缆等细长背景轮�
 TASK2_COLOR_MIN_RECT_FILL = 0.55     # 轮廓面积/最小外接矩形面积
 TASK2_COLOR_MAX_AREA_JUMP = 1.8      # 最大候选若远大于次大候选，判为背景区域
 TASK2_COLOR_MAX_CANDIDATES = 10      # 保留额外候选，由联合评分排除台外同色杂物
+TASK2_COLOR_MAX_ASSIGNMENT_COST = 0.65  # 保留省赛暗紫实拍；新三色需现场验收该阈值
 TASK2_COLOR_BAD_AREA_RATIO = 0.25    # 某轮廓面积低于中位数该比例时视为只识别到边缘
 TASK2_CALIBRATION_FILE = str(RESOURCES_DIR / "visionmaster_task2_calibration.xml")  # VisionMaster 九点标定 XML，现场替换
 TASK2_CALIBRATION_WORLD_SCALE_MM = 1.0  # 当前VM九点标定矩阵已直接输出mm
-TASK2_REQUIRE_ALL_COLORS = False  # True：必须识别到六色方块和六色托盘，否则报错；False：允许缺色，现场可调
+TASK2_REQUIRE_ALL_COLORS = True  # 国赛识别9色方块/6色托盘；False仍强制校验指令涉及的目标
 TASK2_EXECUTE_ROBOT = True  # True：执行抓放；False：只拍照识别，不移动机器人
 TASK2_REQUIRE_OFFSET_FILE = True  # 坐标逻辑调整后，未生成V2偏差文件时禁止真实抓放
 
@@ -224,13 +246,28 @@ TASK2_TRAY_GAIN = None
 # XY标定原点和XY偏移只保存在data/task2_offsets_v2.json，不在config保留副本。
 TASK2_BLOCK_PICK_Z = 173
 TASK2_TRAY_PLACE_Z = 180
+# 上述抓取/放置Z是在参考高度物块上标定的TCP高度。
+# 任务书写明高度未知，以下30/28只是暂定值；实测高度需与参考Z一起标定。
+TASK2_REFERENCE_BLOCK_HEIGHT_MM = 30.0
+TASK2_BLOCK_HEIGHT_MM = {
+    **{color: 30.0 for color in TASK2_TRAY_COLORS},
+    **{color: 28.0 for color in TASK2_EXTRA_BLOCK_COLORS},
+}
+TASK2_ROTATION_ENABLED = True
+# 使用九点矩阵把边向量变到机器人XY后计算角度，无需人工猜图像角度正负。
+TASK2_ROTATE_AT_CLEARANCE = True
 # Z只从本文件读取；抓取/放置姿态分别取aubo_poses.json中的方块/托盘拍照姿态。
 TASK2_LIFT_DISTANCE_MM = 80.0
 TASK2_SETTLE_SECONDS = 0.8
 TASK2_CARD_PROMPT = (
     "识别图片中的任务卡2装配指令。必须返回 JSON 数组，不要 Markdown。"
-    "数组必须恰好6项，按原文顺序排列；每项字段为 step、block_color、tray_color。"
-    "颜色只能是红色、橙色、黄色、绿色、蓝色、紫色。"
+    "按原文顺序逐个展开抓放动作，每项仅含step、source_color、target_type、target_color。"
+    "step从1连续编号；target_type只能是tray（托盘）或block（方块）。"
+    "方块颜色包括红色、橙色、黄色、绿色、蓝色、紫色、青色、粉色、棕色；托盘仅前六色。"
+    "前六次抓放是六色方块放到托盘，后续是青/粉/棕方块叠放到原文指定方块上。"
+    "最后一句若含多个抓放关系，展开为多个动作。只识别原文，不补全、遗漏或重排动作。"
+    "例如红块到黄托盘为{\"step\":1,\"source_color\":\"红色\",\"target_type\":\"tray\",\"target_color\":\"黄色\"}。"
+    "无法辨认或内容不完整时返回空数组，不要猜测。"
 )
 
 # ==============================

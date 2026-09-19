@@ -20,6 +20,7 @@ import cv2
 import config
 from modules.task2_vision import ColorObjectDetector, load_task2_offsets, load_task2_tuning
 from modules.vision import Vision
+from modules.pose_records import apply_aubo_pose_records
 
 
 def _scene_config(scene):
@@ -39,6 +40,7 @@ def main():
     parser.add_argument("--show", action="store_true", help="弹窗显示原图/标注图，按任意键关闭")
     args = parser.parse_args()
 
+    apply_aubo_pose_records()
     load_task2_tuning()
     load_task2_offsets()
     stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -70,7 +72,7 @@ def main():
     annotated_path = output_dir / (args.scene + "_detected.jpg")
     cv2.imwrite(str(annotated_path), annotated)
     found = {item.color for item in targets}
-    expected = set(config.TASK2_HSV_RANGES)
+    expected = set(config.TASK2_BLOCK_COLORS if kind == "方块" else config.TASK2_TRAY_COLORS)
     result = [item.to_dict() for item in targets]
     (output_dir / "detections.json").write_text(
         json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8"

@@ -1,4 +1,4 @@
-"""语音模块：本地语音识别（FunASR）+ 语音播报（pyttsx3）。
+"""语音模块：AI盒子HTTP服务；可显式切回省赛本地FunASR/pyttsx3。
 
 对外接口：
     Voice.wake(wake_word)  -> bool   阻塞监听，命中唤醒词返回 True，听到退出指令返回 False
@@ -8,6 +8,7 @@
 """
 
 import difflib
+import json
 import logging
 import math
 import os
@@ -18,16 +19,17 @@ import threading
 import time
 import warnings
 import wave
+import uuid
+from http.client import HTTPException
 from pathlib import Path
-
-import pyaudio
-import pyttsx3
-from funasr import AutoModel
+from urllib.error import URLError
+from urllib.request import ProxyHandler, Request, build_opener
 
 import config
 
-# pyaudio 采样格式：16 位 PCM
-FORMAT = pyaudio.paInt16
+
+class VoiceServiceError(RuntimeError):
+    """盒子连接、协议或设备失败；不能当成静音继续运行。"""
 
 
 def _configure_logs() -> None:
@@ -44,18 +46,99 @@ def _log_asr_status(message: str) -> None:
 
 
 class Voice:
-    """封装本地语音识别与播报能力。"""
+    """保持wake/listen/speak/is_exit接口，业务层无需区分语音后端。"""
 
-    def __init__(self):
-        _configure_logs()
-        self._load_asr_model()
+    def __init__(self, backend=None):
+        self.backend = backend or config.VOICE_BACKEND
+        if self.backend not in ("ai_box", "local"):
+            raise ValueError("VOICE_BACKEND只能是ai_box或local")
         # pyttsx3 引擎按需初始化，播报时用锁避免通道冲突。
         self._tts_lock = threading.Lock()
+        if self.backend == "local":
+            _configure_logs()
+            self._load_asr_model()
+        else:
+            self._box_url = config.AI_BOX_URL.rstrip("/")
+            # 工位内网直连，不经过系统/环境代理；不需要SSH账户。
+            self._http = build_opener(ProxyHandler({}))
+            self.health = self.check_health()
+            native_word = self.health.get("models", {}).get("wakeup_keyword", "未知")
+            _log_asr_status("AI盒子已连接；原生唤醒词=%s，当前使用ASR文字匹配唤醒=%s"
+                            % (native_word, config.WAKE_WORD))
+
+    def _box_request(self, path, payload=None, timeout=5.0):
+        data = None if payload is None else json.dumps(
+            {**payload, "request_id": str(uuid.uuid4())}, ensure_ascii=False
+        ).encode("utf-8")
+        request = Request(self._box_url + path, data=data,
+                          headers={"Content-Type": "application/json; charset=utf-8"},
+                          method="GET" if payload is None else "POST")
+        try:
+            with self._http.open(request, timeout=timeout) as response:
+                result = json.loads(response.read().decode("utf-8"))
+        except (URLError, OSError, ValueError, HTTPException) as exc:
+            # 请求超时不代表盒子已停止录音/播报，禁止自动重发造成重入。
+            raise VoiceServiceError("AI盒子%s请求失败（未自动重试）：%s" % (path, exc)) from exc
+        if not isinstance(result, dict):
+            raise VoiceServiceError("AI盒子%s响应不是JSON对象" % path)
+        return result
+
+    def check_health(self):
+        """只检查资源是否就绪；不代表麦克风/扬声器已经通过实测。"""
+        if self.backend != "ai_box":
+            raise ValueError("health仅适用于ai_box后端")
+        result = self._box_request("/health", timeout=config.AI_BOX_HEALTH_TIMEOUT)
+        if result.get("ready") is not True:
+            raise VoiceServiceError("AI盒子未就绪：%s" % result.get("message", result))
+        models = result.get("models")
+        if not isinstance(models, dict) or models.get("piper_exists") is not True:
+            raise VoiceServiceError("AI盒子缺少离线Piper资源，不能确认播报可用")
+        return result
+
+    @staticmethod
+    def _box_result(result, operation):
+        # HTTP 200也可能失败；必须同时检查业务状态和摘要结构。
+        if result.get("ok") is not True or result.get("error_code", "OK") != "OK":
+            raise VoiceServiceError("AI盒子%s失败 [%s]：%s" % (
+                operation, result.get("error_code", "UNKNOWN"), result.get("message", "无详情")))
+        digest = result.get("result_digest")
+        if not isinstance(digest, dict):
+            raise VoiceServiceError("AI盒子%s缺少有效result_digest" % operation)
+        return digest
+
+    def _box_listen(self):
+        result = self._box_request("/v1/asr", {
+            "mode": "live_capture", "language": "zh-CN",
+            # 不等待原生“小E同学”；由wake()匹配比赛用“小具同学”。
+            "wakeup_required": False, "prewoken": True,
+            "start_timeout_s": config.AI_BOX_START_TIMEOUT,
+            "max_record_seconds": config.AI_BOX_MAX_RECORD_SECONDS,
+            "vad_threshold": config.AI_BOX_VAD_THRESHOLD,
+        }, timeout=config.AI_BOX_ASR_TIMEOUT)
+        if (result.get("ok") is False
+                and result.get("error_code") == "NO_SPEECH_DETECTED"
+                and result.get("retryable") is not False):
+            return ""
+        digest = self._box_result(result, "识别")
+        text = digest.get("instruction")
+        if not isinstance(text, str):
+            raise VoiceServiceError("AI盒子识别结果instruction不是字符串")
+        return self._normalize_text(text)
+
+    def _box_speak(self, text):
+        result = self._box_request("/v1/tts", {
+            "text": text, "backend": "piper", "voice": "default", "context": {},
+        }, timeout=config.AI_BOX_TTS_TIMEOUT)
+        digest = self._box_result(result, "播报")
+        if digest.get("tts_skipped") or digest.get("interrupted"):
+            raise VoiceServiceError("AI盒子播报被跳过或打断，不能视为已播完：%s" % digest)
 
     # --------------------------------------------------------------
     # 模型加载
     # --------------------------------------------------------------
     def _load_asr_model(self) -> None:
+        from funasr import AutoModel
+
         model_dir = Path(config.ASR_MODEL_DIR)
         if not model_dir.exists():
             raise SystemExit("找不到语音识别模型目录：" + str(model_dir))
@@ -80,7 +163,10 @@ class Voice:
             print("听到：" + text)
             if self._is_exit_command(text):
                 return False
-            if self._has_wakeup_word(text, wake_word):
+            # 盒子分支不使用省赛宽松相似度：否则“小E同学”也可能误中。
+            matched = (wake_word in text if self.backend == "ai_box"
+                       else self._has_wakeup_word(text, wake_word))
+            if matched:
                 return True
 
     def is_exit(self, text: str) -> bool:
@@ -89,12 +175,20 @@ class Voice:
 
     def listen(self) -> str:
         """完成一次「VAD 录音 -> ASR 识别 -> 热词纠错」，返回标准命令文本。"""
+        if self.backend == "ai_box":
+            return self._box_listen()
         wav_file = self._record_audio(Path(config.TEMP_WAV_FILE))
         return self._recognize_audio(wav_file)
 
     def speak(self, text: str) -> None:
-        """语音播报。使用 pyttsx3，优先选择中文语音。"""
+        """同步播完后返回；盒子失败时抛错，不静默切回电脑扬声器。"""
         print("正在播报：" + text)
+        if self.backend == "ai_box":
+            with self._tts_lock:
+                self._box_speak(text)
+            return
+        import pyttsx3
+
         try:
             with self._tts_lock:
                 engine = pyttsx3.init()
@@ -125,12 +219,15 @@ class Voice:
 
     def _record_audio(self, output_file: Path) -> Path:
         """VAD 录音：先等声音超过阈值，再在连续静音后自动停止。"""
+        import pyaudio
+
+        audio_format = pyaudio.paInt16
         start_time = time.monotonic()
         _log_asr_status("开始打开麦克风")
         audio = pyaudio.PyAudio()
-        sample_width = audio.get_sample_size(FORMAT)
+        sample_width = audio.get_sample_size(audio_format)
         stream = audio.open(
-            format=FORMAT,
+            format=audio_format,
             channels=config.CHANNELS,
             rate=config.RATE,
             input=True,

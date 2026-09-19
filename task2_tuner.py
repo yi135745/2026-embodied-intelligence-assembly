@@ -5,7 +5,7 @@
   python task2_tuner.py --camera --scene block
 
 窗口中拖动HSV/形态学/面积滑条，按 s 保存 task2_tuning.json，按 q 退出；
-相机模式按 c 用当前曝光和增益重新拍一张。数字键1~6切换六种颜色。
+相机模式按 c 用当前曝光和增益重新拍一张。方块按1~9、托盘按1~6切换颜色。
 """
 
 import argparse
@@ -18,9 +18,9 @@ import numpy as np
 
 import config
 from modules.vision import Vision
+from modules.task2_vision import load_task2_tuning
 
 
-COLORS = list(config.TASK2_HSV_RANGES)
 WINDOW = "Task2 tuner"
 
 
@@ -28,8 +28,8 @@ def _nothing(_value):
     pass
 
 
-def _set_range(color):
-    lower, upper = config.TASK2_HSV_RANGES[color][0]
+def _set_range(color, ranges):
+    lower, upper = ranges[color][0]
     for name, value in zip(("H low", "S low", "V low", "H high", "S high", "V high"), lower + upper):
         cv2.setTrackbarPos(name, WINDOW, int(value))
 
@@ -54,10 +54,11 @@ def main():
     if not args.image and not args.camera:
         parser.error("必须指定 --image 或 --camera")
 
-    if args.scene == "block":
-        config.TASK2_HSV_RANGES = config.TASK2_BLOCK_HSV_RANGES
-    elif args.scene == "tray":
-        config.TASK2_HSV_RANGES = config.TASK2_TRAY_HSV_RANGES
+    load_task2_tuning()
+    ranges = config.TASK2_BLOCK_HSV_RANGES if args.scene == "block" else config.TASK2_TRAY_HSV_RANGES
+    colors = list(ranges)
+    saved_ranges = {color: [[list(lo), list(hi)] for lo, hi in values]
+                    for color, values in ranges.items()}
 
     cv2.namedWindow(WINDOW, cv2.WINDOW_NORMAL)
     maxima = (179, 255, 255, 179, 255, 255)
@@ -74,7 +75,7 @@ def main():
     cv2.createTrackbar("Gain x10", WINDOW, max(0, int(initial_gain * 10)), 1000, _nothing)
 
     color_index = 0
-    _set_range(COLORS[color_index])
+    _set_range(colors[color_index], saved_ranges)
     vision = Vision() if args.camera else None
     image_path = _capture(vision, args.scene, cv2.getTrackbarPos("Exposure us", WINDOW),
                           cv2.getTrackbarPos("Gain x10", WINDOW) / 10.0) if args.camera else Path(args.image)
@@ -87,8 +88,6 @@ def main():
         cv2.getTrackbarPos("Gain x10", WINDOW),
     )
     settings_changed_at = float("inf")
-    saved_ranges = {color: [[list(lo), list(hi)] for lo, hi in ranges]
-                    for color, ranges in config.TASK2_HSV_RANGES.items()}
     while True:
         current_capture_settings = (
             cv2.getTrackbarPos("Exposure us", WINDOW),
@@ -119,17 +118,17 @@ def main():
         accepted = [c for c in contours if min_area <= cv2.contourArea(c) <= max_area]
         cv2.drawContours(preview, accepted, -1, (255, 255, 255), 2)
         label = "%d:%s accepted=%d  s=save c=refresh q=quit" % (
-            color_index + 1, COLORS[color_index], len(accepted)
+            color_index + 1, colors[color_index], len(accepted)
         )
         cv2.putText(preview, label, (20, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2)
         cv2.imshow(WINDOW, np.hstack((cv2.resize(image, (640, 480)), cv2.resize(preview, (640, 480)))))
         key = cv2.waitKey(50) & 0xFF
         if key in (ord("q"), 27):
             break
-        if ord("1") <= key <= ord("6"):
-            saved_ranges[COLORS[color_index]] = [[low, high]] + saved_ranges[COLORS[color_index]][1:]
+        if ord("1") <= key < ord("1") + len(colors):
+            saved_ranges[colors[color_index]] = [[low, high]] + saved_ranges[colors[color_index]][1:]
             color_index = key - ord("1")
-            _set_range(COLORS[color_index])
+            _set_range(colors[color_index], saved_ranges)
         elif key == ord("c") and vision is not None:
             image_path = _capture(vision, args.scene, cv2.getTrackbarPos("Exposure us", WINDOW),
                                   cv2.getTrackbarPos("Gain x10", WINDOW) / 10.0)
@@ -137,7 +136,7 @@ def main():
             settings_changed_at = float("inf")
         elif key == ord("s"):
             # 只覆盖第一段；红色默认的170~179第二段会保留。
-            saved_ranges[COLORS[color_index]] = [[low, high]] + saved_ranges[COLORS[color_index]][1:]
+            saved_ranges[colors[color_index]] = [[low, high]] + saved_ranges[colors[color_index]][1:]
             exposure = cv2.getTrackbarPos("Exposure us", WINDOW)
             gain = cv2.getTrackbarPos("Gain x10", WINDOW) / 10.0
             payload = {
@@ -150,9 +149,20 @@ def main():
                     "%s_gain" % args.scene: gain,
                 },
             }
-            Path(config.TASK2_TUNING_FILE).write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+            save_tuning(payload)
             print("已保存：" + config.TASK2_TUNING_FILE)
     cv2.destroyAllWindows()
+
+
+def save_tuning(payload):
+    """保存一个分区时保留另一个分区的阈值与曝光。"""
+    path = Path(config.TASK2_TUNING_FILE)
+    existing = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
+    capture = {**existing.get("capture", {}), **payload.get("capture", {})}
+    existing.update(payload)
+    existing["capture"] = capture
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(existing, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
 if __name__ == "__main__":

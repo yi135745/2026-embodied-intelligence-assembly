@@ -1,7 +1,7 @@
-"""任务二 OpenCV 视觉：图像预处理、六色目标检测和坐标接口。"""
+"""任务二 OpenCV 视觉：九色方块、六色托盘、中心和方向标定。"""
 
 from dataclasses import asdict, dataclass
-import itertools
+import math
 import json
 from pathlib import Path
 from typing import List, Optional, Tuple
@@ -9,8 +9,10 @@ from xml.etree import ElementTree
 
 import cv2
 import numpy as np
+from scipy.optimize import linear_sum_assignment
 
 import config
+from modules.task2_planning import normalize_square_angle
 
 
 _TASK2_XY_CALIBRATION = None
@@ -28,10 +30,13 @@ def load_task2_tuning(path=None) -> bool:
         hsv_ranges = data.get(json_key)
         if not hsv_ranges:
             continue
-        setattr(config, config_key, {
+        # 省赛六色调参文件只覆盖已有颜色，不能抹掉国赛新增三色默认值。
+        merged = dict(getattr(config, config_key))
+        merged.update({
             color: [(tuple(item[0]), tuple(item[1])) for item in ranges]
             for color, ranges in hsv_ranges.items()
         })
+        setattr(config, config_key, merged)
     for name, value in data.get("capture", {}).items():
         key = "TASK2_%s" % name.upper()
         if hasattr(config, key):
@@ -104,6 +109,7 @@ class VisionTarget:
     area: float
     angle_deg: float
     robot_pose: Optional[List[float]] = None
+    robot_angle_deg: Optional[float] = None
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -159,9 +165,21 @@ class CoordinateTransformer:
         orientation = list(view_pose[3:])
         return [origin[0] + world[0] + offset[0], origin[1] + world[1] + offset[1], float(z)] + orientation
 
+    def rectangle_angle_to_robot(self, rect):
+        """把正方形一条边的两端映射至机器人XY平面，消除图像Y翻转/透视。"""
+        if self.matrix is None:
+            return None
+        corners = cv2.boxPoints(rect)
+        a = self.pixel_to_world(*corners[0])
+        b = self.pixel_to_world(*corners[1])
+        dx, dy = b[0] - a[0], b[1] - a[1]
+        if not all(math.isfinite(v) for v in (dx, dy)) or math.hypot(dx, dy) < 1e-9:
+            raise ValueError("矩形方向标定结果无效。")
+        return normalize_square_angle(math.degrees(math.atan2(dy, dx)))
+
 
 class ColorObjectDetector:
-    """使用 HSV 阈值和轮廓检测六色方块或托盘区域。"""
+    """使用HSV及全局匹配检测九色方块或六色托盘。"""
 
     def __init__(self, transformer=None):
         self.transformer = transformer or CoordinateTransformer(config.TASK2_CALIBRATION_FILE)
@@ -203,7 +221,8 @@ class ColorObjectDetector:
             (cx, cy), _, angle = rect
             robot_pose = self.transformer.pixel_to_robot(cx, cy, kind) if include_robot_pose else None
             target = VisionTarget(kind, color, (float(cx), float(cy)),
-                                  float(cv2.contourArea(contour)), float(angle), robot_pose)
+                                  float(cv2.contourArea(contour)), float(angle), robot_pose,
+                                  self.transformer.rectangle_angle_to_robot(rect))
             targets.append(target)
             box = cv2.boxPoints(rect).astype(np.int32)
             cv2.drawContours(annotated, [box], 0, (255, 255, 255), 2)
@@ -221,6 +240,12 @@ class ColorObjectDetector:
                 prefix = debug_prefix or kind
                 cv2.imwrite(str(debug_path / ("%s_combined_detected.jpg" % prefix)), annotated)
             print("%s已使用HSV覆盖率 + HSV色相 + Lab颜色距离联合识别。" % kind)
+        # 不允许HSV重叠将同一个轮廓同时识别成两种颜色。
+        for index, target in enumerate(targets):
+            for other in targets[:index]:
+                distance = math.dist(target.pixel_center, other.pixel_center)
+                if distance < 0.25 * math.sqrt(min(target.area, other.area)):
+                    raise ValueError("颜色识别冲突：%s和%s指向同一物块，请调HSV。" % (target.color, other.color))
         return targets, annotated
 
     @staticmethod
@@ -234,7 +259,7 @@ class ColorObjectDetector:
 
     def _combined_color_fallback(self, image, hsv, kind, hsv_ranges, color_masks, kernel,
                                  include_robot_pose=True):
-        """宽掩膜找六个物体，再用三种颜色证据进行六色一对一全局分配。"""
+        """宽掩膜找候选，匈牙利算法完成一对一分配，不进行九色全排列。"""
         broad = cv2.inRange(
             hsv,
             (0, int(config.TASK2_COLOR_FALLBACK_MIN_S), int(config.TASK2_COLOR_FALLBACK_MIN_V)),
@@ -267,7 +292,7 @@ class ColorObjectDetector:
 
         colors = list(hsv_ranges)
         scores = np.zeros((len(contours), len(colors)), dtype=np.float64)
-        measurements = []
+        lab = cv2.cvtColor(image, cv2.COLOR_BGR2LAB)
         for row, contour in enumerate(contours):
             object_mask = np.zeros(hsv.shape[:2], dtype=np.uint8)
             cv2.drawContours(object_mask, [contour], -1, 255, -1)
@@ -276,10 +301,9 @@ class ColorObjectDetector:
             if cv2.countNonZero(inner) < 50:
                 inner = object_mask
             pixels_hsv = hsv[inner > 0]
-            pixels_lab = cv2.cvtColor(image, cv2.COLOR_BGR2LAB)[inner > 0]
+            pixels_lab = lab[inner > 0]
             median_hsv = np.median(pixels_hsv, axis=0)
             median_lab = np.median(pixels_lab, axis=0)
-            measurements.append((median_hsv, median_lab))
             total = max(1, cv2.countNonZero(inner))
             for col, color in enumerate(colors):
                 coverage = cv2.countNonZero(cv2.bitwise_and(color_masks[color], inner)) / total
@@ -301,22 +325,21 @@ class ColorObjectDetector:
                 scores[row, col] = (float(config.TASK2_COLOR_MASK_WEIGHT) * (1.0 - coverage) +
                                     min(prototype_scores))
 
-        # assignment[color_index] = contour_index。允许从多于六个候选中选择，
-        # 避免台外较大杂物仅凭面积挤掉真正物体。
-        best_assignment = min(
-            itertools.permutations(range(len(contours)), len(colors)),
-            key=lambda assignment: sum(scores[row, col] for col, row in enumerate(assignment)),
-        )
+        rows, columns = linear_sum_assignment(scores)
+        assignment = sorted(zip(columns, rows))
         annotated = image.copy()
         targets = []
-        for color_index, contour_index in enumerate(best_assignment):
+        for color_index, contour_index in assignment:
+            if scores[contour_index, color_index] > config.TASK2_COLOR_MAX_ASSIGNMENT_COST:
+                continue
             contour = contours[contour_index]
             color = colors[color_index]
             rect = cv2.minAreaRect(contour)
             (cx, cy), _, angle = rect
             robot_pose = self.transformer.pixel_to_robot(cx, cy, kind) if include_robot_pose else None
             target = VisionTarget(kind, color, (float(cx), float(cy)), float(cv2.contourArea(contour)),
-                                  float(angle), robot_pose)
+                                  float(angle), robot_pose,
+                                  self.transformer.rectangle_angle_to_robot(rect))
             targets.append(target)
             box = cv2.boxPoints(rect).astype(np.int32)
             cv2.drawContours(annotated, [box], 0, (255, 255, 255), 2)
@@ -328,7 +351,12 @@ class ColorObjectDetector:
 
 
 def validate_six_colors(targets, kind: str) -> None:
-    expected = set(config.TASK2_HSV_RANGES)
+    """兼容原调试工具函数名；国赛方块验证九色、托盘验证六色。"""
+    validate_colors(targets, kind)
+
+
+def validate_colors(targets, kind: str) -> None:
+    expected = set(config.TASK2_BLOCK_COLORS if kind == "方块" else config.TASK2_TRAY_COLORS)
     actual = {item.color for item in targets}
     if actual != expected:
         raise RuntimeError("%s颜色识别不完整，缺少：%s，多出：%s" % (kind, sorted(expected-actual), sorted(actual-expected)))

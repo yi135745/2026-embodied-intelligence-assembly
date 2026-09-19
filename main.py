@@ -9,7 +9,6 @@
 
 import config
 
-from modules.voice import Voice
 from modules.vision import Vision
 from modules.robot import Robot
 from modules.llm import LLM
@@ -17,14 +16,12 @@ from modules.pose_records import apply_aubo_pose_records
 
 from task.task1 import task1_run
 
-# 任务二尚未实现（task/task2.py 为空），先用占位方式处理。
-try:
-    from task.task2 import task2_run
-except ImportError:
-    task2_run = None
+from task.task2 import task2_run
 
 
 def main():
+    from modules.voice import Voice
+
     apply_aubo_pose_records()
     voice = Voice()
     vision = Vision()
@@ -32,7 +29,16 @@ def main():
     llm = LLM()
 
     print("系统启动")
-    voice.speak("系统已启动，请呼叫" + config.WAKE_WORD)
+    try:
+        voice.speak("系统已启动，请呼叫" + config.WAKE_WORD)
+        run_tasks(voice, vision, robot, llm)
+    finally:
+        robot.disconnect()
+
+
+def run_tasks(voice, vision, robot, llm):
+    """任务返回成功才计入本轮；失败后清空本轮状态，等待裁判重新发卡。"""
+    completed = set()
 
     while True:
         # ── 阶段 1：语音唤醒 ──────────────────────────────
@@ -53,18 +59,26 @@ def main():
                 voice.speak("收到，系统退出")
                 return
 
-            if  config.TASK1_COMMAND in command:
-                task1_run(voice, vision, robot, llm)
-                voice.speak(config.RETURN_REPLY)
-                break
-
-            if config.TASK2_COMMAND in command:
-                if task2_run is None:
-                    print("任务二尚未实现")
-                    voice.speak("任务二尚未实现")
+            task_id = (1 if config.TASK1_COMMAND in command else
+                       2 if config.TASK2_COMMAND in command else None)
+            if task_id is not None:
+                if task_id in completed:
+                    voice.speak("本项任务已完成，请执行另一个任务")
+                    break
+                if task_id == 1:
+                    success = task1_run(voice, vision, robot, llm) is True
                 else:
-                    task2_run(voice, vision, robot, llm)
+                    result = task2_run(voice, vision, robot, llm)
+                    success = bool(result and result.get("status") == "completed")
+                if success:
+                    completed.add(task_id)
                     voice.speak(config.RETURN_REPLY)
+                    if completed == {1, 2}:
+                        voice.speak("两个任务均已完成")
+                        return
+                else:
+                    completed.clear()
+                    voice.speak("本轮未完成；重试前请由裁判重新发放任务卡")
                 break
 
             # ── 未识别的提示词，提示后继续监听 ────────────

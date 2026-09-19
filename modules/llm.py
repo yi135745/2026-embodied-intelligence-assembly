@@ -14,6 +14,7 @@ from socket import timeout as SOCKET_TIMEOUT
 from urllib import error, request
 
 import config
+from modules.task2_planning import validate_actions
 
 
 def _guess_image_mime(image_bytes: bytes, image_name: str = "") -> str:
@@ -153,7 +154,7 @@ class LLM:
         raise RuntimeError("模型没有返回可读取的文本结果。")
 
     def parse_task2_card(self, image, output_dir=None) -> list:
-        """通过视觉 API 识别任务卡2，返回校验后的六步装配指令。"""
+        """通过视觉API识别任务卡2，返回校验后的落盘/叠放动作。"""
         image_path = image if isinstance(image, Path) else Path(image)
         api_key = config.DASHSCOPE_API_KEY
         if not api_key:
@@ -171,11 +172,15 @@ class LLM:
                 result = json.loads(response.read().decode("utf-8"))
         except Exception as exc:
             raise RuntimeError("任务卡2 API 识别失败：" + str(exc)) from exc
-        text = result.get("choices", [{}])[0].get("message", {}).get("content", "")
+        choices = result.get("choices") or []
+        text = choices[0].get("message", {}).get("content", "") if choices else ""
+        if not isinstance(text, str):
+            raise RuntimeError("任务卡2 API未返回文本。")
         raw_text = text.strip()
         log_path = None
         if output_dir is not None:
-            log_path = Path(output_dir) / ("task2_llm_%s.txt" % datetime.now().strftime("%Y%m%d_%H%M%S"))
+            Path(output_dir).mkdir(parents=True, exist_ok=True)
+            log_path = Path(output_dir) / ("task2_llm_%s.txt" % datetime.now().strftime("%Y%m%d_%H%M%S_%f"))
             log_path.write_text(
                 "timestamp: %s\nmodel: %s\n\n[RAW_OUTPUT]\n%s\n"
                 % (datetime.now().isoformat(timespec="seconds"), self.model, raw_text),
@@ -186,19 +191,7 @@ class LLM:
             steps = json.loads(text)
         except json.JSONDecodeError as exc:
             raise RuntimeError("任务卡2 API 未返回合法 JSON：" + text) from exc
-        colors = set(config.TASK2_HSV_RANGES)
-        if not isinstance(steps, list) or len(steps) != 6:
-            raise RuntimeError("任务卡2必须解析为6步。")
-        normalized = []
-        for index, item in enumerate(steps, 1):
-            block, tray = item.get("block_color"), item.get("tray_color")
-            if block not in colors or tray not in colors:
-                raise RuntimeError("任务卡2第%d步颜色无效。" % index)
-            normalized.append({"step": index, "block_color": block, "tray_color": tray})
-        if {x["block_color"] for x in normalized} != colors:
-            raise RuntimeError("六步指令没有完整覆盖六种方块颜色。")
-        if {x["tray_color"] for x in normalized} != colors:
-            raise RuntimeError("六步指令没有完整覆盖六种托盘颜色。")
+        normalized = validate_actions(steps)
         if log_path is not None:
             with log_path.open("a", encoding="utf-8") as stream:
                 stream.write("\n[VALIDATED_STEPS]\n")

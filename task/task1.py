@@ -25,6 +25,15 @@ from modules.pose_records import apply_aubo_pose_records
 
 
 def task1_run(voice, vision, robot, llm):
+    try:
+        return _task1_run(voice, vision, robot, llm)
+    except (Exception, SystemExit) as exc:
+        print("任务一失败：" + str(exc))
+        voice.speak("任务一失败")
+        return False
+
+
+def _task1_run(voice, vision, robot, llm):
     """任务一主流程。
 
     功能：
@@ -39,7 +48,7 @@ def task1_run(voice, vision, robot, llm):
         llm    -- LLM 模块实例，提供视觉大模型理解能力
 
     输出：
-        无。识别结果通过 voice.speak 直接播报，执行完毕后返回 main.py。
+        成功返回True，识别失败返回False，主入口据此决定是否播报完成。
     """
     apply_aubo_pose_records()
     # ── 阶段 1：机器人移动到任务卡拍照位 ────────────────
@@ -59,10 +68,11 @@ def task1_run(voice, vision, robot, llm):
     except Exception as exc:
         print("大模型识别失败：" + str(exc))
         voice.speak("大模型识别失败")
-        return
+        return False
 
     # ── 阶段 4：语音播报结果 ──────────────────────────
     voice.speak(result)
+    return True
 
 
 if __name__ == "__main__":

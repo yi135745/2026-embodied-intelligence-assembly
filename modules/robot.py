@@ -184,9 +184,10 @@ class Robot:
     def _orientation_error_degrees(current_pose, target_pose) -> float:
         """getTcpPose 返回弧度，转成角度误差。"""
         scale = 180.0 / 3.141592653589793
-        drx = (current_pose[3] - target_pose[3]) * scale
-        dry = (current_pose[4] - target_pose[4]) * scale
-        drz = (current_pose[5] - target_pose[5]) * scale
+        # 欧拉角±pi等价，不能将跨边界的微小误差判为接近360度。
+        import math
+        drx, dry, drz = [((current_pose[i] - target_pose[i] + math.pi) %
+                         (2 * math.pi) - math.pi) * scale for i in (3, 4, 5)]
         return (drx * drx + dry * dry + drz * drz) ** 0.5
 
     @staticmethod
@@ -366,12 +367,19 @@ class Robot:
         return self.set_suction(False)
 
     def pick_and_place(self, pick_pose, place_pose, lift_mm=None) -> bool:
-        """上方接近、下降吸取、原地抬升、水平移动、原地下降并释放。"""
+        """在共同净空高度旋转/平移，保持低位抓取与释放过程竖直。"""
         lift = float(config.TASK2_LIFT_DISTANCE_MM if lift_mm is None else lift_mm)
         pick, place = list(map(float, pick_pose)), list(map(float, place_pose))
         pick_above, place_above = pick.copy(), place.copy()
-        pick_above[2] += lift
-        place_above[2] += lift
+        clearance = max(pick[2] + lift, place[2] + lift, float(config.ROBOT_SAFE_Z))
+        current = self.get_current_pose()
+        clearance = max(clearance, current[2])
+        # 从上一放置点先竖直抬起，再跨区移动到下一个抓取点。
+        rise = list(current)
+        rise[2] = clearance
+        if not self.move_to(rise):
+            return False
+        pick_above[2] = place_above[2] = clearance
         if not self.move_to(pick_above) or not self.move_to(pick):
             return False
         if not self.vacuum_on():
@@ -379,6 +387,12 @@ class Robot:
         if not self.move_to(pick_above):
             self.vacuum_off()
             return False
+        if config.TASK2_ROTATE_AT_CLEARANCE:
+            rotated = pick_above.copy()
+            rotated[3:] = place[3:]
+            if not self.move_to(rotated):
+                self.vacuum_off()
+                return False
         if not self.move_to(place_above) or not self.move_to(place):
             self.vacuum_off()
             return False
