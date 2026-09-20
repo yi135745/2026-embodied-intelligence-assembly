@@ -45,6 +45,14 @@ def _capture(vision, scene, exposure, gain):
     return vision.capture(output_name=path, exposure_time=float(exposure), gain=float(gain))
 
 
+def _window_open():
+    """窗口被 X 关闭时停止读取轨道条，避免 OpenCV NULL window 异常。"""
+    try:
+        return cv2.getWindowProperty(WINDOW, cv2.WND_PROP_VISIBLE) >= 1
+    except cv2.error:
+        return False
+
+
 def main():
     parser = argparse.ArgumentParser(description="任务二HSV、曝光和增益人工调参")
     parser.add_argument("--image", help="使用本地图片")
@@ -60,6 +68,22 @@ def main():
     saved_ranges = {color: [[list(lo), list(hi)] for lo, hi in values]
                     for color, values in ranges.items()}
 
+    scene_exposure = getattr(config, "TASK2_%s_EXPOSURE_TIME" % args.scene.upper())
+    scene_gain = getattr(config, "TASK2_%s_GAIN" % args.scene.upper())
+    initial_exposure = config.MVS_EXPOSURE_TIME if scene_exposure is None else scene_exposure
+    initial_gain = config.MVS_GAIN if scene_gain is None else scene_gain
+    initial_exposure = max(0, int(initial_exposure))
+    initial_gain_x10 = max(0, int(initial_gain * 10))
+
+    color_index = 0
+    vision = Vision() if args.camera else None
+    # 首帧采集结束后再显示窗口，避免相机阻塞时留下空白/无响应窗口。
+    image_path = (_capture(vision, args.scene, initial_exposure, initial_gain_x10 / 10.0)
+                  if args.camera else Path(args.image))
+    image = cv2.imread(str(image_path))
+    if image is None:
+        raise RuntimeError("无法读取图片：" + str(image_path))
+
     cv2.namedWindow(WINDOW, cv2.WINDOW_NORMAL)
     maxima = (179, 255, 255, 179, 255, 255)
     for name, maximum in zip(("H low", "S low", "V low", "H high", "S high", "V high"), maxima):
@@ -67,28 +91,14 @@ def main():
     cv2.createTrackbar("Morph", WINDOW, int(config.TASK2_MORPH_KERNEL), 31, _nothing)
     cv2.createTrackbar("Min area", WINDOW, int(config.TASK2_MIN_CONTOUR_AREA), 50000, _nothing)
     cv2.createTrackbar("Max area/100", WINDOW, max(1, int(config.TASK2_MAX_CONTOUR_AREA / 100)), 10000, _nothing)
-    scene_exposure = getattr(config, "TASK2_%s_EXPOSURE_TIME" % args.scene.upper())
-    scene_gain = getattr(config, "TASK2_%s_GAIN" % args.scene.upper())
-    initial_exposure = config.MVS_EXPOSURE_TIME if scene_exposure is None else scene_exposure
-    initial_gain = config.MVS_GAIN if scene_gain is None else scene_gain
-    cv2.createTrackbar("Exposure us", WINDOW, max(0, int(initial_exposure)), 100000, _nothing)
-    cv2.createTrackbar("Gain x10", WINDOW, max(0, int(initial_gain * 10)), 1000, _nothing)
-
-    color_index = 0
+    cv2.createTrackbar("Exposure us", WINDOW, initial_exposure, 100000, _nothing)
+    cv2.createTrackbar("Gain x10", WINDOW, initial_gain_x10, 1000, _nothing)
     _set_range(colors[color_index], saved_ranges)
-    vision = Vision() if args.camera else None
-    image_path = _capture(vision, args.scene, cv2.getTrackbarPos("Exposure us", WINDOW),
-                          cv2.getTrackbarPos("Gain x10", WINDOW) / 10.0) if args.camera else Path(args.image)
-    image = cv2.imread(str(image_path))
-    if image is None:
-        raise RuntimeError("无法读取图片：" + str(image_path))
-
-    last_capture_settings = (
-        cv2.getTrackbarPos("Exposure us", WINDOW),
-        cv2.getTrackbarPos("Gain x10", WINDOW),
-    )
+    last_capture_settings = (initial_exposure, initial_gain_x10)
     settings_changed_at = float("inf")
-    while True:
+    cv2.imshow(WINDOW, cv2.resize(image, (640, 480)))
+    cv2.waitKey(1)
+    while _window_open():
         current_capture_settings = (
             cv2.getTrackbarPos("Exposure us", WINDOW),
             cv2.getTrackbarPos("Gain x10", WINDOW),
@@ -100,6 +110,8 @@ def main():
         if vision is not None and time.monotonic() - settings_changed_at >= 0.35:
             exposure, gain_x10 = current_capture_settings
             image_path = _capture(vision, args.scene, exposure, gain_x10 / 10.0)
+            if not _window_open():
+                break
             refreshed = cv2.imread(str(image_path))
             if refreshed is not None:
                 image = refreshed

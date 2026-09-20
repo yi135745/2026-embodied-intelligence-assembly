@@ -200,7 +200,12 @@ class ColorObjectDetector:
             debug_path.mkdir(parents=True, exist_ok=True)
         size = max(1, int(config.TASK2_MORPH_KERNEL))
         kernel = np.ones((size, size), np.uint8)
-        hsv_ranges = config.TASK2_BLOCK_HSV_RANGES if kind == "方块" else config.TASK2_TRAY_HSV_RANGES
+        hsv_ranges = (config.TASK2_BLOCK_HSV_RANGES if kind == "方块"
+                      else config.TASK2_TRAY_HSV_RANGES)
+        if kind == "方块":
+            disabled = set(config.TASK2_DISABLED_BLOCK_COLORS)
+            hsv_ranges = {color: ranges for color, ranges in hsv_ranges.items()
+                          if color not in disabled}
         color_masks = {}
         for color_index, (color, ranges) in enumerate(hsv_ranges.items(), start=1):
             mask = np.zeros(hsv.shape[:2], dtype=np.uint8)
@@ -357,6 +362,8 @@ def validate_six_colors(targets, kind: str) -> None:
 
 def validate_colors(targets, kind: str) -> None:
     expected = set(config.TASK2_BLOCK_COLORS if kind == "方块" else config.TASK2_TRAY_COLORS)
+    if kind == "方块":
+        expected -= set(config.TASK2_DISABLED_BLOCK_COLORS)
     actual = {item.color for item in targets}
     if actual != expected:
         raise RuntimeError("%s颜色识别不完整，缺少：%s，多出：%s" % (kind, sorted(expected-actual), sorted(actual-expected)))

@@ -73,6 +73,8 @@ def main():
     cv2.imwrite(str(annotated_path), annotated)
     found = {item.color for item in targets}
     expected = set(config.TASK2_BLOCK_COLORS if kind == "方块" else config.TASK2_TRAY_COLORS)
+    if kind == "方块":
+        expected -= set(config.TASK2_DISABLED_BLOCK_COLORS)
     result = [item.to_dict() for item in targets]
     (output_dir / "detections.json").write_text(
         json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8"

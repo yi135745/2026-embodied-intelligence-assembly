@@ -29,6 +29,8 @@ def validate_actions(actions):
         source, kind, target = (action[key] for key in ("source_color", "target_type", "target_color"))
         if not all(isinstance(value, str) for value in (source, kind, target)):
             raise ValueError("第%d步颜色与目标类型必须为字符串。" % index)
+        if source in config.TASK2_DISABLED_BLOCK_COLORS:
+            raise ValueError("第%d步需要已屏蔽的%s方块；缺件期间禁止执行该任务卡。" % (index, source))
         if source not in config.TASK2_BLOCK_COLORS or source in used:
             raise ValueError("第%d步来源颜色无效或重复使用：%s。" % (index, source))
         if index <= 6:

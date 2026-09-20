@@ -209,6 +209,9 @@ TASK2_TRAY_HSV_RANGES = dict(TASK2_HSV_RANGES)
 TASK2_TRAY_COLORS = ("红色", "橙色", "黄色", "绿色", "蓝色", "紫色")
 TASK2_EXTRA_BLOCK_COLORS = ("青色", "粉色", "棕色")
 TASK2_BLOCK_COLORS = TASK2_TRAY_COLORS + TASK2_EXTRA_BLOCK_COLORS
+# 临时缺件调试：不检测/不要求这些方块；任务卡若用到它们仍禁止执行。
+# 青色方块到货并完成实物调参后改回空元组 ()。
+TASK2_DISABLED_BLOCK_COLORS = ("青色",)
 # None：按卡面接受1~3个叠放动作；规则明确后设1/2/3。0仅供省赛六步回归。
 TASK2_EXPECTED_STACK_COUNT = None
 TASK2_MIN_CONTOUR_AREA = 300
@@ -244,8 +247,8 @@ TASK2_TRAY_EXPOSURE_TIME = None
 TASK2_TRAY_GAIN = None
 
 # XY标定原点和XY偏移只保存在data/task2_offsets_v2.json，不在config保留副本。
-TASK2_BLOCK_PICK_Z = 173
-TASK2_TRAY_PLACE_Z = 180
+TASK2_BLOCK_PICK_Z = 180
+TASK2_TRAY_PLACE_Z = 183
 # 上述抓取/放置Z是在参考高度物块上标定的TCP高度。
 # 任务书写明高度未知，以下30/28只是暂定值；实测高度需与参考Z一起标定。
 TASK2_REFERENCE_BLOCK_HEIGHT_MM = 30.0

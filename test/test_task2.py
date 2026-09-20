@@ -63,6 +63,7 @@ class Task2Test(unittest.TestCase):
         self.scope.enter_context(redirect_stdout(io.StringIO()))
         for name, value in {
             "TASK2_EXPECTED_STACK_COUNT": None, "TASK2_REFERENCE_BLOCK_HEIGHT_MM": 30.,
+            "TASK2_DISABLED_BLOCK_COLORS": (),
             "TASK2_BLOCK_HEIGHT_MM": {**{c: 30. for c in config.TASK2_TRAY_COLORS},
                                       **{c: 28. for c in config.TASK2_EXTRA_BLOCK_COLORS}},
             "TASK2_ROTATION_ENABLED": True, "TASK2_ROTATE_AT_CLEARANCE": True,
@@ -151,10 +152,17 @@ class Task2Test(unittest.TestCase):
                     for p in root.find(".//CalibPointFListParam[@ParamName='%s']" % name)]
         transformer = CoordinateTransformer(config.TASK2_CALIBRATION_FILE)
         images, worlds = points("ImagePointLst"), points("WorldPointLst")
-        self.assertEqual(9, len(images))
-        self.assertEqual(9, len(worlds))
-        for image, world in zip(images, worlds):
-            self.assertLess(math.dist(transformer.pixel_to_world(*image), world), 0.2)
+        recorded_count = int(root.findtext(".//CalibParam[@ParamName='TransNum']/ParamValue"))
+        self.assertGreaterEqual(recorded_count, 9)
+        self.assertEqual(recorded_count, len(images))
+        self.assertEqual(recorded_count, len(worlds))
+        errors = [math.dist(transformer.pixel_to_world(*image), world)
+                  for image, world in zip(images, worlds)]
+        self.assertTrue(all(math.isfinite(error) for error in errors))
+        recorded_rms = float(root.findtext(
+            ".//CalibParam[@ParamName='TransWorldError']/ParamValue"))
+        computed_rms = math.sqrt(sum(error ** 2 for error in errors) / len(errors))
+        self.assertAlmostEqual(recorded_rms, computed_rms, places=4)
 
     def test_nine_blocks_six_trays_with_angles(self):
         with tempfile.TemporaryDirectory() as folder:
@@ -171,6 +179,25 @@ class Task2Test(unittest.TestCase):
                     self.assertAlmostEqual(20, target.robot_angle_deg, delta=1)
                     colors = config.TASK2_BLOCK_COLORS if kind == "方块" else config.TASK2_TRAY_COLORS
                     self.assertAlmostEqual(70 + colors.index(target.color)*140, target.pixel_center[0], delta=2)
+
+    def test_missing_cyan_can_be_ignored_for_vision_but_not_execution(self):
+        with tempfile.TemporaryDirectory() as folder, patch.object(
+                config, "TASK2_DISABLED_BLOCK_COLORS", ("青色",)):
+            transformer = CoordinateTransformer()
+            transformer.matrix = np.eye(3)
+            image = cv2.imread(str(make_image(Path(folder) / "blocks.png", "方块")))
+            cyan_index = config.TASK2_BLOCK_COLORS.index("青色")
+            cv2.rectangle(image, (cyan_index * 140 + 30, 150),
+                          (cyan_index * 140 + 110, 250), (245, 245, 245), -1)
+            path = Path(folder) / "without_cyan.png"
+            self.assertTrue(cv2.imwrite(str(path), image))
+            found, _ = ColorObjectDetector(transformer).detect(
+                path, "方块", include_robot_pose=False)
+            validate_colors(found, "方块")
+            self.assertEqual(set(config.TASK2_BLOCK_COLORS) - {"青色"},
+                             {target.color for target in found})
+            with self.assertRaisesRegex(ValueError, "已屏蔽的青色方块"):
+                validate_actions(actions())
 
     def test_missing_block_is_not_silently_filled(self):
         with tempfile.TemporaryDirectory() as folder:
