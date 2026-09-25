@@ -34,7 +34,7 @@
 
 ---
 
-## 第 5 页 · 视觉采集（vision.py）
+## 第 5 页 · 视觉采集（camera.py）
 - 海康 MVS 工业相机（GigE/USB），枚举设备、按 IP 选相机
 - 完整取流流程：枚举 → 打开 → 触发模式 → 曝光/增益 → 抓一帧 → 存 JPG → 释放
 - 三级兜底：调试图 > 本地测试图 > 实机拍照（便于无相机离线开发）
@@ -83,8 +83,8 @@
 
 ## 第 11 页 · 调参与标定工具链
 - `task2_tuner.py`：HSV/曝光/增益 交互式滑条调参
-- `task2_offset_calibrate.py`：半自动标定方块/托盘 XY 偏移 + 抓放 Z
-- `task2_tray_verify.py`：托盘坐标人工验收，可复用省去现场重复识别
+- `task2_closed_loop_offset_calibrate.py`：双区绝对锚定、动作补偿与验证
+- `task2_calibration_audit.py`：只读审计矩阵、绑定和偏移版本链
 - 所有参数集中 `config.py`，现场只改少数几项
 
 ---

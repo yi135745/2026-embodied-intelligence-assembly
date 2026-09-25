@@ -28,25 +28,9 @@
 
 省赛回归可以手动设置 `VOICE_BACKEND="local"`；此时才加载本地 FunASR、PyAudio、pyttsx3。盒子模式的语音模块和独立测试脚本仅依赖 Python 标准库，其他视觉/机器人模块仍使用原有环境。
 
-## 无机械臂的联调顺序
+## 联调与离线回归
 
-从项目根目录运行，建议沿用 Python 3.10 环境。以下脚本只导入语音模块，不连接相机、机械臂或视觉大模型：
-
-```powershell
-# 默认只读：不录音、不播报
-python test/ai_box_check.py
-
-# 会从盒子扬声器播一句短句，需要人工确认确实有声音
-python test/ai_box_check.py --action tts
-
-# 会使用盒子麦克风录一次音；提示后直接说“任务一”，无需“小E同学”
-python test/ai_box_check.py --action listen
-
-# 测试“小具同学”→就绪播报→“任务一/任务二”；只复述，不执行任何任务
-python test/ai_box_check.py --action dialogue
-```
-
-`--url http://其他地址:8765` 只对本次脚本生效；`--action tts --text "测试内容"` 可指定播报内容。先关掉厂商测试客户端及其他录音程序，避免争抢捕获锁。
+未使用的盒子手工检查脚本已从 `test/` 删除；测试目录只保留可自动发现且无设备副作用的回归。需要重新做盒子麦克风或扬声器联调时，应在 `tools/diagnostics/` 新建明确标注设备占用的入口，不把它伪装成离线测试。联调前先关闭厂商测试客户端及其他录音程序，避免争抢捕获锁。
 
 离线测试：`python -m unittest discover -s test -p "test*.py" -v`。语音测试用模拟响应，覆盖请求字段、HTTP 200 业务失败、超时不重试、静音、畸形响应、播报失败、唤醒词差异及本地后端保留，不能代替真实声学验收。
 

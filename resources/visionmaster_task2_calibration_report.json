@@ -1,0 +1,2849 @@
+{
+  "created_at": "2026-09-25T20:22:05",
+  "mode": "single_9_pose_up_to_6_trays_geometry_hsv_spatial_fallback",
+  "reference_pixel_zero": [
+    1503.5214538574219,
+    1027.1534576416016
+  ],
+  "relative_world_rms_mm": 0.04988679780379673,
+  "relative_world_max_mm": 0.1226638520012232,
+  "region_relative_rms_mm": {
+    "top_left": 0.04651616271377364,
+    "top_center": 0.0476812197686866,
+    "top_right": 0.05518591989173363,
+    "bottom_left": 0.04633492290649819,
+    "bottom_center": 0.04294032320583588,
+    "bottom_right": 0.058810043924381813
+  },
+  "region_sample_counts": {
+    "top_left": 9,
+    "top_center": 9,
+    "top_right": 9,
+    "bottom_left": 9,
+    "bottom_center": 9,
+    "bottom_right": 9
+  },
+  "region_total_weighting": "equalized_by_sqrt_mean_count_over_group_count",
+  "requires_new_xy_offset_calibration": true,
+  "training_error_is_not_independent_placement_accuracy": true,
+  "leave_one_region_out_relative_rms_mm": {
+    "top_left": 0.05239230895248315,
+    "top_center": 0.05113223327964142,
+    "top_right": 0.05794057039152675,
+    "bottom_left": 0.06009373287378941,
+    "bottom_center": 0.043727154239309965,
+    "bottom_right": 0.06634579673474228
+  },
+  "formal_project_files_modified": false,
+  "tray_view_pose_mm_rad": [
+    76.01091721350092,
+    -444.8703668387765,
+    436.0552719825446,
+    -3.1415298357600463,
+    0.00017744660881005513,
+    1.5313931882822114
+  ],
+  "camera_pose_count": 9,
+  "tray_landmark_count": 6,
+  "maximum_sample_count": 54,
+  "raw_sample_count": 54,
+  "sample_count": 54,
+  "excluded_sample_count": 0,
+  "raw_region_sample_counts": {
+    "top_left": 9,
+    "top_center": 9,
+    "top_right": 9,
+    "bottom_left": 9,
+    "bottom_center": 9,
+    "bottom_right": 9
+  },
+  "per_camera_pose_sample_counts": {
+    "1": 6,
+    "2": 6,
+    "3": 6,
+    "4": 6,
+    "5": 6,
+    "6": 6,
+    "7": 6,
+    "8": 6,
+    "9": 6
+  },
+  "matrix_pixel_to_world_mm": [
+    [
+      -0.0039934236335185825,
+      -0.12476745917851645,
+      134.15952520370698
+    ],
+    [
+      -0.1248983766226195,
+      0.003464501499127634,
+      184.22881411023926
+    ],
+    [
+      -7.312827440022913e-07,
+      8.947714771186574e-06,
+      1.0
+    ]
+  ],
+  "world_rms_mm": 0.04988679780379673,
+  "pixel_rms": 0.40262044009299586,
+  "per_camera_pose_world_rms_mm": {
+    "1": 0.09466107550177622,
+    "2": 0.06536442863116991,
+    "3": 0.03333024715743077,
+    "4": 0.035062646714163564,
+    "5": 0.0424344353701957,
+    "6": 0.02489136666089431,
+    "7": 0.03522566778865532,
+    "8": 0.027647268828729817,
+    "9": 0.04898194010207211
+  },
+  "tray_estimated_xy": {
+    "top_left": [
+      115.55044310517451,
+      -364.09428897241537
+    ],
+    "top_center": [
+      112.17450289667755,
+      -446.2610082236063
+    ],
+    "top_right": [
+      108.71417893868694,
+      -528.2528617141655
+    ],
+    "bottom_left": [
+      43.39902818279544,
+      -361.76294288320724
+    ],
+    "bottom_center": [
+      39.94455990080062,
+      -443.48667880621247
+    ],
+    "bottom_right": [
+      36.59764938406524,
+      -525.2877293068045
+    ]
+  },
+  "candidate_xml": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\visionmaster_task2_tray_candidate.xml",
+  "source_report_for_offline_replay": null,
+  "color_identity_used_for_correspondence": false,
+  "color_used_for_calibration": false,
+  "hsv_spatial_fallback_sample_count": 0,
+  "six_observations_at_one_pose_share_camera_pose_error": true,
+  "samples": [
+    {
+      "region": "top_left",
+      "region_label": "top_left",
+      "point_index": 1,
+      "step_mm": 8.0,
+      "command_offset_mm": [
+        0.0,
+        0.0
+      ],
+      "camera_tcp_pose_mm_rad": [
+        76.01006754793232,
+        -444.86900115979705,
+        436.0593986462799,
+        -3.1415329108189236,
+        0.00018684785929168115,
+        1.531382790604864
+      ],
+      "image_point": [
+        845.18408203125,
+        729.8304443359375
+      ],
+      "nested_square_support": 58,
+      "median_square_side_px": 347.75862356414086,
+      "detection_source": "geometry",
+      "grid_score": 0.0025832329994543435,
+      "tracking": {
+        "observed_count": 6,
+        "geometry_count": 6,
+        "supplement_count": 0,
+        "common_image_shift_px": [
+          0.0,
+          0.0
+        ],
+        "geometry_match_rms_px": 0.0,
+        "grid_score": 0.0025832329994543435
+      },
+      "raw_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\01_raw.jpg",
+      "annotated_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\01_detected.jpg",
+      "world_point_mm": [
+        39.540375557242186,
+        80.77471218738168
+      ],
+      "world_error_mm": [
+        -0.04860368703253215,
+        -0.05674369703368143
+      ],
+      "pixel_error": [
+        -0.4654790310789849,
+        -0.3760004515396531
+      ]
+    },
+    {
+      "region": "top_center",
+      "region_label": "top_center",
+      "point_index": 1,
+      "step_mm": 8.0,
+      "command_offset_mm": [
+        0.0,
+        0.0
+      ],
+      "camera_tcp_pose_mm_rad": [
+        76.01006754793232,
+        -444.86900115979705,
+        436.0593986462799,
+        -3.1415329108189236,
+        0.00018684785929168115,
+        1.531382790604864
+      ],
+      "image_point": [
+        1507.2152709960938,
+        736.0719604492188
+      ],
+      "nested_square_support": 30,
+      "median_square_side_px": 374.42025242775287,
+      "detection_source": "geometry",
+      "grid_score": 0.0025832329994543435,
+      "tracking": {
+        "observed_count": 6,
+        "geometry_count": 6,
+        "supplement_count": 0,
+        "common_image_shift_px": [
+          0.0,
+          0.0
+        ],
+        "geometry_match_rms_px": 0.0,
+        "grid_score": 0.0025832329994543435
+      },
+      "raw_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\01_raw.jpg",
+      "annotated_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\01_detected.jpg",
+      "world_point_mm": [
+        36.16443534874523,
+        -1.3920070638092739
+      ],
+      "world_error_mm": [
+        -0.05968456769978303,
+        -0.06978059658867775
+      ],
+      "pixel_error": [
+        -0.5746062043997426,
+        -0.4615232398197122
+      ]
+    },
+    {
+      "region": "top_right",
+      "region_label": "top_right",
+      "point_index": 1,
+      "step_mm": 8.0,
+      "command_offset_mm": [
+        0.0,
+        0.0
+      ],
+      "camera_tcp_pose_mm_rad": [
+        76.01006754793232,
+        -444.86900115979705,
+        436.0593986462799,
+        -3.1415329108189236,
+        0.00018684785929168115,
+        1.531382790604864
+      ],
+      "image_point": [
+        2167.337890625,
+        742.9723510742188
+      ],
+      "nested_square_support": 60,
+      "median_square_side_px": 350.49937452078905,
+      "detection_source": "geometry",
+      "grid_score": 0.0025832329994543435,
+      "tracking": {
+        "observed_count": 6,
+        "geometry_count": 6,
+        "supplement_count": 0,
+        "common_image_shift_px": [
+          0.0,
+          0.0
+        ],
+        "geometry_match_rms_px": 0.0,
+        "grid_score": 0.0025832329994543435
+      },
+      "raw_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\01_raw.jpg",
+      "annotated_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\01_detected.jpg",
+      "world_point_mm": [
+        32.70411139075462,
+        -83.38386055436848
+      ],
+      "world_error_mm": [
+        -0.06371430675037715,
+        -0.08766698020026809
+      ],
+      "pixel_error": [
+        -0.7215980580340329,
+        -0.48914488262801115
+      ]
+    },
+    {
+      "region": "bottom_left",
+      "region_label": "bottom_left",
+      "point_index": 1,
+      "step_mm": 8.0,
+      "command_offset_mm": [
+        0.0,
+        0.0
+      ],
+      "camera_tcp_pose_mm_rad": [
+        76.01006754793232,
+        -444.86900115979705,
+        436.0593986462799,
+        -3.1415329108189236,
+        0.00018684785929168115,
+        1.531382790604864
+      ],
+      "image_point": [
+        838.9908447265625,
+        1313.1608276367188
+      ],
+      "nested_square_support": 58,
+      "median_square_side_px": 348.2379465071213,
+      "detection_source": "geometry",
+      "grid_score": 0.0025832329994543435,
+      "tracking": {
+        "observed_count": 6,
+        "geometry_count": 6,
+        "supplement_count": 0,
+        "common_image_shift_px": [
+          0.0,
+          0.0
+        ],
+        "geometry_match_rms_px": 0.0,
+        "grid_score": 0.0025832329994543435
+      },
+      "raw_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\01_raw.jpg",
+      "annotated_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\01_detected.jpg",
+      "world_point_mm": [
+        -32.61103936513688,
+        83.1060582765898
+      ],
+      "world_error_mm": [
+        -0.05583481067332485,
+        -0.041419518899431296
+      ],
+      "pixel_error": [
+        -0.3451247448221011,
+        -0.44241692754144424
+      ]
+    },
+    {
+      "region": "bottom_center",
+      "region_label": "bottom_center",
+      "point_index": 1,
+      "step_mm": 8.0,
+      "command_offset_mm": [
+        0.0,
+        0.0
+      ],
+      "camera_tcp_pose_mm_rad": [
+        76.01006754793232,
+        -444.86900115979705,
+        436.0593986462799,
+        -3.1415329108189236,
+        0.00018684785929168115,
+        1.531382790604864
+      ],
+      "image_point": [
+        1500.9157104492188,
+        1319.9635620117188
+      ],
+      "nested_square_support": 24,
+      "median_square_side_px": 407.47753999768054,
+      "detection_source": "geometry",
+      "grid_score": 0.0025832329994543435,
+      "tracking": {
+        "observed_count": 6,
+        "geometry_count": 6,
+        "supplement_count": 0,
+        "common_image_shift_px": [
+          0.0,
+          0.0
+        ],
+        "geometry_match_rms_px": 0.0,
+        "grid_score": 0.0025832329994543435
+      },
+      "raw_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\01_raw.jpg",
+      "annotated_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\01_detected.jpg",
+      "world_point_mm": [
+        -36.0655076471317,
+        1.382322353584584
+      ],
+      "world_error_mm": [
+        -0.07013580935326047,
+        -0.0566304087095697
+      ],
+      "pixel_error": [
+        -0.4735945656070726,
+        -0.5543297041733695
+      ]
+    },
+    {
+      "region": "bottom_right",
+      "region_label": "bottom_right",
+      "point_index": 1,
+      "step_mm": 8.0,
+      "command_offset_mm": [
+        0.0,
+        0.0
+      ],
+      "camera_tcp_pose_mm_rad": [
+        76.01006754793232,
+        -444.86900115979705,
+        436.0593986462799,
+        -3.1415329108189236,
+        0.00018684785929168115,
+        1.531382790604864
+      ],
+      "image_point": [
+        2162.935302734375,
+        1325.9486083984375
+      ],
+      "nested_square_support": 54,
+      "median_square_side_px": 347.81491707562185,
+      "detection_source": "geometry",
+      "grid_score": 0.0025832329994543435,
+      "tracking": {
+        "observed_count": 6,
+        "geometry_count": 6,
+        "supplement_count": 0,
+        "common_image_shift_px": [
+          0.0,
+          0.0
+        ],
+        "geometry_match_rms_px": 0.0,
+        "grid_score": 0.0025832329994543435
+      },
+      "raw_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\01_raw.jpg",
+      "annotated_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\01_detected.jpg",
+      "world_point_mm": [
+        -39.41241816386708,
+        -80.41872814700747
+      ],
+      "world_error_mm": [
+        -0.09458201887817808,
+        -0.07810673653857236
+      ],
+      "pixel_error": [
+        -0.6565013512104088,
+        -0.746807793766493
+      ]
+    },
+    {
+      "region": "top_left",
+      "region_label": "top_left",
+      "point_index": 2,
+      "step_mm": 8.0,
+      "command_offset_mm": [
+        -8.0,
+        -8.0
+      ],
+      "camera_tcp_pose_mm_rad": [
+        68.00599224480068,
+        -452.8718565458051,
+        436.0630598764497,
+        -3.141528729954116,
+        0.0002005465439831582,
+        1.5313702409695717
+      ],
+      "image_point": [
+        778.8444519042969,
+        667.037353515625
+      ],
+      "nested_square_support": 60,
+      "median_square_side_px": 351.6515516159237,
+      "detection_source": "geometry",
+      "grid_score": null,
+      "tracking": {
+        "observed_count": 6,
+        "geometry_count": 6,
+        "supplement_count": 0,
+        "common_image_shift_px": [
+          -67.33294677734375,
+          -63.32696533203125
+        ],
+        "geometry_match_rms_px": 0.733417599309617
+      },
+      "raw_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\02_raw.jpg",
+      "annotated_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\02_detected.jpg",
+      "world_point_mm": [
+        47.54445086037383,
+        88.77756757338972
+      ],
+      "world_error_mm": [
+        0.023448184033100006,
+        0.006454310812443964
+      ],
+      "pixel_error": [
+        0.05597249555501094,
+        0.186537796448647
+      ]
+    },
+    {
+      "region": "top_center",
+      "region_label": "top_center",
+      "point_index": 2,
+      "step_mm": 8.0,
+      "command_offset_mm": [
+        -8.0,
+        -8.0
+      ],
+      "camera_tcp_pose_mm_rad": [
+        68.00599224480068,
+        -452.8718565458051,
+        436.0630598764497,
+        -3.141528729954116,
+        0.0002005465439831582,
+        1.5313702409695717
+      ],
+      "image_point": [
+        1439.93896484375,
+        673.1508178710938
+      ],
+      "nested_square_support": 40,
+      "median_square_side_px": 381.0448218042467,
+      "detection_source": "geometry",
+      "grid_score": null,
+      "tracking": {
+        "observed_count": 6,
+        "geometry_count": 6,
+        "supplement_count": 0,
+        "common_image_shift_px": [
+          -67.33294677734375,
+          -63.32696533203125
+        ],
+        "geometry_match_rms_px": 0.733417599309617
+      },
+      "raw_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\02_raw.jpg",
+      "annotated_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\02_detected.jpg",
+      "world_point_mm": [
+        44.16851065187687,
+        6.610848322198763
+      ],
+      "world_error_mm": [
+        0.03371895980642137,
+        0.07084956019627064
+      ],
+      "pixel_error": [
+        0.5769832010184928,
+        0.252479811425701
+      ]
+    },
+    {
+      "region": "top_right",
+      "region_label": "top_right",
+      "point_index": 2,
+      "step_mm": 8.0,
+      "command_offset_mm": [
+        -8.0,
+        -8.0
+      ],
+      "camera_tcp_pose_mm_rad": [
+        68.00599224480068,
+        -452.8718565458051,
+        436.0630598764497,
+        -3.141528729954116,
+        0.0002005465439831582,
+        1.5313702409695717
+      ],
+      "image_point": [
+        2099.483642578125,
+        679.9086303710938
+      ],
+      "nested_square_support": 58,
+      "median_square_side_px": 345.87528160172263,
+      "detection_source": "geometry",
+      "grid_score": null,
+      "tracking": {
+        "observed_count": 6,
+        "geometry_count": 6,
+        "supplement_count": 0,
+        "common_image_shift_px": [
+          -67.33294677734375,
+          -63.32696533203125
+        ],
+        "geometry_match_rms_px": 0.733417599309617
+      },
+      "raw_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\02_raw.jpg",
+      "annotated_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\02_detected.jpg",
+      "world_point_mm": [
+        40.70818669388626,
+        -75.38100516836045
+      ],
+      "world_error_mm": [
+        0.051351517962700655,
+        0.08573146625244021
+      ],
+      "pixel_error": [
+        0.7021462068269102,
+        0.39000520292779584
+      ]
+    },
+    {
+      "region": "bottom_left",
+      "region_label": "bottom_left",
+      "point_index": 2,
+      "step_mm": 8.0,
+      "command_offset_mm": [
+        -8.0,
+        -8.0
+      ],
+      "camera_tcp_pose_mm_rad": [
+        68.00599224480068,
+        -452.8718565458051,
+        436.0630598764497,
+        -3.141528729954116,
+        0.0002005465439831582,
+        1.5313702409695717
+      ],
+      "image_point": [
+        772.5671997070312,
+        1249.521484375
+      ],
+      "nested_square_support": 58,
+      "median_square_side_px": 356.1424686618155,
+      "detection_source": "geometry",
+      "grid_score": null,
+      "tracking": {
+        "observed_count": 6,
+        "geometry_count": 6,
+        "supplement_count": 0,
+        "common_image_shift_px": [
+          -67.33294677734375,
+          -63.32696533203125
+        ],
+        "geometry_match_rms_px": 0.733417599309617
+      },
+      "raw_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\02_raw.jpg",
+      "annotated_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\02_detected.jpg",
+      "world_point_mm": [
+        -24.60696406200524,
+        91.10891366259784
+      ],
+      "world_error_mm": [
+        0.04244250059189625,
+        -0.010564692248323126
+      ],
+      "pixel_error": [
+        -0.07816744644321716,
+        0.3469092687560078
+      ]
+    },
+    {
+      "region": "bottom_center",
+      "region_label": "bottom_center",
+      "point_index": 2,
+      "step_mm": 8.0,
+      "command_offset_mm": [
+        -8.0,
+        -8.0
+      ],
+      "camera_tcp_pose_mm_rad": [
+        68.00599224480068,
+        -452.8718565458051,
+        436.0630598764497,
+        -3.141528729954116,
+        0.0002005465439831582,
+        1.5313702409695717
+      ],
+      "image_point": [
+        1433.526123046875,
+        1256.3733520507812
+      ],
+      "nested_square_support": 20,
+      "median_square_side_px": 414.23680562072144,
+      "detection_source": "geometry",
+      "grid_score": null,
+      "tracking": {
+        "observed_count": 6,
+        "geometry_count": 6,
+        "supplement_count": 0,
+        "common_image_shift_px": [
+          -67.33294677734375,
+          -63.32696533203125
+        ],
+        "geometry_match_rms_px": 0.733417599309617
+      },
+      "raw_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\02_raw.jpg",
+      "annotated_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\02_detected.jpg",
+      "world_point_mm": [
+        -28.06143234400006,
+        9.38517773959262
+      ],
+      "world_error_mm": [
+        0.027529130801095647,
+        0.05503069829313212
+      ],
+      "pixel_error": [
+        0.4507715124761944,
+        0.20881087782117902
+      ]
+    },
+    {
+      "region": "bottom_right",
+      "region_label": "bottom_right",
+      "point_index": 2,
+      "step_mm": 8.0,
+      "command_offset_mm": [
+        -8.0,
+        -8.0
+      ],
+      "camera_tcp_pose_mm_rad": [
+        68.00599224480068,
+        -452.8718565458051,
+        436.0630598764497,
+        -3.141528729954116,
+        0.0002005465439831582,
+        1.5313702409695717
+      ],
+      "image_point": [
+        2095.1146240234375,
+        1262.1612548828125
+      ],
+      "nested_square_support": 56,
+      "median_square_side_px": 351.76513655783594,
+      "detection_source": "geometry",
+      "grid_score": null,
+      "tracking": {
+        "observed_count": 6,
+        "geometry_count": 6,
+        "supplement_count": 0,
+        "common_image_shift_px": [
+          -67.33294677734375,
+          -63.32696533203125
+        ],
+        "geometry_match_rms_px": 0.733417599309617
+      },
+      "raw_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\02_raw.jpg",
+      "annotated_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\02_detected.jpg",
+      "world_point_mm": [
+        -31.408342860735438,
+        -72.41587276099943
+      ],
+      "world_error_mm": [
+        0.030821547394292992,
+        0.04744372904816885
+      ],
+      "pixel_error": [
+        0.39121692570461164,
+        0.23738432593881953
+      ]
+    },
+    {
+      "region": "top_left",
+      "region_label": "top_left",
+      "point_index": 3,
+      "step_mm": 8.0,
+      "command_offset_mm": [
+        0.0,
+        -8.0
+      ],
+      "camera_tcp_pose_mm_rad": [
+        76.00979192288837,
+        -452.87085560195914,
+        436.06593974634575,
+        -3.1415283756324004,
+        0.00020642842801605411,
+        1.5313766976316252
+      ],
+      "image_point": [
+        780.4087524414062,
+        731.66943359375
+      ],
+      "nested_square_support": 54,
+      "median_square_side_px": 340.901923643,
+      "detection_source": "geometry",
+      "grid_score": null,
+      "tracking": {
+        "observed_count": 6,
+        "geometry_count": 6,
+        "supplement_count": 0,
+        "common_image_shift_px": [
+          -65.01885986328125,
+          1.68878173828125
+        ],
+        "geometry_match_rms_px": 0.19779958158246852
+      },
+      "raw_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\03_raw.jpg",
+      "annotated_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\03_detected.jpg",
+      "world_point_mm": [
+        39.54065118228614,
+        88.77656662954377
+      ],
+      "world_error_mm": [
+        -0.02232917884816743,
+        -0.015113603442458157
+      ],
+      "pixel_error": [
+        -0.12554860007480784,
+        -0.1755487559555604
+      ]
+    },
+    {
+      "region": "top_center",
+      "region_label": "top_center",
+      "point_index": 3,
+      "step_mm": 8.0,
+      "command_offset_mm": [
+        0.0,
+        -8.0
+      ],
+      "camera_tcp_pose_mm_rad": [
+        76.00979192288837,
+        -452.87085560195914,
+        436.06593974634575,
+        -3.1415283756324004,
+        0.00020642842801605411,
+        1.5313766976316252
+      ],
+      "image_point": [
+        1442.167724609375,
+        737.8294067382812
+      ],
+      "nested_square_support": 28,
+      "median_square_side_px": 398.49612361229583,
+      "detection_source": "geometry",
+      "grid_score": null,
+      "tracking": {
+        "observed_count": 6,
+        "geometry_count": 6,
+        "supplement_count": 0,
+        "common_image_shift_px": [
+          -65.01885986328125,
+          1.68878173828125
+        ],
+        "geometry_match_rms_px": 0.19779958158246852
+      },
+      "raw_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\03_raw.jpg",
+      "annotated_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\03_detected.jpg",
+      "world_point_mm": [
+        36.164710973789184,
+        6.609847378352811
+      ],
+      "world_error_mm": [
+        -0.021965844127080913,
+        0.014025884227314656
+      ],
+      "pixel_error": [
+        0.10801783442570922,
+        -0.1799984763027851
+      ]
+    },
+    {
+      "region": "top_right",
+      "region_label": "top_right",
+      "point_index": 3,
+      "step_mm": 8.0,
+      "command_offset_mm": [
+        0.0,
+        -8.0
+      ],
+      "camera_tcp_pose_mm_rad": [
+        76.00979192288837,
+        -452.87085560195914,
+        436.06593974634575,
+        -3.1415283756324004,
+        0.00020642842801605411,
+        1.5313766976316252
+      ],
+      "image_point": [
+        2102.3218994140625,
+        744.6572875976562
+      ],
+      "nested_square_support": 54,
+      "median_square_side_px": 346.0779865323787,
+      "detection_source": "geometry",
+      "grid_score": null,
+      "tracking": {
+        "observed_count": 6,
+        "geometry_count": 6,
+        "supplement_count": 0,
+        "common_image_shift_px": [
+          -65.01885986328125,
+          1.68878173828125
+        ],
+        "geometry_match_rms_px": 0.19779958158246852
+      },
+      "raw_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\03_raw.jpg",
+      "annotated_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\03_detected.jpg",
+      "world_point_mm": [
+        32.704387015798574,
+        -75.3820061122064
+      ],
+      "world_error_mm": [
+        -0.01686431886741957,
+        0.00046893585307827834
+      ],
+      "pixel_error": [
+        -0.0007168265601649182,
+        -0.13551815904293107
+      ]
+    },
+    {
+      "region": "bottom_left",
+      "region_label": "bottom_left",
+      "point_index": 3,
+      "step_mm": 8.0,
+      "command_offset_mm": [
+        0.0,
+        -8.0
+      ],
+      "camera_tcp_pose_mm_rad": [
+        76.00979192288837,
+        -452.87085560195914,
+        436.06593974634575,
+        -3.1415283756324004,
+        0.00020642842801605411,
+        1.5313766976316252
+      ],
+      "image_point": [
+        774.305419921875,
+        1314.848876953125
+      ],
+      "nested_square_support": 58,
+      "median_square_side_px": 348.1561827584361,
+      "detection_source": "geometry",
+      "grid_score": null,
+      "tracking": {
+        "observed_count": 6,
+        "geometry_count": 6,
+        "supplement_count": 0,
+        "common_image_shift_px": [
+          -65.01885986328125,
+          1.68878173828125
+        ],
+        "geometry_match_rms_px": 0.19779958158246852
+      },
+      "raw_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\03_raw.jpg",
+      "annotated_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\03_detected.jpg",
+      "world_point_mm": [
+        -32.61076374009293,
+        91.10791271875189
+      ],
+      "world_error_mm": [
+        -0.006919964364463738,
+        -0.052985516262126
+      ],
+      "pixel_error": [
+        -0.43010723373129167,
+        -0.04233438811343149
+      ]
+    },
+    {
+      "region": "bottom_center",
+      "region_label": "bottom_center",
+      "point_index": 3,
+      "step_mm": 8.0,
+      "command_offset_mm": [
+        0.0,
+        -8.0
+      ],
+      "camera_tcp_pose_mm_rad": [
+        76.00979192288837,
+        -452.87085560195914,
+        436.06593974634575,
+        -3.1415283756324004,
+        0.00020642842801605411,
+        1.5313766976316252
+      ],
+      "image_point": [
+        1435.765625,
+        1321.653076171875
+      ],
+      "nested_square_support": 18,
+      "median_square_side_px": 410.1642092424676,
+      "detection_source": "geometry",
+      "grid_score": null,
+      "tracking": {
+        "observed_count": 6,
+        "geometry_count": 6,
+        "supplement_count": 0,
+        "common_image_shift_px": [
+          -65.01885986328125,
+          1.68878173828125
+        ],
+        "geometry_match_rms_px": 0.19779958158246852
+      },
+      "raw_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\03_raw.jpg",
+      "annotated_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\03_detected.jpg",
+      "world_point_mm": [
+        -36.06523202208775,
+        9.384176795746669
+      ],
+      "world_error_mm": [
+        -0.019318611414668396,
+        -0.0023859232731702207
+      ],
+      "pixel_error": [
+        -0.02353648634948513,
+        -0.15615100075410737
+      ]
+    },
+    {
+      "region": "bottom_right",
+      "region_label": "bottom_right",
+      "point_index": 3,
+      "step_mm": 8.0,
+      "command_offset_mm": [
+        0.0,
+        -8.0
+      ],
+      "camera_tcp_pose_mm_rad": [
+        76.00979192288837,
+        -452.87085560195914,
+        436.06593974634575,
+        -3.1415283756324004,
+        0.00020642842801605411,
+        1.5313766976316252
+      ],
+      "image_point": [
+        2097.91357421875,
+        1327.4998779296875
+      ],
+      "nested_square_support": 60,
+      "median_square_side_px": 352.1485313929089,
+      "detection_source": "geometry",
+      "grid_score": null,
+      "tracking": {
+        "observed_count": 6,
+        "geometry_count": 6,
+        "supplement_count": 0,
+        "common_image_shift_px": [
+          -65.01885986328125,
+          1.68878173828125
+        ],
+        "geometry_match_rms_px": 0.19779958158246852
+      },
+      "raw_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\03_raw.jpg",
+      "annotated_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\03_detected.jpg",
+      "world_point_mm": [
+        -39.412142538823126,
+        -72.41687370484539
+      ],
+      "world_error_mm": [
+        -0.027021091872704517,
+        -0.031783305443497056
+      ],
+      "pixel_error": [
+        -0.26393783983303365,
+        -0.21089911366789238
+      ]
+    },
+    {
+      "region": "top_left",
+      "region_label": "top_left",
+      "point_index": 4,
+      "step_mm": 8.0,
+      "command_offset_mm": [
+        8.0,
+        -8.0
+      ],
+      "camera_tcp_pose_mm_rad": [
+        84.00858359745736,
+        -452.8715639190535,
+        436.0627638615692,
+        -3.141528724717797,
+        0.00020072577324097758,
+        1.5313641470991488
+      ],
+      "image_point": [
+        781.3790588378906,
+        795.8489074707031
+      ],
+      "nested_square_support": 60,
+      "median_square_side_px": 352.4428692355822,
+      "detection_source": "geometry",
+      "grid_score": null,
+      "tracking": {
+        "observed_count": 6,
+        "geometry_count": 6,
+        "supplement_count": 0,
+        "common_image_shift_px": [
+          -63.357177734375,
+          66.02085876464844
+        ],
+        "geometry_match_rms_px": 0.47826806179650494
+      },
+      "raw_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\04_raw.jpg",
+      "annotated_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\04_detected.jpg",
+      "world_point_mm": [
+        31.54185950771715,
+        88.7772749466381
+      ],
+      "world_error_mm": [
+        -0.005310392331786318,
+        0.034102148952129596
+      ],
+      "pixel_error": [
+        0.27387011765347324,
+        -0.05143983850484801
+      ]
+    },
+    {
+      "region": "top_center",
+      "region_label": "top_center",
+      "point_index": 4,
+      "step_mm": 8.0,
+      "command_offset_mm": [
+        8.0,
+        -8.0
+      ],
+      "camera_tcp_pose_mm_rad": [
+        84.00858359745736,
+        -452.8715639190535,
+        436.0627638615692,
+        -3.141528724717797,
+        0.00020072577324097758,
+        1.5313641470991488
+      ],
+      "image_point": [
+        1443.8607177734375,
+        801.8540954589844
+      ],
+      "nested_square_support": 26,
+      "median_square_side_px": 390.3698594706686,
+      "detection_source": "geometry",
+      "grid_score": null,
+      "tracking": {
+        "observed_count": 6,
+        "geometry_count": 6,
+        "supplement_count": 0,
+        "common_image_shift_px": [
+          -63.357177734375,
+          66.02085876464844
+        ],
+        "geometry_match_rms_px": 0.47826806179650494
+      },
+      "raw_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\04_raw.jpg",
+      "annotated_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\04_detected.jpg",
+      "world_point_mm": [
+        28.165919299220192,
+        6.610555695447147
+      ],
+      "world_error_mm": [
+        0.009955155061319942,
+        0.019852663452244457
+      ],
+      "pixel_error": [
+        0.1619734292908106,
+        0.07496893504594482
+      ]
+    },
+    {
+      "region": "top_right",
+      "region_label": "top_right",
+      "point_index": 4,
+      "step_mm": 8.0,
+      "command_offset_mm": [
+        8.0,
+        -8.0
+      ],
+      "camera_tcp_pose_mm_rad": [
+        84.00858359745736,
+        -452.8715639190535,
+        436.0627638615692,
+        -3.141528724717797,
+        0.00020072577324097758,
+        1.5313641470991488
+      ],
+      "image_point": [
+        2104.608642578125,
+        808.5478820800781
+      ],
+      "nested_square_support": 52,
+      "median_square_side_px": 343.00762447874195,
+      "detection_source": "geometry",
+      "grid_score": null,
+      "tracking": {
+        "observed_count": 6,
+        "geometry_count": 6,
+        "supplement_count": 0,
+        "common_image_shift_px": [
+          -63.357177734375,
+          66.02085876464844
+        ],
+        "geometry_match_rms_px": 0.47826806179650494
+      },
+      "raw_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\04_raw.jpg",
+      "annotated_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\04_detected.jpg",
+      "world_point_mm": [
+        24.705595341229582,
+        -75.38129779511206
+      ],
+      "world_error_mm": [
+        0.02799864241783112,
+        -0.021412566817531342
+      ],
+      "pixel_error": [
+        -0.16470436018926193,
+        0.23052413431628338
+      ]
+    },
+    {
+      "region": "bottom_left",
+      "region_label": "bottom_left",
+      "point_index": 4,
+      "step_mm": 8.0,
+      "command_offset_mm": [
+        8.0,
+        -8.0
+      ],
+      "camera_tcp_pose_mm_rad": [
+        84.00858359745736,
+        -452.8715639190535,
+        436.0627638615692,
+        -3.141528724717797,
+        0.00020072577324097758,
+        1.5313641470991488
+      ],
+      "image_point": [
+        775.547119140625,
+        1379.55615234375
+      ],
+      "nested_square_support": 58,
+      "median_square_side_px": 348.6331988669707,
+      "detection_source": "geometry",
+      "grid_score": null,
+      "tracking": {
+        "observed_count": 6,
+        "geometry_count": 6,
+        "supplement_count": 0,
+        "common_image_shift_px": [
+          -63.357177734375,
+          66.02085876464844
+        ],
+        "geometry_match_rms_px": 0.47826806179650494
+      },
+      "raw_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\04_raw.jpg",
+      "annotated_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\04_detected.jpg",
+      "world_point_mm": [
+        -40.60955541466192,
+        91.10862103584623
+      ],
+      "world_error_mm": [
+        0.026215567636548087,
+        -0.03742964160768736
+      ],
+      "pixel_error": [
+        -0.29864194905076147,
+        0.22286865717501314
+      ]
+    },
+    {
+      "region": "bottom_center",
+      "region_label": "bottom_center",
+      "point_index": 4,
+      "step_mm": 8.0,
+      "command_offset_mm": [
+        8.0,
+        -8.0
+      ],
+      "camera_tcp_pose_mm_rad": [
+        84.00858359745736,
+        -452.8715639190535,
+        436.0627638615692,
+        -3.141528724717797,
+        0.00020072577324097758,
+        1.5313641470991488
+      ],
+      "image_point": [
+        1437.555908203125,
+        1386.34912109375
+      ],
+      "nested_square_support": 24,
+      "median_square_side_px": 423.37282490069254,
+      "detection_source": "geometry",
+      "grid_score": null,
+      "tracking": {
+        "observed_count": 6,
+        "geometry_count": 6,
+        "supplement_count": 0,
+        "common_image_shift_px": [
+          -63.357177734375,
+          66.02085876464844
+        ],
+        "geometry_match_rms_px": 0.47826806179650494
+      },
+      "raw_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\04_raw.jpg",
+      "annotated_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\04_detected.jpg",
+      "world_point_mm": [
+        -44.06402369665674,
+        9.384885112841005
+      ],
+      "world_error_mm": [
+        0.011665683995083498,
+        -0.007922014786343468
+      ],
+      "pixel_error": [
+        -0.061529758809456325,
+        0.09685227595491597
+      ]
+    },
+    {
+      "region": "bottom_right",
+      "region_label": "bottom_right",
+      "point_index": 4,
+      "step_mm": 8.0,
+      "command_offset_mm": [
+        8.0,
+        -8.0
+      ],
+      "camera_tcp_pose_mm_rad": [
+        84.00858359745736,
+        -452.8715639190535,
+        436.0627638615692,
+        -3.141528724717797,
+        0.00020072577324097758,
+        1.5313641470991488
+      ],
+      "image_point": [
+        2100.069580078125,
+        1391.9718627929688
+      ],
+      "nested_square_support": 60,
+      "median_square_side_px": 352.5400773793515,
+      "detection_source": "geometry",
+      "grid_score": null,
+      "tracking": {
+        "observed_count": 6,
+        "geometry_count": 6,
+        "supplement_count": 0,
+        "common_image_shift_px": [
+          -63.357177734375,
+          66.02085876464844
+        ],
+        "geometry_match_rms_px": 0.47826806179650494
+      },
+      "raw_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\04_raw.jpg",
+      "annotated_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\04_detected.jpg",
+      "world_point_mm": [
+        -47.41093421339212,
+        -72.41616538775105
+      ],
+      "world_error_mm": [
+        0.028577849523607313,
+        -0.0366844509596973
+      ],
+      "pixel_error": [
+        -0.28884083654884307,
+        0.24169690020630696
+      ]
+    },
+    {
+      "region": "top_left",
+      "region_label": "top_left",
+      "point_index": 5,
+      "step_mm": 8.0,
+      "command_offset_mm": [
+        8.0,
+        0.0
+      ],
+      "camera_tcp_pose_mm_rad": [
+        84.00782528518619,
+        -444.8637635989514,
+        436.0608214390992,
+        -3.1415331790714043,
+        0.00017668885801069183,
+        1.531378121813499
+      ],
+      "image_point": [
+        845.6183776855469,
+        793.9622192382812
+      ],
+      "nested_square_support": 52,
+      "median_square_side_px": 344.6201525478055,
+      "detection_source": "geometry",
+      "grid_score": null,
+      "tracking": {
+        "observed_count": 6,
+        "geometry_count": 6,
+        "supplement_count": 0,
+        "common_image_shift_px": [
+          1.0537109375,
+          64.09158325195312
+        ],
+        "geometry_match_rms_px": 0.4791195519536958
+      },
+      "raw_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\05_raw.jpg",
+      "annotated_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\05_detected.jpg",
+      "world_point_mm": [
+        31.542617819988322,
+        80.76947462653601
+      ],
+      "world_error_mm": [
+        -0.02506910802355833,
+        0.06935878606279289
+      ],
+      "pixel_error": [
+        0.554369840061554,
+        -0.21937475983395416
+      ]
+    },
+    {
+      "region": "top_center",
+      "region_label": "top_center",
+      "point_index": 5,
+      "step_mm": 8.0,
+      "command_offset_mm": [
+        8.0,
+        0.0
+      ],
+      "camera_tcp_pose_mm_rad": [
+        84.00782528518619,
+        -444.8637635989514,
+        436.0608214390992,
+        -3.1415331790714043,
+        0.00017668885801069183,
+        1.531378121813499
+      ],
+      "image_point": [
+        1508.2041015625,
+        800.0730285644531
+      ],
+      "nested_square_support": 34,
+      "median_square_side_px": 395.2246784420881,
+      "detection_source": "geometry",
+      "grid_score": null,
+      "tracking": {
+        "observed_count": 6,
+        "geometry_count": 6,
+        "supplement_count": 0,
+        "common_image_shift_px": [
+          1.0537109375,
+          64.09158325195312
+        ],
+        "geometry_match_rms_px": 0.4791195519536958
+      },
+      "raw_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\05_raw.jpg",
+      "annotated_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\05_detected.jpg",
+      "world_point_mm": [
+        28.166677611491366,
+        -1.3972446246549453
+      ],
+      "world_error_mm": [
+        -0.023561186780295174,
+        0.033925169534055
+      ],
+      "pixel_error": [
+        0.2677497947017855,
+        -0.19810987061123342
+      ]
+    },
+    {
+      "region": "top_right",
+      "region_label": "top_right",
+      "point_index": 5,
+      "step_mm": 8.0,
+      "command_offset_mm": [
+        8.0,
+        0.0
+      ],
+      "camera_tcp_pose_mm_rad": [
+        84.00782528518619,
+        -444.8637635989514,
+        436.0608214390992,
+        -3.1415331790714043,
+        0.00017668885801069183,
+        1.531378121813499
+      ],
+      "image_point": [
+        2168.7445068359375,
+        806.8653564453125
+      ],
+      "nested_square_support": 56,
+      "median_square_side_px": 342.89735548913643,
+      "detection_source": "geometry",
+      "grid_score": null,
+      "tracking": {
+        "observed_count": 6,
+        "geometry_count": 6,
+        "supplement_count": 0,
+        "common_image_shift_px": [
+          1.0537109375,
+          64.09158325195312
+        ],
+        "geometry_match_rms_px": 0.4791195519536958
+      },
+      "raw_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\05_raw.jpg",
+      "annotated_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\05_detected.jpg",
+      "world_point_mm": [
+        24.706353653500756,
+        -83.38909811521415
+      ],
+      "world_error_mm": [
+        -0.01717428199278359,
+        0.01035570380602735
+      ],
+      "pixel_error": [
+        0.07859905224904651,
+        -0.14068087399311935
+      ]
+    },
+    {
+      "region": "bottom_left",
+      "region_label": "bottom_left",
+      "point_index": 5,
+      "step_mm": 8.0,
+      "command_offset_mm": [
+        8.0,
+        0.0
+      ],
+      "camera_tcp_pose_mm_rad": [
+        84.00782528518619,
+        -444.8637635989514,
+        436.0608214390992,
+        -3.1415331790714043,
+        0.00017668885801069183,
+        1.531378121813499
+      ],
+      "image_point": [
+        839.7852783203125,
+        1377.87109375
+      ],
+      "nested_square_support": 58,
+      "median_square_side_px": 348.55339326287583,
+      "detection_source": "geometry",
+      "grid_score": null,
+      "tracking": {
+        "observed_count": 6,
+        "geometry_count": 6,
+        "supplement_count": 0,
+        "common_image_shift_px": [
+          1.0537109375,
+          64.09158325195312
+        ],
+        "geometry_match_rms_px": 0.4791195519536958
+      },
+      "raw_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\05_raw.jpg",
+      "annotated_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\05_detected.jpg",
+      "world_point_mm": [
+        -40.608797102390746,
+        83.10082071574413
+      ],
+      "world_error_mm": [
+        -0.022785644005189454,
+        0.03984583181993173
+      ],
+      "pixel_error": [
+        0.31865696376314645,
+        -0.19560902801504199
+      ]
+    },
+    {
+      "region": "bottom_center",
+      "region_label": "bottom_center",
+      "point_index": 5,
+      "step_mm": 8.0,
+      "command_offset_mm": [
+        8.0,
+        0.0
+      ],
+      "camera_tcp_pose_mm_rad": [
+        84.00782528518619,
+        -444.8637635989514,
+        436.0608214390992,
+        -3.1415331790714043,
+        0.00017668885801069183,
+        1.531378121813499
+      ],
+      "image_point": [
+        1502.0343017578125,
+        1384.3980712890625
+      ],
+      "nested_square_support": 32,
+      "median_square_side_px": 400.42367558775027,
+      "detection_source": "geometry",
+      "grid_score": null,
+      "tracking": {
+        "observed_count": 6,
+        "geometry_count": 6,
+        "supplement_count": 0,
+        "common_image_shift_px": [
+          1.0537109375,
+          64.09158325195312
+        ],
+        "geometry_match_rms_px": 0.4791195519536958
+      },
+      "raw_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\05_raw.jpg",
+      "annotated_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\05_detected.jpg",
+      "world_point_mm": [
+        -44.063265384385566,
+        1.3770847927389127
+      ],
+      "world_error_mm": [
+        -0.0058120948473856515,
+        0.030443304513157576
+      ],
+      "pixel_error": [
+        0.24497276827355563,
+        -0.055187777015135
+      ]
+    },
+    {
+      "region": "bottom_right",
+      "region_label": "bottom_right",
+      "point_index": 5,
+      "step_mm": 8.0,
+      "command_offset_mm": [
+        8.0,
+        0.0
+      ],
+      "camera_tcp_pose_mm_rad": [
+        84.00782528518619,
+        -444.8637635989514,
+        436.0608214390992,
+        -3.1415331790714043,
+        0.00017668885801069183,
+        1.531378121813499
+      ],
+      "image_point": [
+        2164.481201171875,
+        1390.0
+      ],
+      "nested_square_support": 58,
+      "median_square_side_px": 356.9522626283185,
+      "detection_source": "geometry",
+      "grid_score": null,
+      "tracking": {
+        "observed_count": 6,
+        "geometry_count": 6,
+        "supplement_count": 0,
+        "common_image_shift_px": [
+          1.0537109375,
+          64.09158325195312
+        ],
+        "geometry_match_rms_px": 0.4791195519536958
+      },
+      "raw_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\05_raw.jpg",
+      "annotated_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\05_detected.jpg",
+      "world_point_mm": [
+        -47.410175901120944,
+        -80.42396570785314
+      ],
+      "world_error_mm": [
+        0.013706295011864711,
+        0.0011956550192309123
+      ],
+      "pixel_error": [
+        0.013388883891821024,
+        0.11099226031342369
+      ]
+    },
+    {
+      "region": "top_left",
+      "region_label": "top_left",
+      "point_index": 6,
+      "step_mm": 8.0,
+      "command_offset_mm": [
+        -8.0,
+        0.0
+      ],
+      "camera_tcp_pose_mm_rad": [
+        68.00724905200187,
+        -444.86336700788263,
+        436.06260536518414,
+        -3.141525989632339,
+        0.00018363836438773764,
+        1.5313763945280758
+      ],
+      "image_point": [
+        843.5859375,
+        664.9458618164062
+      ],
+      "nested_square_support": 60,
+      "median_square_side_px": 351.7199975976839,
+      "detection_source": "geometry",
+      "grid_score": null,
+      "tracking": {
+        "observed_count": 6,
+        "geometry_count": 6,
+        "supplement_count": 0,
+        "common_image_shift_px": [
+          -2.2008056640625,
+          -65.1497802734375
+        ],
+        "geometry_match_rms_px": 0.620239111786382
+      },
+      "raw_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\06_raw.jpg",
+      "annotated_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\06_detected.jpg",
+      "world_point_mm": [
+        47.54319405317264,
+        80.76907803546726
+      ],
+      "world_error_mm": [
+        0.030227725317807597,
+        -0.029643103867343257
+      ],
+      "pixel_error": [
+        -0.23322324644527725,
+        0.2501115097552429
+      ]
+    },
+    {
+      "region": "top_center",
+      "region_label": "top_center",
+      "point_index": 6,
+      "step_mm": 8.0,
+      "command_offset_mm": [
+        -8.0,
+        0.0
+      ],
+      "camera_tcp_pose_mm_rad": [
+        68.00724905200187,
+        -444.86336700788263,
+        436.06260536518414,
+        -3.141525989632339,
+        0.00018363836438773764,
+        1.5313763945280758
+      ],
+      "image_point": [
+        1505.0086059570312,
+        671.1807861328125
+      ],
+      "nested_square_support": 44,
+      "median_square_side_px": 366.3829284750336,
+      "detection_source": "geometry",
+      "grid_score": null,
+      "tracking": {
+        "observed_count": 6,
+        "geometry_count": 6,
+        "supplement_count": 0,
+        "common_image_shift_px": [
+          -2.2008056640625,
+          -65.1497802734375
+        ],
+        "geometry_match_rms_px": 0.620239111786382
+      },
+      "raw_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\06_raw.jpg",
+      "annotated_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\06_detected.jpg",
+      "world_point_mm": [
+        44.167253844675685,
+        -1.397641215723695
+      ],
+      "world_error_mm": [
+        0.02385800844551511,
+        -0.01444332100639767
+      ],
+      "pixel_error": [
+        -0.11077676005356807,
+        0.1950568344061594
+      ]
+    },
+    {
+      "region": "top_right",
+      "region_label": "top_right",
+      "point_index": 6,
+      "step_mm": 8.0,
+      "command_offset_mm": [
+        -8.0,
+        0.0
+      ],
+      "camera_tcp_pose_mm_rad": [
+        68.00724905200187,
+        -444.86336700788263,
+        436.06260536518414,
+        -3.141525989632339,
+        0.00018363836438773764,
+        1.5313763945280758
+      ],
+      "image_point": [
+        2164.4681396484375,
+        678.1184387207031
+      ],
+      "nested_square_support": 56,
+      "median_square_side_px": 342.53897705958,
+      "detection_source": "geometry",
+      "grid_score": null,
+      "tracking": {
+        "observed_count": 6,
+        "geometry_count": 6,
+        "supplement_count": 0,
+        "common_image_shift_px": [
+          -2.2008056640625,
+          -65.1497802734375
+        ],
+        "geometry_match_rms_px": 0.620239111786382
+      },
+      "raw_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\06_raw.jpg",
+      "annotated_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\06_detected.jpg",
+      "world_point_mm": [
+        40.706929886685074,
+        -83.3894947062829
+      ],
+      "world_error_mm": [
+        0.019195081008426484,
+        0.0030634170107362024
+      ],
+      "pixel_error": [
+        0.029785596281271864,
+        0.1531435102397154
+      ]
+    },
+    {
+      "region": "bottom_left",
+      "region_label": "bottom_left",
+      "point_index": 6,
+      "step_mm": 8.0,
+      "command_offset_mm": [
+        -8.0,
+        0.0
+      ],
+      "camera_tcp_pose_mm_rad": [
+        68.00724905200187,
+        -444.86336700788263,
+        436.06260536518414,
+        -3.141525989632339,
+        0.00018363836438773764,
+        1.5313763945280758
+      ],
+      "image_point": [
+        837.3760986328125,
+        1247.6630859375
+      ],
+      "nested_square_support": 58,
+      "median_square_side_px": 347.75816012114586,
+      "detection_source": "geometry",
+      "grid_score": null,
+      "tracking": {
+        "observed_count": 6,
+        "geometry_count": 6,
+        "supplement_count": 0,
+        "common_image_shift_px": [
+          -2.2008056640625,
+          -65.1497802734375
+        ],
+        "geometry_match_rms_px": 0.620239111786382
+      },
+      "raw_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\06_raw.jpg",
+      "annotated_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\06_detected.jpg",
+      "world_point_mm": [
+        -24.608220869206427,
+        83.10042412467538
+      ],
+      "world_error_mm": [
+        0.015482624158437375,
+        -0.012684600007830227
+      ],
+      "pixel_error": [
+        -0.09987274822469772,
+        0.12883958316342614
+      ]
+    },
+    {
+      "region": "bottom_center",
+      "region_label": "bottom_center",
+      "point_index": 6,
+      "step_mm": 8.0,
+      "command_offset_mm": [
+        -8.0,
+        0.0
+      ],
+      "camera_tcp_pose_mm_rad": [
+        68.00724905200187,
+        -444.86336700788263,
+        436.06260536518414,
+        -3.141525989632339,
+        0.00018363836438773764,
+        1.5313763945280758
+      ],
+      "image_point": [
+        1498.7207641601562,
+        1254.55517578125
+      ],
+      "nested_square_support": 22,
+      "median_square_side_px": 409.8052074464209,
+      "detection_source": "geometry",
+      "grid_score": null,
+      "tracking": {
+        "observed_count": 6,
+        "geometry_count": 6,
+        "supplement_count": 0,
+        "common_image_shift_px": [
+          -2.2008056640625,
+          -65.1497802734375
+        ],
+        "geometry_match_rms_px": 0.620239111786382
+      },
+      "raw_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\06_raw.jpg",
+      "annotated_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\06_detected.jpg",
+      "world_point_mm": [
+        -28.062689151201248,
+        1.376688201670163
+      ],
+      "world_error_mm": [
+        -0.0061533413106076296,
+        -0.0031691999812986094
+      ],
+      "pixel_error": [
+        -0.026987170968141072,
+        -0.04904854195115149
+      ]
+    },
+    {
+      "region": "bottom_right",
+      "region_label": "bottom_right",
+      "point_index": 6,
+      "step_mm": 8.0,
+      "command_offset_mm": [
+        -8.0,
+        0.0
+      ],
+      "camera_tcp_pose_mm_rad": [
+        68.00724905200187,
+        -444.86336700788263,
+        436.06260536518414,
+        -3.141525989632339,
+        0.00018363836438773764,
+        1.5313763945280758
+      ],
+      "image_point": [
+        2160.0079345703125,
+        1260.3369140625
+      ],
+      "nested_square_support": 58,
+      "median_square_side_px": 355.92208252795,
+      "detection_source": "geometry",
+      "grid_score": null,
+      "tracking": {
+        "observed_count": 6,
+        "geometry_count": 6,
+        "supplement_count": 0,
+        "common_image_shift_px": [
+          -2.2008056640625,
+          -65.1497802734375
+        ],
+        "geometry_match_rms_px": 0.620239111786382
+      },
+      "raw_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\06_raw.jpg",
+      "annotated_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\06_detected.jpg",
+      "world_point_mm": [
+        -31.409599667936625,
+        -80.42436229892189
+      ],
+      "world_error_mm": [
+        -0.0011289549122253106,
+        0.017877621993193316
+      ],
+      "pixel_error": [
+        0.14399523060637875,
+        -0.013802666295987365
+      ]
+    },
+    {
+      "region": "top_left",
+      "region_label": "top_left",
+      "point_index": 7,
+      "step_mm": 8.0,
+      "command_offset_mm": [
+        -8.0,
+        8.0
+      ],
+      "camera_tcp_pose_mm_rad": [
+        68.00617799994167,
+        -436.8640789646909,
+        436.05829257510385,
+        -3.1415338020442833,
+        0.00017323096231149326,
+        1.5313707862940413
+      ],
+      "image_point": [
+        908.0850219726562,
+        663.0126037597656
+      ],
+      "nested_square_support": 56,
+      "median_square_side_px": 359.26406756521294,
+      "detection_source": "geometry",
+      "grid_score": null,
+      "tracking": {
+        "observed_count": 6,
+        "geometry_count": 6,
+        "supplement_count": 0,
+        "common_image_shift_px": [
+          62.364044189453125,
+          -67.10981750488281
+        ],
+        "geometry_match_rms_px": 0.7399309567842265
+      },
+      "raw_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\07_raw.jpg",
+      "annotated_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\07_detected.jpg",
+      "world_point_mm": [
+        47.54426510523284,
+        72.76978999227555
+      ],
+      "world_error_mm": [
+        0.015928725853470382,
+        -0.04545230364139741
+      ],
+      "pixel_error": [
+        -0.3628466052788326,
+        0.13937717745534428
+      ]
+    },
+    {
+      "region": "top_center",
+      "region_label": "top_center",
+      "point_index": 7,
+      "step_mm": 8.0,
+      "command_offset_mm": [
+        -8.0,
+        8.0
+      ],
+      "camera_tcp_pose_mm_rad": [
+        68.00617799994167,
+        -436.8640789646909,
+        436.05829257510385,
+        -3.1415338020442833,
+        0.00017323096231149326,
+        1.5313707862940413
+      ],
+      "image_point": [
+        1569.4462890625,
+        669.3253479003906
+      ],
+      "nested_square_support": 54,
+      "median_square_side_px": 355.30501770169275,
+      "detection_source": "geometry",
+      "grid_score": null,
+      "tracking": {
+        "observed_count": 6,
+        "geometry_count": 6,
+        "supplement_count": 0,
+        "common_image_shift_px": [
+          62.364044189453125,
+          -67.10981750488281
+        ],
+        "geometry_match_rms_px": 0.7399309567842265
+      },
+      "raw_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\07_raw.jpg",
+      "annotated_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\07_detected.jpg",
+      "world_point_mm": [
+        44.16832489673588,
+        -9.396929258915407
+      ],
+      "world_error_mm": [
+        -0.00011478511690654614,
+        -0.031028809543071745
+      ],
+      "pixel_error": [
+        -0.24942335082300815,
+        0.006972175212354159
+      ]
+    },
+    {
+      "region": "top_right",
+      "region_label": "top_right",
+      "point_index": 7,
+      "step_mm": 8.0,
+      "command_offset_mm": [
+        -8.0,
+        8.0
+      ],
+      "camera_tcp_pose_mm_rad": [
+        68.00617799994167,
+        -436.8640789646909,
+        436.05829257510385,
+        -3.1415338020442833,
+        0.00017323096231149326,
+        1.5313707862940413
+      ],
+      "image_point": [
+        2228.647705078125,
+        676.5388793945312
+      ],
+      "nested_square_support": 54,
+      "median_square_side_px": 345.86575376222027,
+      "detection_source": "geometry",
+      "grid_score": null,
+      "tracking": {
+        "observed_count": 6,
+        "geometry_count": 6,
+        "supplement_count": 0,
+        "common_image_shift_px": [
+          62.364044189453125,
+          -67.10981750488281
+        ],
+        "geometry_match_rms_px": 0.7399309567842265
+      },
+      "raw_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\07_raw.jpg",
+      "annotated_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\07_detected.jpg",
+      "world_point_mm": [
+        40.70800093874527,
+        -91.38878274947461
+      ],
+      "world_error_mm": [
+        -0.038357685848097844,
+        0.011213830930245194
+      ],
+      "pixel_error": [
+        0.07949558033487847,
+        -0.3104126381311971
+      ]
+    },
+    {
+      "region": "bottom_left",
+      "region_label": "bottom_left",
+      "point_index": 7,
+      "step_mm": 8.0,
+      "command_offset_mm": [
+        -8.0,
+        8.0
+      ],
+      "camera_tcp_pose_mm_rad": [
+        68.00617799994167,
+        -436.8640789646909,
+        436.05829257510385,
+        -3.1415338020442833,
+        0.00017323096231149326,
+        1.5313707862940413
+      ],
+      "image_point": [
+        901.7918395996094,
+        1245.759033203125
+      ],
+      "nested_square_support": 52,
+      "median_square_side_px": 336.46168011439636,
+      "detection_source": "geometry",
+      "grid_score": null,
+      "tracking": {
+        "observed_count": 6,
+        "geometry_count": 6,
+        "supplement_count": 0,
+        "common_image_shift_px": [
+          62.364044189453125,
+          -67.10981750488281
+        ],
+        "geometry_match_rms_px": 0.7399309567842265
+      },
+      "raw_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\07_raw.jpg",
+      "annotated_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\07_detected.jpg",
+      "world_point_mm": [
+        -24.60714981714623,
+        75.10113608148367
+      ],
+      "world_error_mm": [
+        -0.006620829775226156,
+        0.02342655521036363
+      ],
+      "pixel_error": [
+        0.18827815930103498,
+        -0.059780722164077815
+      ]
+    },
+    {
+      "region": "bottom_center",
+      "region_label": "bottom_center",
+      "point_index": 7,
+      "step_mm": 8.0,
+      "command_offset_mm": [
+        -8.0,
+        8.0
+      ],
+      "camera_tcp_pose_mm_rad": [
+        68.00617799994167,
+        -436.8640789646909,
+        436.05829257510385,
+        -3.1415338020442833,
+        0.00017323096231149326,
+        1.5313707862940413
+      ],
+      "image_point": [
+        1563.4127807617188,
+        1252.472412109375
+      ],
+      "nested_square_support": 24,
+      "median_square_side_px": 399.55197510120024,
+      "detection_source": "geometry",
+      "grid_score": null,
+      "tracking": {
+        "observed_count": 6,
+        "geometry_count": 6,
+        "supplement_count": 0,
+        "common_image_shift_px": [
+          62.364044189453125,
+          -67.10981750488281
+        ],
+        "geometry_match_rms_px": 0.7399309567842265
+      },
+      "raw_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\07_raw.jpg",
+      "annotated_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\07_detected.jpg",
+      "world_point_mm": [
+        -28.06161809914105,
+        -6.622599841521549
+      ],
+      "world_error_mm": [
+        -0.007553552889209669,
+        -0.010361208403892874
+      ],
+      "pixel_error": [
+        -0.08543964056570985,
+        -0.05851935567898181
+      ]
+    },
+    {
+      "region": "bottom_right",
+      "region_label": "bottom_right",
+      "point_index": 7,
+      "step_mm": 8.0,
+      "command_offset_mm": [
+        -8.0,
+        8.0
+      ],
+      "camera_tcp_pose_mm_rad": [
+        68.00617799994167,
+        -436.8640789646909,
+        436.05829257510385,
+        -3.1415338020442833,
+        0.00017323096231149326,
+        1.5313707862940413
+      ],
+      "image_point": [
+        2224.5,
+        1258.5
+      ],
+      "nested_square_support": 56,
+      "median_square_side_px": 343.8946972257657,
+      "detection_source": "geometry",
+      "grid_score": null,
+      "tracking": {
+        "observed_count": 6,
+        "geometry_count": 6,
+        "supplement_count": 0,
+        "common_image_shift_px": [
+          62.364044189453125,
+          -67.10981750488281
+        ],
+        "geometry_match_rms_px": 0.7399309567842265
+      },
+      "raw_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\07_raw.jpg",
+      "annotated_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\07_detected.jpg",
+      "world_point_mm": [
+        -31.408528615876428,
+        -88.4236503421136
+      ],
+      "world_error_mm": [
+        -0.03226506258079098,
+        0.02770385547465537
+      ],
+      "pixel_error": [
+        0.2146845740153367,
+        -0.2686088901689345
+      ]
+    },
+    {
+      "region": "top_left",
+      "region_label": "top_left",
+      "point_index": 8,
+      "step_mm": 8.0,
+      "command_offset_mm": [
+        0.0,
+        8.0
+      ],
+      "camera_tcp_pose_mm_rad": [
+        76.0109985604736,
+        -436.8707750750199,
+        436.06419972346583,
+        -3.141531465933852,
+        0.00020318769078098988,
+        1.5313765461046196
+      ],
+      "image_point": [
+        909.1024780273438,
+        727.3399658203125
+      ],
+      "nested_square_support": 60,
+      "median_square_side_px": 351.9474853532457,
+      "detection_source": "geometry",
+      "grid_score": null,
+      "tracking": {
+        "observed_count": 6,
+        "geometry_count": 6,
+        "supplement_count": 0,
+        "common_image_shift_px": [
+          63.862396240234375,
+          -2.559356689453125
+        ],
+        "geometry_match_rms_px": 0.3405468623904519
+      },
+      "raw_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\08_raw.jpg",
+      "annotated_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\08_detected.jpg",
+      "world_point_mm": [
+        39.53944454470091,
+        72.77648610260451
+      ],
+      "world_error_mm": [
+        0.010192628424256611,
+        0.001516866896082547
+      ],
+      "pixel_error": [
+        0.014057372745810426,
+        0.08149259909623652
+      ]
+    },
+    {
+      "region": "top_center",
+      "region_label": "top_center",
+      "point_index": 8,
+      "step_mm": 8.0,
+      "command_offset_mm": [
+        0.0,
+        8.0
+      ],
+      "camera_tcp_pose_mm_rad": [
+        76.0109985604736,
+        -436.8707750750199,
+        436.06419972346583,
+        -3.141531465933852,
+        0.00020318769078098988,
+        1.5313765461046196
+      ],
+      "image_point": [
+        1571.0216674804688,
+        733.5086059570312
+      ],
+      "nested_square_support": 36,
+      "median_square_side_px": 381.4652865137306,
+      "detection_source": "geometry",
+      "grid_score": null,
+      "tracking": {
+        "observed_count": 6,
+        "geometry_count": 6,
+        "supplement_count": 0,
+        "common_image_shift_px": [
+          63.862396240234375,
+          -2.559356689453125
+        ],
+        "geometry_match_rms_px": 0.3405468623904519
+      },
+      "raw_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\08_raw.jpg",
+      "annotated_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\08_detected.jpg",
+      "world_point_mm": [
+        36.16350433620396,
+        -9.390233148586447
+      ],
+      "world_error_mm": [
+        0.008412807770113773,
+        -0.0068875444298246435
+      ],
+      "pixel_error": [
+        -0.053471543314572045,
+        0.0693133434400579
+      ]
+    },
+    {
+      "region": "top_right",
+      "region_label": "top_right",
+      "point_index": 8,
+      "step_mm": 8.0,
+      "command_offset_mm": [
+        0.0,
+        8.0
+      ],
+      "camera_tcp_pose_mm_rad": [
+        76.0109985604736,
+        -436.8707750750199,
+        436.06419972346583,
+        -3.141531465933852,
+        0.00020318769078098988,
+        1.5313765461046196
+      ],
+      "image_point": [
+        2230.732177734375,
+        740.4169921875
+      ],
+      "nested_square_support": 58,
+      "median_square_side_px": 345.94783288611706,
+      "detection_source": "geometry",
+      "grid_score": null,
+      "tracking": {
+        "observed_count": 6,
+        "geometry_count": 6,
+        "supplement_count": 0,
+        "common_image_shift_px": [
+          63.862396240234375,
+          -2.559356689453125
+        ],
+        "geometry_match_rms_px": 0.3405468623904519
+      },
+      "raw_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\08_raw.jpg",
+      "annotated_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\08_detected.jpg",
+      "world_point_mm": [
+        32.70318037821335,
+        -91.38208663914565
+      ],
+      "world_error_mm": [
+        0.004804074342693809,
+        0.017500215229517835
+      ],
+      "pixel_error": [
+        0.14190858986967214,
+        0.03410166855690022
+      ]
+    },
+    {
+      "region": "bottom_left",
+      "region_label": "bottom_left",
+      "point_index": 8,
+      "step_mm": 8.0,
+      "command_offset_mm": [
+        0.0,
+        8.0
+      ],
+      "camera_tcp_pose_mm_rad": [
+        76.0109985604736,
+        -436.8707750750199,
+        436.06419972346583,
+        -3.141531465933852,
+        0.00020318769078098988,
+        1.5313765461046196
+      ],
+      "image_point": [
+        903.0843200683594,
+        1310.6727294921875
+      ],
+      "nested_square_support": 58,
+      "median_square_side_px": 348.2617830542834,
+      "detection_source": "geometry",
+      "grid_score": null,
+      "tracking": {
+        "observed_count": 6,
+        "geometry_count": 6,
+        "supplement_count": 0,
+        "common_image_shift_px": [
+          63.862396240234375,
+          -2.559356689453125
+        ],
+        "geometry_match_rms_px": 0.3405468623904519
+      },
+      "raw_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\08_raw.jpg",
+      "annotated_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\08_detected.jpg",
+      "world_point_mm": [
+        -32.611970377678155,
+        75.10783219181263
+      ],
+      "world_error_mm": [
+        -0.003252511422772386,
+        0.036413953779515396
+      ],
+      "pixel_error": [
+        0.29410170860694507,
+        -0.035910587545231465
+      ]
+    },
+    {
+      "region": "bottom_center",
+      "region_label": "bottom_center",
+      "point_index": 8,
+      "step_mm": 8.0,
+      "command_offset_mm": [
+        0.0,
+        8.0
+      ],
+      "camera_tcp_pose_mm_rad": [
+        76.0109985604736,
+        -436.8707750750199,
+        436.06419972346583,
+        -3.141531465933852,
+        0.00020318769078098988,
+        1.5313765461046196
+      ],
+      "image_point": [
+        1565.11376953125,
+        1317.1707153320312
+      ],
+      "nested_square_support": 32,
+      "median_square_side_px": 403.1357583886059,
+      "detection_source": "geometry",
+      "grid_score": null,
+      "tracking": {
+        "observed_count": 6,
+        "geometry_count": 6,
+        "supplement_count": 0,
+        "common_image_shift_px": [
+          63.862396240234375,
+          -2.559356689453125
+        ],
+        "geometry_match_rms_px": 0.3405468623904519
+      },
+      "raw_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\08_raw.jpg",
+      "annotated_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\08_detected.jpg",
+      "world_point_mm": [
+        -36.066438659672976,
+        -6.615903731192589
+      ],
+      "world_error_mm": [
+        0.019339853303200982,
+        -0.0016926007032216361
+      ],
+      "pixel_error": [
+        -0.009256095178670876,
+        0.15736187548850467
+      ]
+    },
+    {
+      "region": "bottom_right",
+      "region_label": "bottom_right",
+      "point_index": 8,
+      "step_mm": 8.0,
+      "command_offset_mm": [
+        0.0,
+        8.0
+      ],
+      "camera_tcp_pose_mm_rad": [
+        76.0109985604736,
+        -436.8707750750199,
+        436.06419972346583,
+        -3.141531465933852,
+        0.00020318769078098988,
+        1.5313765461046196
+      ],
+      "image_point": [
+        2226.500244140625,
+        1323.0
+      ],
+      "nested_square_support": 52,
+      "median_square_side_px": 352.05080340302095,
+      "detection_source": "geometry",
+      "grid_score": null,
+      "tracking": {
+        "observed_count": 6,
+        "geometry_count": 6,
+        "supplement_count": 0,
+        "common_image_shift_px": [
+          63.862396240234375,
+          -2.559356689453125
+        ],
+        "geometry_match_rms_px": 0.3405468623904519
+      },
+      "raw_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\08_raw.jpg",
+      "annotated_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\08_detected.jpg",
+      "world_point_mm": [
+        -39.41334917640835,
+        -88.41695423178464
+      ],
+      "world_error_mm": [
+        0.016395333933061806,
+        0.045279480544891726
+      ],
+      "pixel_error": [
+        0.3701684257703164,
+        0.12115773792947948
+      ]
+    },
+    {
+      "region": "top_left",
+      "region_label": "top_left",
+      "point_index": 9,
+      "step_mm": 8.0,
+      "command_offset_mm": [
+        8.0,
+        8.0
+      ],
+      "camera_tcp_pose_mm_rad": [
+        84.00918765777018,
+        -436.8714700359964,
+        436.0651506682669,
+        -3.141531582911295,
+        0.0002045139045668248,
+        1.5313651172598368
+      ],
+      "image_point": [
+        910.2695922851562,
+        791.5455627441406
+      ],
+      "nested_square_support": 60,
+      "median_square_side_px": 352.33547609818834,
+      "detection_source": "geometry",
+      "grid_score": null,
+      "tracking": {
+        "observed_count": 6,
+        "geometry_count": 6,
+        "supplement_count": 0,
+        "common_image_shift_px": [
+          65.7884521484375,
+          61.63325500488281
+        ],
+        "geometry_match_rms_px": 0.49186638079154243
+      },
+      "raw_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\09_raw.jpg",
+      "annotated_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\09_detected.jpg",
+      "world_point_mm": [
+        31.541255447404325,
+        72.77718106358105
+      ],
+      "world_error_mm": [
+        0.021515102607509107,
+        0.03552059526100493
+      ],
+      "pixel_error": [
+        0.2900373806794505,
+        0.1639477168371286
+      ]
+    },
+    {
+      "region": "top_center",
+      "region_label": "top_center",
+      "point_index": 9,
+      "step_mm": 8.0,
+      "command_offset_mm": [
+        8.0,
+        8.0
+      ],
+      "camera_tcp_pose_mm_rad": [
+        84.00918765777018,
+        -436.8714700359964,
+        436.0651506682669,
+        -3.141531582911295,
+        0.0002045139045668248,
+        1.5313651172598368
+      ],
+      "image_point": [
+        1572.9144897460938,
+        797.6016235351562
+      ],
+      "nested_square_support": 20,
+      "median_square_side_px": 413.5328646202362,
+      "detection_source": "geometry",
+      "grid_score": null,
+      "tracking": {
+        "observed_count": 6,
+        "geometry_count": 6,
+        "supplement_count": 0,
+        "common_image_shift_px": [
+          65.7884521484375,
+          61.63325500488281
+        ],
+        "geometry_match_rms_px": 0.49186638079154243
+      },
+      "raw_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\09_raw.jpg",
+      "annotated_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\09_detected.jpg",
+      "world_point_mm": [
+        28.165315238907368,
+        -9.3895381876099
+      ],
+      "world_error_mm": [
+        0.029381452640766526,
+        -0.016513005841851225
+      ],
+      "pixel_error": [
+        -0.12616513236866922,
+        0.2404311495923821
+      ]
+    },
+    {
+      "region": "top_right",
+      "region_label": "top_right",
+      "point_index": 9,
+      "step_mm": 8.0,
+      "command_offset_mm": [
+        8.0,
+        8.0
+      ],
+      "camera_tcp_pose_mm_rad": [
+        84.00918765777018,
+        -436.8714700359964,
+        436.0651506682669,
+        -3.141531582911295,
+        0.0002045139045668248,
+        1.5313651172598368
+      ],
+      "image_point": [
+        2233.215576171875,
+        804.4240112304688
+      ],
+      "nested_square_support": 58,
+      "median_square_side_px": 346.1348392944981,
+      "detection_source": "geometry",
+      "grid_score": null,
+      "tracking": {
+        "observed_count": 6,
+        "geometry_count": 6,
+        "supplement_count": 0,
+        "common_image_shift_px": [
+          65.7884521484375,
+          61.63325500488281
+        ],
+        "geometry_match_rms_px": 0.49186638079154243
+      },
+      "raw_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\09_raw.jpg",
+      "annotated_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\09_detected.jpg",
+      "world_point_mm": [
+        24.704991280916758,
+        -91.38139167816911
+      ],
+      "world_error_mm": [
+        0.03276127772694437,
+        -0.019254022063549314
+      ],
+      "pixel_error": [
+        -0.14574180366798828,
+        0.26820831526788425
+      ]
+    },
+    {
+      "region": "bottom_left",
+      "region_label": "bottom_left",
+      "point_index": 9,
+      "step_mm": 8.0,
+      "command_offset_mm": [
+        8.0,
+        8.0
+      ],
+      "camera_tcp_pose_mm_rad": [
+        84.00918765777018,
+        -436.8714700359964,
+        436.0651506682669,
+        -3.141531582911295,
+        0.0002045139045668248,
+        1.5313651172598368
+      ],
+      "image_point": [
+        904.3750915527344,
+        1375.5164184570312
+      ],
+      "nested_square_support": 60,
+      "median_square_side_px": 352.7455531973515,
+      "detection_source": "geometry",
+      "grid_score": null,
+      "tracking": {
+        "observed_count": 6,
+        "geometry_count": 6,
+        "supplement_count": 0,
+        "common_image_shift_px": [
+          65.7884521484375,
+          61.63325500488281
+        ],
+        "geometry_match_rms_px": 0.49186638079154243
+      },
+      "raw_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\09_raw.jpg",
+      "annotated_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\09_detected.jpg",
+      "world_point_mm": [
+        -40.61015947497474,
+        75.10852715278918
+      ],
+      "world_error_mm": [
+        0.011273067854119745,
+        0.05539762821535987
+      ],
+      "pixel_error": [
+        0.45062920260443207,
+        0.07709893036826543
+      ]
+    },
+    {
+      "region": "bottom_center",
+      "region_label": "bottom_center",
+      "point_index": 9,
+      "step_mm": 8.0,
+      "command_offset_mm": [
+        8.0,
+        8.0
+      ],
+      "camera_tcp_pose_mm_rad": [
+        84.00918765777018,
+        -436.8714700359964,
+        436.0651506682669,
+        -3.141531582911295,
+        0.0002045139045668248,
+        1.5313651172598368
+      ],
+      "image_point": [
+        1566.9459838867188,
+        1381.8507690429688
+      ],
+      "nested_square_support": 38,
+      "median_square_side_px": 376.0404324797603,
+      "detection_source": "geometry",
+      "grid_score": null,
+      "tracking": {
+        "observed_count": 6,
+        "geometry_count": 6,
+        "supplement_count": 0,
+        "common_image_shift_px": [
+          65.7884521484375,
+          61.63325500488281
+        ],
+        "geometry_match_rms_px": 0.49186638079154243
+      },
+      "raw_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\09_raw.jpg",
+      "annotated_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\09_detected.jpg",
+      "world_point_mm": [
+        -44.064627756969564,
+        -6.615208770216043
+      ],
+      "world_error_mm": [
+        0.050438741715773006,
+        -0.0033126469484958676
+      ],
+      "pixel_error": [
+        -0.015236037712611505,
+        0.41058630458837797
+      ]
+    },
+    {
+      "region": "bottom_right",
+      "region_label": "bottom_right",
+      "point_index": 9,
+      "step_mm": 8.0,
+      "command_offset_mm": [
+        8.0,
+        8.0
+      ],
+      "camera_tcp_pose_mm_rad": [
+        84.00918765777018,
+        -436.8714700359964,
+        436.0651506682669,
+        -3.141531582911295,
+        0.0002045139045668248,
+        1.5313651172598368
+      ],
+      "image_point": [
+        2229.0,
+        1387.5
+      ],
+      "nested_square_support": 54,
+      "median_square_side_px": 340.9941043288178,
+      "detection_source": "geometry",
+      "grid_score": null,
+      "tracking": {
+        "observed_count": 6,
+        "geometry_count": 6,
+        "supplement_count": 0,
+        "common_image_shift_px": [
+          65.7884521484375,
+          61.63325500488281
+        ],
+        "geometry_match_rms_px": 0.49186638079154243
+      },
+      "raw_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\09_raw.jpg",
+      "annotated_image": "E:\\project_test\\project_all\\output\\task2\\tray_auto_calibration\\20260925_202140_318357\\09_detected.jpg",
+      "world_point_mm": [
+        -47.41153827370494,
+        -88.4162592708081
+      ],
+      "world_error_mm": [
+        0.0654961023810543,
+        0.007074150861669182
+      ],
+      "pixel_error": [
+        0.07526894888997049,
+        0.5299788352792802
+      ]
+    }
+  ],
+  "excluded_samples": [],
+  "shared_view_compatibility": {
+    "z_diff_mm": 0.0044913276339570984,
+    "rz_diff_rad": 2.458981425212947e-05,
+    "max_z_diff_mm": 2.0,
+    "max_rz_diff_rad": 0.02
+  },
+  "report_path": "E:\\project_test\\project_all\\resources\\visionmaster_task2_calibration_report.json"
+}

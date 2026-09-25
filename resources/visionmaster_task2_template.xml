@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CalibInfo>
+    <CalibInputParam>
+        <CalibParam ParamName="CreateCalibTime" DataType="string"><ParamValue></ParamValue></CalibParam>
+        <CalibParam ParamName="CalibType" DataType="string"><ParamValue>NPointCalib</ParamValue></CalibParam>
+        <CalibParam ParamName="TransNum" DataType="int"><ParamValue>0</ParamValue></CalibParam>
+        <CalibParam ParamName="RotNum" DataType="int"><ParamValue>0</ParamValue></CalibParam>
+        <CalibParam ParamName="CalibErrStatus" DataType="int"><ParamValue>0</ParamValue></CalibParam>
+        <CalibParam ParamName="TransError" DataType="float"><ParamValue>0</ParamValue></CalibParam>
+        <CalibParam ParamName="RotError" DataType="float"><ParamValue>-999</ParamValue></CalibParam>
+        <CalibParam ParamName="TransWorldError" DataType="float"><ParamValue>0</ParamValue></CalibParam>
+        <CalibParam ParamName="RotWorldError" DataType="float"><ParamValue>-999</ParamValue></CalibParam>
+        <CalibParam ParamName="PixelPrecisionX" DataType="float"><ParamValue>0</ParamValue></CalibParam>
+        <CalibParam ParamName="PixelPrecisionY" DataType="float"><ParamValue>0</ParamValue></CalibParam>
+        <CalibParam ParamName="PixelPrecision" DataType="float"><ParamValue>0</ParamValue></CalibParam>
+        <CalibPointFListParam ParamName="ImagePointLst" DataType="CalibPointList" />
+        <CalibPointFListParam ParamName="WorldPointLst" DataType="CalibPointList" />
+    </CalibInputParam>
+    <CalibOutputParam>
+        <CalibParam ParamName="RotDirectionState" DataType="int"><ParamValue>-999</ParamValue></CalibParam>
+        <CalibParam ParamName="IsRightCoorA" DataType="int"><ParamValue>1</ParamValue></CalibParam>
+        <PointF ParamName="RotCenterImagePoint" DataType="CalibPointF">
+            <RotCenterImagePointX>0</RotCenterImagePointX><RotCenterImagePointY>0</RotCenterImagePointY><RotCenterImageR>-999</RotCenterImageR>
+        </PointF>
+        <PointF ParamName="RotCenterWorldPoint" DataType="CalibPointF">
+            <RotCenterWorldPointX>0</RotCenterWorldPointX><RotCenterWorldPointY>0</RotCenterWorldPointY><RotCenterWorldR>-999</RotCenterWorldR>
+        </PointF>
+        <CalibFloatListParam ParamName="CalibMatrix" DataType="FloatList">
+            <ParamValue>1</ParamValue><ParamValue>0</ParamValue><ParamValue>0</ParamValue>
+            <ParamValue>0</ParamValue><ParamValue>1</ParamValue><ParamValue>0</ParamValue>
+            <ParamValue>0</ParamValue><ParamValue>0</ParamValue><ParamValue>1</ParamValue>
+        </CalibFloatListParam>
+    </CalibOutputParam>
+</CalibInfo>

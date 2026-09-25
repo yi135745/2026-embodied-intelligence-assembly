@@ -1,0 +1,10 @@
+{
+  "active_xml_sha256": "7aa5593774edfe72cd35ac687eea863f4a2201649608a56d1d9b6c8a126b7bf9",
+  "activated_at": "2026-09-24T23:14:10",
+  "quality": {
+    "world_rms_mm": 0.2153080166942821,
+    "pixel_rms": 1.4839803896135308,
+    "point_count": 54,
+    "source_report": null
+  }
+}

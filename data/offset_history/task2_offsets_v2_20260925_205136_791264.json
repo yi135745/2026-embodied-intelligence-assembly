@@ -1,0 +1,605 @@
+{
+  "updated_at": "2026-09-25T18:26:16",
+  "calibration_world_scale_mm": 1.0,
+  "calibration_xml_sha256": "bb9c0f8f436f9646336f924905952f30b3ed5dc04241cfc5d0a014561a16b81e",
+  "block_origin_xy": [
+    -141.6445400915572,
+    -444.8607947520402
+  ],
+  "block_view_orientation_rad": [
+    -3.1415261913838264,
+    0.00014179152180963565,
+    1.5314177780964635
+  ],
+  "block_xy_offset": [
+    123.63481676985158,
+    1.590323762109874
+  ],
+  "tray_origin_xy": [
+    76.01091721350092,
+    -444.8703668387765
+  ],
+  "tray_view_orientation_rad": [
+    -3.1415298357600463,
+    0.00017744660881005513,
+    1.5313931882822114
+  ],
+  "tray_xy_offset": [
+    126.41440346554842,
+    1.6132260539475984
+  ],
+  "motion_compensation": {
+    "model_version": 1,
+    "models": {
+      "tray": {
+        "model_version": 1,
+        "mode": "spatial_rotation",
+        "reference_robot_xy": [
+          179.62976224752614,
+          -475.63733638327005
+        ],
+        "constant_bias_mm": [
+          -0.8267385765222257,
+          -2.2295228557853846
+        ],
+        "spatial_residual_matrix": [
+          [
+            0.03481029496083229,
+            -0.006745530813417403
+          ],
+          [
+            -0.014799606706814074,
+            0.046125902545317066
+          ]
+        ],
+        "rotation_center_bias_mm": [
+          -2.0324538955775795,
+          -0.004215724373151427
+        ],
+        "sample_count": 5,
+        "fit_rms_mm": 0.20814912750961911
+      },
+      "block": {
+        "model_version": 1,
+        "mode": "rotation_only",
+        "reference_robot_xy": [
+          11.890600729033876,
+          -0.8910187226970884
+        ],
+        "constant_bias_mm": [
+          0.0,
+          0.0
+        ],
+        "spatial_residual_matrix": [
+          [
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0
+          ]
+        ],
+        "rotation_center_bias_mm": [
+          -1.3935265775580878,
+          1.1096592310055367
+        ],
+        "sample_count": 2,
+        "fit_rms_mm": 1.0786126150142061
+      }
+    }
+  },
+  "block_reference_color": "红色",
+  "block_pixel_center": [
+    1482.3074951171875,
+    860.3279418945312
+  ],
+  "block_predicted_xy": [
+    -120.93382559714878,
+    -442.81891183184325
+  ],
+  "block_actual_xy": [
+    2.700991172702797,
+    -441.2285880697334
+  ],
+  "tray_reference_color": "黄色",
+  "tray_pixel_center": [
+    1501.2603759765625,
+    1319.569580078125
+  ],
+  "tray_predicted_xy": [
+    39.90824684305517,
+    -443.6304339610109
+  ],
+  "tray_actual_xy": [
+    166.32265030860358,
+    -442.0172079070633
+  ],
+  "closed_loop_calibration": {
+    "created_at": "2026-09-25T18:15:38",
+    "report": "E:\\project_test\\project_all\\output\\task2\\closed_loop_offset_calibration\\20260925_181538_425168\\closed_loop_report.json",
+    "sampling_profile": "robust",
+    "manual_block_alignment": {
+      "reference_color": "红色",
+      "pixel": [
+        1482.3074951171875,
+        860.3279418945312
+      ],
+      "world_xy": [
+        20.710714494408407,
+        2.041882920196913
+      ],
+      "predicted_xy_without_offset": [
+        -120.93382559714878,
+        -442.81891183184325
+      ],
+      "actual_tcp_xy": [
+        2.700991172702797,
+        -441.2285880697334
+      ],
+      "coarse_xy_offset": [
+        123.63481676985158,
+        1.590323762109874
+      ],
+      "coarse_offset_norm_mm": 123.64504457269246,
+      "scene_shift_px": 0.2547990580955512,
+      "board_guard_audits": [
+        {
+          "mode": "fallback",
+          "status": "passed",
+          "reason": null,
+          "detected_block_count": 1
+        },
+        {
+          "mode": "fallback",
+          "status": "passed",
+          "reason": null,
+          "detected_block_count": 1
+        }
+      ]
+    },
+    "manual_tray_alignment": {
+      "reference_color": "黄色",
+      "pixel": [
+        1501.2603759765625,
+        1319.569580078125
+      ],
+      "world_xy": [
+        -36.10267037044575,
+        1.239932877765555
+      ],
+      "predicted_xy_without_offset": [
+        39.90824684305517,
+        -443.6304339610109
+      ],
+      "actual_tcp_xy": [
+        166.32265030860358,
+        -442.0172079070633
+      ],
+      "coarse_xy_offset": [
+        126.41440346554842,
+        1.6132260539475984
+      ],
+      "coarse_offset_norm_mm": 126.4246965661836,
+      "scene_shift_px": 0.42055332701168313
+    },
+    "block_fit": {
+      "manual_seed_delta_mm": [
+        123.63481676985158,
+        1.590323762109874
+      ],
+      "fitted_reference_pose_center_bias_mm": [
+        -1.3935265775580878,
+        1.1096592310055367
+      ],
+      "rotation_center_fit_rms_mm": 1.0786126150142061,
+      "rotation_bias_update_gain": 0.7,
+      "applied_rotation_offset_step_mm": [
+        0.9754686042906614,
+        -0.7767614617038756
+      ],
+      "applied_block_offset_correction_mm": [
+        124.61028537414225,
+        0.8135623004059984
+      ],
+      "rotation_response": {
+        "command_to_observed_scale": 1.117125157529293,
+        "mean_error_deg": -3.0557713271953375,
+        "max_abs_error_deg": 5.983900265427664
+      },
+      "coordinate_offset_applied": false,
+      "diagnostic_offset_if_legacy_applied": [
+        124.61028537414225,
+        0.8135623004059984
+      ]
+    },
+    "translation_summary": {
+      "sample_count": 4,
+      "rms_residual_norm_mm": 1.968963781204758,
+      "max_residual_norm_mm": 2.6202758461744846
+    },
+    "tray_fit": {
+      "model_version": 1,
+      "mode": "spatial_rotation",
+      "reference_robot_xy": [
+        179.62976224752614,
+        -475.63733638327005
+      ],
+      "constant_bias_mm": [
+        -0.8267385765222257,
+        -2.2295228557853846
+      ],
+      "spatial_residual_matrix": [
+        [
+          0.03481029496083229,
+          -0.006745530813417403
+        ],
+        [
+          -0.014799606706814074,
+          0.046125902545317066
+        ]
+      ],
+      "rotation_center_bias_mm": [
+        -2.0324538955775795,
+        -0.004215724373151427
+      ],
+      "sample_count": 5,
+      "fit_rms_mm": 0.20814912750961911
+    },
+    "motion_compensation": {
+      "model_version": 1,
+      "models": {
+        "tray": {
+          "model_version": 1,
+          "mode": "spatial_rotation",
+          "reference_robot_xy": [
+            179.62976224752614,
+            -475.63733638327005
+          ],
+          "constant_bias_mm": [
+            -0.8267385765222257,
+            -2.2295228557853846
+          ],
+          "spatial_residual_matrix": [
+            [
+              0.03481029496083229,
+              -0.006745530813417403
+            ],
+            [
+              -0.014799606706814074,
+              0.046125902545317066
+            ]
+          ],
+          "rotation_center_bias_mm": [
+            -2.0324538955775795,
+            -0.004215724373151427
+          ],
+          "sample_count": 5,
+          "fit_rms_mm": 0.20814912750961911
+        },
+        "block": {
+          "model_version": 1,
+          "mode": "rotation_only",
+          "reference_robot_xy": [
+            11.890600729033876,
+            -0.8910187226970884
+          ],
+          "constant_bias_mm": [
+            0.0,
+            0.0
+          ],
+          "spatial_residual_matrix": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0
+            ]
+          ],
+          "rotation_center_bias_mm": [
+            -1.3935265775580878,
+            1.1096592310055367
+          ],
+          "sample_count": 2,
+          "fit_rms_mm": 1.0786126150142061
+        }
+      }
+    },
+    "tray_trials": [
+      {
+        "target_color": "黄色",
+        "requested_rotation_deg": 0.0,
+        "command_rotation_deg": 0.0,
+        "target_robot_xy": [
+          166.36260690283262,
+          -442.0075088385012
+        ],
+        "command_place_xy": [
+          166.36260690283262,
+          -442.0075088385012
+        ],
+        "predicted_motion_residual_mm": [
+          0.0,
+          0.0
+        ],
+        "target_world_xy": [
+          -36.0627137762167,
+          1.249631946327669
+        ],
+        "observed_block_world_xy": [
+          -37.48548531947549,
+          1.2942503843718618
+        ],
+        "placement_residual_mm": [
+          -1.42277154325879,
+          0.04461843804419274
+        ],
+        "block_return_residual_mm": [
+          -1.489998638322012,
+          0.07189220053071277
+        ],
+        "block_return_residual_norm_mm": 1.491732023755808,
+        "block_return_pixel_shift": [
+          -0.2501220703125,
+          12.0380859375
+        ],
+        "block_return_pixel_shift_norm": 12.040684120459796,
+        "height_parallax_not_separated": true
+      },
+      {
+        "target_color": "蓝色",
+        "requested_rotation_deg": 0.0,
+        "command_rotation_deg": 0.0,
+        "target_robot_xy": [
+          162.43817587303715,
+          -525.297115439464
+        ],
+        "command_place_xy": [
+          162.43817587303715,
+          -525.297115439464
+        ],
+        "predicted_motion_residual_mm": [
+          0.0,
+          0.0
+        ],
+        "target_world_xy": [
+          -39.98714480601219,
+          -82.03997465463519
+        ],
+        "observed_block_world_xy": [
+          -41.07734600526394,
+          -86.30567092257988
+        ],
+        "placement_residual_mm": [
+          -1.0902011992517515,
+          -4.265696267944691
+        ],
+        "block_return_residual_mm": [
+          -0.3314872391974255,
+          2.6644718947466424
+        ],
+        "block_return_residual_norm_mm": 2.6850128989719013,
+        "block_return_pixel_shift": [
+          -21.378173828125,
+          3.371337890625
+        ],
+        "block_return_pixel_shift_norm": 21.642371297949136,
+        "height_parallax_not_separated": true
+      },
+      {
+        "target_color": "紫色",
+        "requested_rotation_deg": 0.0,
+        "command_rotation_deg": 0.0,
+        "target_robot_xy": [
+          236.62281465609573,
+          -526.8670399613823
+        ],
+        "command_place_xy": [
+          236.62281465609573,
+          -526.8670399613823
+        ],
+        "predicted_motion_residual_mm": [
+          0.0,
+          0.0
+        ],
+        "target_world_xy": [
+          34.1974939770464,
+          -83.60989917655343
+        ],
+        "observed_block_world_xy": [
+          35.700271909633045,
+          -89.04591310767597
+        ],
+        "placement_residual_mm": [
+          1.5027779325866462,
+          -5.436013931122545
+        ],
+        "block_return_residual_mm": [
+          -3.0418807410859205,
+          3.4008712531777
+        ],
+        "block_return_residual_norm_mm": 4.56278026248031,
+        "block_return_pixel_shift": [
+          -26.7138671875,
+          25.4312744140625
+        ],
+        "block_return_pixel_shift_norm": 36.88333524011541,
+        "height_parallax_not_separated": true
+      },
+      {
+        "target_color": "黄色",
+        "requested_rotation_deg": 20.0,
+        "command_rotation_deg": 20.0,
+        "target_robot_xy": [
+          166.36260690283262,
+          -442.0075088385012
+        ],
+        "command_place_xy": [
+          166.36260690283262,
+          -442.0075088385012
+        ],
+        "predicted_motion_residual_mm": [
+          0.0,
+          0.0
+        ],
+        "target_world_xy": [
+          -36.0627137762167,
+          1.249631946327669
+        ],
+        "observed_block_world_xy": [
+          -37.70205094233231,
+          1.1910881268415279
+        ],
+        "placement_residual_mm": [
+          -1.6393371661156166,
+          -0.05854381948614118
+        ],
+        "block_return_residual_mm": [
+          -1.325689982567436,
+          -0.20837039792946788
+        ],
+        "block_return_residual_norm_mm": 1.341965779225735,
+        "block_return_pixel_shift": [
+          1.9700927734375,
+          10.63916015625
+        ],
+        "block_return_pixel_shift_norm": 10.820027466059788,
+        "height_parallax_not_separated": true
+      },
+      {
+        "target_color": "黄色",
+        "requested_rotation_deg": -20.0,
+        "command_rotation_deg": -20.0,
+        "target_robot_xy": [
+          166.36260690283262,
+          -442.0075088385012
+        ],
+        "command_place_xy": [
+          166.36260690283262,
+          -442.0075088385012
+        ],
+        "predicted_motion_residual_mm": [
+          0.0,
+          0.0
+        ],
+        "target_world_xy": [
+          -36.0627137762167,
+          1.249631946327669
+        ],
+        "observed_block_world_xy": [
+          -37.792018618419824,
+          -0.1828552306669311
+        ],
+        "placement_residual_mm": [
+          -1.7293048422031276,
+          -1.4324871769946002
+        ],
+        "block_return_residual_mm": [
+          -0.3799598979035572,
+          -1.6807419931397987
+        ],
+        "block_return_residual_norm_mm": 1.723155005075987,
+        "block_return_pixel_shift": [
+          13.6148681640625,
+          2.624755859375
+        ],
+        "block_return_pixel_shift_norm": 13.865568089556445,
+        "height_parallax_not_separated": true
+      }
+    ],
+    "tray_verification_trials": [
+      {
+        "target_color": "蓝色",
+        "requested_rotation_deg": 20.0,
+        "command_rotation_deg": 20.0,
+        "target_robot_xy": [
+          162.43817587303715,
+          -525.297115439464
+        ],
+        "command_place_xy": [
+          163.65239090275898,
+          -521.7263051048992
+        ],
+        "predicted_motion_residual_mm": [
+          -1.2142150297218375,
+          -3.570810334564882
+        ],
+        "target_world_xy": [
+          -39.98714480601219,
+          -82.03997465463519
+        ],
+        "observed_block_world_xy": [
+          -40.57593047994173,
+          -82.19846696067547
+        ],
+        "placement_residual_mm": [
+          -0.588785673929543,
+          -0.1584923060402872
+        ],
+        "block_return_residual_mm": [
+          1.04270188580616,
+          1.1824817890264687
+        ],
+        "block_return_residual_norm_mm": 1.5765438160872538,
+        "block_return_pixel_shift": [
+          -9.7490234375,
+          -8.1002197265625
+        ],
+        "block_return_pixel_shift_norm": 12.675054934930916,
+        "height_parallax_not_separated": true,
+        "residual_norm_mm": 0.6097445210074742,
+        "limit_mm": 3.0,
+        "passed": true
+      },
+      {
+        "target_color": "紫色",
+        "requested_rotation_deg": -20.0,
+        "command_rotation_deg": -20.0,
+        "target_robot_xy": [
+          236.62281465609573,
+          -526.8670399613823
+        ],
+        "command_place_xy": [
+          235.24116682867052,
+          -520.735631618303
+        ],
+        "predicted_motion_residual_mm": [
+          1.3816478274252222,
+          -6.131408343079233
+        ],
+        "target_world_xy": [
+          34.1974939770464,
+          -83.60989917655343
+        ],
+        "observed_block_world_xy": [
+          34.92324177024583,
+          -82.64526173425068
+        ],
+        "placement_residual_mm": [
+          0.7257477931994316,
+          0.9646374423027453
+        ],
+        "block_return_residual_mm": [
+          -5.103928269416241,
+          1.8611388549566612
+        ],
+        "block_return_residual_norm_mm": 5.43267168313857,
+        "block_return_pixel_shift": [
+          -13.8621826171875,
+          41.66925048828125
+        ],
+        "block_return_pixel_shift_norm": 43.91453680920912,
+        "height_parallax_not_separated": true,
+        "residual_norm_mm": 1.2071599953718757,
+        "limit_mm": 3.0,
+        "passed": true
+      }
+    ],
+    "block_return_validation_residual_mm": [
+      -5.103928269416241,
+      1.8611388549566612
+    ]
+  }
+}

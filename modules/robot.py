@@ -1,7 +1,8 @@
 """机器人模块：遨博 AUBO 机械臂连接与直线运动。
 
 对外接口：
-    Robot.move_to(pose_mm_rad) -> bool        移动到位姿（XYZ毫米，姿态弧度），返回是否到位
+    Robot.move_to(pose_mm_rad, speed=None, acceleration=None) -> bool
+                                                移动到位姿，可覆盖单段速度/加速度
     Robot.move_to_safe(pose_mm_rad) -> bool   安全移动到目标位姿（先升安全Z，再平移/转向，后下降）
     Robot.disconnect()                         释放连接
 
@@ -11,13 +12,8 @@
 import time
 from typing import Optional
 
-try:
-    from pyaubo_sdk import RpcClient, StandardOutputRunState
-except ImportError:
-    RpcClient = None
-    StandardOutputRunState = None
-
 import config
+from drivers.aubo_sdk import RpcClient, StandardOutputRunState
 
 
 def _format_pose(values) -> str:
@@ -77,7 +73,7 @@ class Robot:
         print("AUBO当前基座TCP位姿：" + _format_pose(result))
         return result
 
-    def move_to(self, pose_mm_rad) -> bool:
+    def move_to(self, pose_mm_rad, speed=None, acceleration=None) -> bool:
         """移动到目标位姿（XYZ毫米，RX/RY/RZ弧度），返回是否到位。"""
         if not self.available or self.robot_interface is None:
             print("机器人未连接，跳过运动执行。")
@@ -97,8 +93,8 @@ class Robot:
             # duration=0时由速度/加速度自动计算轨迹时间；True会被当作1秒而不是阻塞开关。
             result = self.robot_interface.getMotionControl().moveLine(
                 target_pose,
-                config.ROBOT_ACCELERATION,
-                config.ROBOT_SPEED,
+                float(config.ROBOT_ACCELERATION if acceleration is None else acceleration),
+                float(config.ROBOT_SPEED if speed is None else speed),
                 0.0,
                 0.0,
             )
@@ -329,8 +325,8 @@ class Robot:
         print("AUBO末端TOOL_IO[%d] <- %s（%s），SDK返回=%s，单路回读=%s，整组位图=0x%X" %
               (channel, bool(value), label, result, actual, outputs_mask))
 
-    def set_suction(self, enabled: bool) -> bool:
-        """True吸取；False停泵、短暂泄压，然后关闭泄压阀。"""
+    def set_suction(self, enabled: bool, keep_vent_open: bool = False) -> bool:
+        """True吸取；False先开阀、延迟停泵并泄压，可保持阀开启供慢速脱离。"""
         if not config.ROBOT_VACUUM_ENABLED:
             print("吸盘控制已被ROBOT_VACUUM_ENABLED=False禁用。")
             return False
@@ -348,11 +344,15 @@ class Robot:
                 time.sleep(max(0.0, float(config.TOOL_IO_SUCTION_WAIT_SEC)))
                 print("吸盘已开启。")
             else:
-                self._write_tool_output(config.TOOL_IO_PUMP_INDEX, not pump_on, "真空泵停止")
                 self._write_tool_output(config.TOOL_IO_VENT_INDEX, vent_open, "泄压阀开启")
+                time.sleep(max(0.0, float(config.TOOL_IO_VENT_BEFORE_PUMP_OFF_SEC)))
+                self._write_tool_output(config.TOOL_IO_PUMP_INDEX, not pump_on, "真空泵停止")
                 time.sleep(max(0.0, float(config.TOOL_IO_RELEASE_WAIT_SEC)))
-                self._write_tool_output(config.TOOL_IO_VENT_INDEX, not vent_open, "泄压阀关闭")
-                print("吸盘已关闭并完成泄压。")
+                if not keep_vent_open:
+                    self._write_tool_output(config.TOOL_IO_VENT_INDEX, not vent_open, "泄压阀关闭")
+                    print("吸盘已关闭并完成泄压。")
+                else:
+                    print("真空泵已停止，泄压阀保持开启，等待低速脱离。")
             return True
         except Exception as exc:
             print("吸盘控制失败：" + str(exc))
@@ -365,6 +365,20 @@ class Robot:
     def vacuum_off(self) -> bool:
         """关闭气泵，短暂开启泄压阀后恢复关闭。"""
         return self.set_suction(False)
+
+    def _close_release_vent(self) -> bool:
+        """慢速脱离后关闭泄压阀；仅由完整抓放流程使用。"""
+        try:
+            self._write_tool_output(
+                config.TOOL_IO_VENT_INDEX,
+                not bool(config.TOOL_IO_VENT_OPEN_LEVEL),
+                "泄压阀关闭",
+            )
+            print("低速脱离完成，泄压阀已关闭。")
+            return True
+        except Exception as exc:
+            print("关闭泄压阀失败：" + str(exc))
+            return False
 
     def pick_and_place(self, pick_pose, place_pose, lift_mm=None) -> bool:
         """在共同净空高度旋转/平移，保持低位抓取与释放过程竖直。"""
@@ -396,7 +410,21 @@ class Robot:
         if not self.move_to(place_above) or not self.move_to(place):
             self.vacuum_off()
             return False
-        if not self.vacuum_off():
+        if not self.set_suction(False, keep_vent_open=True):
+            self.vacuum_off()
+            return False
+        slow_lift = place.copy()
+        slow_lift[2] = min(
+            clearance,
+            place[2] + max(0.0, float(config.TASK2_RELEASE_SLOW_LIFT_MM)),
+        )
+        if slow_lift[2] > place[2] and not self.move_to(
+                slow_lift,
+                speed=config.TASK2_RELEASE_SLOW_SPEED,
+                acceleration=config.TASK2_RELEASE_SLOW_ACCELERATION):
+            self._close_release_vent()
+            return False
+        if not self._close_release_vent():
             return False
         return self.move_to(place_above)
 

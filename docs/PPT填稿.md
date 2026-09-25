@@ -67,12 +67,12 @@
 | 能力 | 模块 | 对外接口（真实） |
 |------|------|------------------|
 | 语音 | voice.py | `wake() / listen() / speak() / is_exit()` |
-| 视觉采集 | vision.py | `capture()` |
-| 任务理解 | llm.py | `identify_image() / parse_task2_card()` |
-| 视觉处理 | task2_vision.py | `ColorObjectDetector.detect() / CoordinateTransformer.pixel_to_robot()` |
+| 视觉采集 | camera.py | `capture()` |
+| 任务理解 | interpreter.py | `identify_image() / parse_task2_card()` |
+| 视觉处理 | task2_perception/ | `ColorObjectDetector.detect() / CoordinateTransformer.pixel_to_robot()` |
 | 机器人控制 | robot.py | `move_to() / move_to_safe() / get_current_pose() / set_suction() / pick_and_place()` |
 
-- 核心句：**模块按独立能力划分，而不是按任务划分** —— 所以同一个 `robot.py` / `vision.py` 被任务一、任务二共同调用。
+- 核心句：**模块按独立能力划分，而不是按任务划分** —— 所以同一个 `robot.py` / `camera.py` 被任务一、任务二共同调用。
 
 **📍 引用**
 - 目录结构与模块职责表：[docs/项目流程说明.md:18-55](docs/项目流程说明.md#L18-L55)
@@ -85,8 +85,8 @@
 - 设计方法：定义职责 → 定义输入 → 定义输出 → 封装接口。
 - 三个真实接口示例：
   ```
-  Vision.capture()         输入拍摄配置 → 输出图像路径
-  LLM.parse_task2_card()   输入任务卡图像 → 输出 6 步结构化 JSON
+  Camera.capture()              输入拍摄配置 → 输出图像路径
+  Interpreter.parse_task2_card() 输入任务卡图像 → 输出结构化 JSON
   Robot.move_to()          输入目标位姿 → 返回是否到位(bool)
   ```
 - `robot.py` 的层次展示：
@@ -98,8 +98,8 @@
 - 核心句：**基础能力独立封装，复杂能力通过基础能力组合实现。**
 
 **📍 引用**
-- `Vision.capture()` 三级兜底与返回值：[modules/vision.py:210-232](modules/vision.py#L210-L232)
-- `LLM.parse_task2_card()`：[modules/llm.py:155-207](modules/llm.py#L155-L207)
+- `Camera.capture()` 三级兜底与返回值：`modules/camera.py`
+- `Interpreter.parse_task2_card()`：`modules/interpreter.py`
 - `Robot.move_to()` / `move_to_safe()` / `pick_and_place()`：[modules/robot.py:80-111](modules/robot.py#L80-L111)、[modules/robot.py:113-145](modules/robot.py#L113-L145)、[modules/robot.py:303-322](modules/robot.py#L303-L322)
 
 ---
@@ -132,7 +132,7 @@
   ```
           业务流程层   main / task1 / task2
                ↓
-          能力模块层   voice / vision / llm / task2_vision / robot
+          平行功能层   voice / camera / interpreter / robot / perception / planning
                ↓
           基础/复合能力  move_to / move_to_safe / pick_and_place ...
                ↓
@@ -189,10 +189,10 @@
 
 **📍 引用**
 - 任务一 prompt：[config.py](config.py)
-- `identify_image()` 与图片压缩：[modules/llm.py:96-153](modules/llm.py#L96-L153)
-- `parse_task2_card()` 温度 0 与强校验：[modules/llm.py:167](modules/llm.py#L167)、[modules/llm.py:190-201](modules/llm.py#L190-L201)
-- LLM 原始返回留痕：[modules/llm.py:176-183](modules/llm.py#L176-L183)
-- 校验后步骤留痕：[modules/llm.py:202-206](modules/llm.py#L202-L206)
+- `identify_image()` 与图片压缩：`modules/interpreter.py`
+- `parse_task2_card()` 温度 0 与 JSON 解析：`modules/interpreter.py`
+- 模型原始返回留痕：`modules/interpreter.py`
+- 确定性协议校验：`modules/task2_planning.py`
 - 任务二 prompt 与上传分辨率：[config.py:230-234](config.py#L230-L234)、[config.py:217-218](config.py#L217-L218)
 
 ---
@@ -210,11 +210,11 @@
 - `validate_six_colors()` 校验六色齐全。
 
 **📍 引用**
-- HSV 分割 + minAreaRect：[modules/task2_vision.py:156-177](modules/task2_vision.py#L156-L177)
+- HSV 分割 + minAreaRect：`modules/task2_perception/`
 - 方块/托盘分区 HSV：[config.py:184-192](config.py#L184-L192)
 - 联合评分权重：[config.py:197-202](config.py#L197-L202)
-- fallback 全局分配：[modules/task2_vision.py:200-290](modules/task2_vision.py#L200-L290)
-- 六色校验：[modules/task2_vision.py:293-297](modules/task2_vision.py#L293-L297)
+- fallback 全局分配：`modules/task2_perception/`
+- 颜色完整性校验：`modules/task2_perception/`
 
 ---
 
@@ -229,8 +229,8 @@
 - 不要写"±0.1mm"这类未验证精度。
 
 **📍 引用**
-- `pixel_to_world()` / `pixel_to_robot()`：[modules/task2_vision.py:108-131](modules/task2_vision.py#L108-L131)
-- 标定矩阵读取：[modules/task2_vision.py:91-99](modules/task2_vision.py#L91-L99)
+- `pixel_to_world()` / `pixel_to_robot()`：`modules/task2_perception/`
+- 标定矩阵读取：`modules/task2_perception/`
 - 标定原点/XY 偏移/抓放 Z 配置：[config.py:225-231](config.py#L225-L231)
 - 九点标定约束与抓放 Z 说明：[docs/项目流程说明.md:121](docs/项目流程说明.md#L121)、[docs/项目流程说明.md:132](docs/项目流程说明.md#L132)
 
@@ -273,11 +273,12 @@
 
 ## P14 · 现场标定与调试工具链
 **内容**
-- 三个标定/调参工具：
+- 现场标定/调参工具：
   - `task2_tuner.py`：HSV/曝光/增益 滑条调参 → `task2_tuning.json`
-  - `task2_offset_calibrate.py`：XY 偏移 + 抓放 Z → `task2_offsets_v2.json`
-  - `task2_tray_verify.py`：托盘坐标人工验收 → `task2_verified_trays.json`
-- 两个独立测试入口：`task2_vision_test.py`（视觉离线）、`vacuum_io_test.py`（吸盘 Tool IO 单测）。
+  - `task2_tray_auto_calibrate.py`：生成并启用公共平面矩阵
+  - `task2_closed_loop_offset_calibrate.py`：双区锚定、动作补偿与验证
+  - `task2_calibration_audit.py`：只读审计矩阵、绑定与偏移指纹
+- 独立诊断入口：`task2_vision_test.py`（视觉）与 `vacuum_io_test.py`（吸盘 Tool IO）。
 - 无臂模式（机器人连接失败自动降级，不影响视觉联调）。
 - 核心句：**针对比赛现场建立独立调试/标定/验证工具，而不是所有问题都靠改主程序解决。**
 

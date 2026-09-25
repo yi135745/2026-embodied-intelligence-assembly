@@ -1,0 +1,10 @@
+{
+  "active_xml_sha256": "262c9ba2125b61596ed870b16031fa1c9fb4e8417d72ab7e8d90091033c7e8ad",
+  "activated_at": "2026-09-25T20:22:36",
+  "quality": {
+    "world_rms_mm": 0.04988679780379673,
+    "pixel_rms": 0.40262044009299586,
+    "point_count": 54,
+    "source_report": "E:\\project_test\\project_all\\resources\\visionmaster_task2_calibration_report.json"
+  }
+}

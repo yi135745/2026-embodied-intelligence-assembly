@@ -9,10 +9,10 @@
 
 import config
 
-from modules.vision import Vision
+from modules.camera import Camera
 from modules.robot import Robot
-from modules.llm import LLM
-from modules.pose_records import apply_aubo_pose_records
+from modules.interpreter import Interpreter
+from runtime.site_data import apply_aubo_pose_records
 
 from task.task1 import task1_run
 
@@ -24,19 +24,19 @@ def main():
 
     apply_aubo_pose_records()
     voice = Voice()
-    vision = Vision()
+    camera = Camera()
     robot = Robot()
-    llm = LLM()
+    interpreter = Interpreter()
 
     print("系统启动")
     try:
         voice.speak("系统已启动，请呼叫" + config.WAKE_WORD)
-        run_tasks(voice, vision, robot, llm)
+        run_tasks(voice, camera, robot, interpreter)
     finally:
         robot.disconnect()
 
 
-def run_tasks(voice, vision, robot, llm):
+def run_tasks(voice, camera, robot, interpreter):
     """任务返回成功才计入本轮；失败后清空本轮状态，等待裁判重新发卡。"""
     completed = set()
 
@@ -66,9 +66,9 @@ def run_tasks(voice, vision, robot, llm):
                     voice.speak("本项任务已完成，请执行另一个任务")
                     break
                 if task_id == 1:
-                    success = task1_run(voice, vision, robot, llm) is True
+                    success = task1_run(voice, camera, robot, interpreter) is True
                 else:
-                    result = task2_run(voice, vision, robot, llm)
+                    result = task2_run(voice, camera, robot, interpreter)
                     success = bool(result and result.get("status") == "completed")
                 if success:
                     completed.add(task_id)

@@ -8,7 +8,6 @@
 """
 
 import difflib
-import json
 import logging
 import math
 import os
@@ -19,13 +18,10 @@ import threading
 import time
 import warnings
 import wave
-import uuid
-from http.client import HTTPException
 from pathlib import Path
-from urllib.error import URLError
-from urllib.request import ProxyHandler, Request, build_opener
 
 import config
+from drivers.ai_box import AiBoxClient, AiBoxRequestError
 
 
 class VoiceServiceError(RuntimeError):
@@ -58,30 +54,18 @@ class Voice:
             _configure_logs()
             self._load_asr_model()
         else:
-            self._box_url = config.AI_BOX_URL.rstrip("/")
-            # 工位内网直连，不经过系统/环境代理；不需要SSH账户。
-            self._http = build_opener(ProxyHandler({}))
+            self._box_client = AiBoxClient(config.AI_BOX_URL)
             self.health = self.check_health()
             native_word = self.health.get("models", {}).get("wakeup_keyword", "未知")
             _log_asr_status("AI盒子已连接；原生唤醒词=%s，当前使用ASR文字匹配唤醒=%s"
                             % (native_word, config.WAKE_WORD))
 
     def _box_request(self, path, payload=None, timeout=5.0):
-        data = None if payload is None else json.dumps(
-            {**payload, "request_id": str(uuid.uuid4())}, ensure_ascii=False
-        ).encode("utf-8")
-        request = Request(self._box_url + path, data=data,
-                          headers={"Content-Type": "application/json; charset=utf-8"},
-                          method="GET" if payload is None else "POST")
         try:
-            with self._http.open(request, timeout=timeout) as response:
-                result = json.loads(response.read().decode("utf-8"))
-        except (URLError, OSError, ValueError, HTTPException) as exc:
+            return self._box_client.request(path, payload, timeout)
+        except AiBoxRequestError as exc:
             # 请求超时不代表盒子已停止录音/播报，禁止自动重发造成重入。
-            raise VoiceServiceError("AI盒子%s请求失败（未自动重试）：%s" % (path, exc)) from exc
-        if not isinstance(result, dict):
-            raise VoiceServiceError("AI盒子%s响应不是JSON对象" % path)
-        return result
+            raise VoiceServiceError(str(exc)) from exc
 
     def check_health(self):
         """只检查资源是否就绪；不代表麦克风/扬声器已经通过实测。"""

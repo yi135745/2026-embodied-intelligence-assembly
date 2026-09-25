@@ -7,8 +7,6 @@ from datetime import datetime
 from pathlib import Path
 from copy import deepcopy
 
-import cv2
-
 import os
 import sys
 
@@ -17,18 +15,27 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import config
-from modules.task2_vision import (ColorObjectDetector, load_task2_offsets,
-                                  load_task2_tuning, validate_colors)
-from modules.pose_records import apply_aubo_pose_records
-from modules.task2_planning import build_plan, validate_actions
+from modules.task2_perception import (
+    ColorObjectDetector,
+    load_task2_tuning,
+    save_debug_image,
+    validate_colors,
+)
+from runtime.site_data import apply_aubo_pose_records
+from runtime.task2_state import load_task2_runtime_state
+from modules.task2_planning import (
+    apply_motion_compensation,
+    build_plan,
+    validate_actions,
+)
 
 
-def _capture(vision, output_dir, name, debug_image, exposure_time=None, gain=None):
+def _capture(camera, output_dir, name, debug_image, exposure_time=None, gain=None):
     try:
-        return vision.capture(output_name=output_dir / name, debug_image=debug_image,
+        return camera.capture(output_name=output_dir / name, debug_image=debug_image,
                               exposure_time=exposure_time, gain=gain)
     except TypeError:  # 兼容离线测试中的简化相机对象
-        return vision.capture(output_name=output_dir / name, debug_image=debug_image)
+        return camera.capture(output_name=output_dir / name, debug_image=debug_image)
 
 
 def _move_to_view(robot, pose, label):
@@ -42,11 +49,12 @@ def _move_to_view(robot, pose, label):
     time.sleep(max(0.0, float(config.TASK2_SETTLE_SECONDS)))
 
 
-def _build_plan(steps, blocks, trays):
-    return build_plan(steps, blocks, trays)
+def _build_plan(steps, blocks, trays, motion_compensation=None):
+    nominal = build_plan(steps, blocks, trays)
+    return apply_motion_compensation(nominal, motion_compensation)
 
 
-def task2_run(voice, vision, robot, llm):
+def task2_run(voice, camera, robot, interpreter):
     """先预检整份计划，成功执行一步才提交已放置状态；无硬件时可用三张调试图。"""
     output_dir = Path(config.TASK2_OUTPUT_DIR)
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -55,18 +63,19 @@ def task2_run(voice, vision, robot, llm):
     try:
         apply_aubo_pose_records()
         load_task2_tuning()
-        load_task2_offsets()
-        detector = ColorObjectDetector()
+        runtime_state = load_task2_runtime_state()
+        motion_compensation = runtime_state.motion_compensation
+        detector = ColorObjectDetector(xy_calibration=runtime_state.xy_calibration)
         execute = bool(config.TASK2_EXECUTE_ROBOT)
         if execute and (robot is None or not getattr(robot, "available", False)):
             raise RuntimeError("机器人未连接；离线计划请明确设置TASK2_EXECUTE_ROBOT=False。")
         voice.speak("开始识别任务卡二")
         if execute:
             _move_to_view(robot, config.TASK2_CARD_VIEW_POSE, "任务卡拍照位")
-        card = _capture(vision, output_dir, config.TASK2_CARD_CAPTURE_NAME, config.TASK2_CARD_DEBUG_IMAGE,
+        card = _capture(camera, output_dir, config.TASK2_CARD_CAPTURE_NAME, config.TASK2_CARD_DEBUG_IMAGE,
                         config.TASK2_CARD_EXPOSURE_TIME, config.TASK2_CARD_GAIN)
         try:
-            steps = validate_actions(llm.parse_task2_card(card, output_dir=output_dir))
+            steps = validate_actions(interpreter.parse_task2_card(card, output_dir=output_dir))
         except Exception:
             voice.speak("任务卡识别失败，请确认任务卡位置")
             raise
@@ -75,21 +84,23 @@ def task2_run(voice, vision, robot, llm):
                      "托盘" if x["target_type"] == "tray" else "方块") for x in steps))
         if execute:
             _move_to_view(robot, config.TASK2_BLOCK_VIEW_POSE, "方块拍照位")
-        block_image = _capture(vision, output_dir, config.TASK2_BLOCK_CAPTURE_NAME, config.TASK2_BLOCK_DEBUG_IMAGE,
+        block_image = _capture(camera, output_dir, config.TASK2_BLOCK_CAPTURE_NAME, config.TASK2_BLOCK_DEBUG_IMAGE,
                                config.TASK2_BLOCK_EXPOSURE_TIME, config.TASK2_BLOCK_GAIN)
-        blocks, block_debug = detector.detect(block_image, "方块", output_dir, "blocks")
-        cv2.imwrite(str(output_dir / "blocks_detected.jpg"), block_debug)
+        blocks, block_debug = detector.detect(block_image, "方块", output_dir, "blocks",
+                                               strict_board=True)
+        save_debug_image(output_dir / "blocks_detected.jpg", block_debug)
         if execute:
             _move_to_view(robot, config.TASK2_TRAY_VIEW_POSE, "托盘拍照位")
-        tray_image = _capture(vision, output_dir, config.TASK2_TRAY_CAPTURE_NAME, config.TASK2_TRAY_DEBUG_IMAGE,
+        tray_image = _capture(camera, output_dir, config.TASK2_TRAY_CAPTURE_NAME, config.TASK2_TRAY_DEBUG_IMAGE,
                               config.TASK2_TRAY_EXPOSURE_TIME, config.TASK2_TRAY_GAIN)
         trays, tray_debug = detector.detect(tray_image, "托盘", output_dir, "trays")
-        cv2.imwrite(str(output_dir / "trays_detected.jpg"), tray_debug)
+        save_debug_image(output_dir / "trays_detected.jpg", tray_debug)
         if config.TASK2_REQUIRE_ALL_COLORS:
             validate_colors(blocks, "方块")
             validate_colors(trays, "托盘")
         record = {"timestamp": datetime.now().isoformat(timespec="seconds"), "steps": steps,
-                  "plan": _build_plan(steps, blocks, trays), "status": "planned",
+                  "plan": _build_plan(steps, blocks, trays, motion_compensation),
+                  "status": "planned",
                   "placed_block_map": {}, "rotation_enabled": config.TASK2_ROTATION_ENABLED,
                   "height_mm": dict(config.TASK2_BLOCK_HEIGHT_MM),
                   "reference_height_mm": config.TASK2_REFERENCE_BLOCK_HEIGHT_MM}
@@ -98,11 +109,17 @@ def task2_run(voice, vision, robot, llm):
         print("任务二计划已生成：" + str(log_path))
         if execute:
             if config.TASK2_REQUIRE_OFFSET_FILE and not Path(config.TASK2_OFFSET_FILE).exists():
-                raise RuntimeError("缺少新的偏差标定文件%s，请先运行task2_offset_calibrate.py。" % config.TASK2_OFFSET_FILE)
+                raise RuntimeError(
+                    "缺少正式偏差文件%s，请先运行"
+                    "tools/task2/workflow/task2_closed_loop_offset_calibrate.py。" %
+                    config.TASK2_OFFSET_FILE)
             for item in record["plan"]:
                 if item["target_type"] == "block" and item["target_color"] not in record["placed_block_map"]:
                     raise RuntimeError("目标方块尚未成功放置：" + item["target_color"])
-                pick_pose, place_pose = item["pick"]["robot_pose"], item["place"]["robot_pose"]
+                pick_pose = item["pick"].get(
+                    "command_robot_pose", item["pick"]["robot_pose"])
+                place_pose = item["place"].get(
+                    "command_robot_pose", item["place"]["robot_pose"])
                 if pick_pose is None or place_pose is None:
                     raise RuntimeError("第%d步缺少机器人坐标，请填写标定原点和抓放Z高度。" % item["step"])
                 item["robot_status"] = "running"
@@ -139,13 +156,13 @@ def task2_run(voice, vision, robot, llm):
 
 
 if __name__ == "__main__":
-    from modules.llm import LLM
+    from modules.interpreter import Interpreter
     from modules.robot import Robot
-    from modules.vision import Vision
+    from modules.camera import Camera
     from modules.voice import Voice
 
     standalone_robot = Robot()
     try:
-        task2_run(Voice(), Vision(), standalone_robot, LLM())
+        task2_run(Voice(), Camera(), standalone_robot, Interpreter())
     finally:
         standalone_robot.disconnect()

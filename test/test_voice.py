@@ -29,7 +29,7 @@ class BoxVoiceTests(unittest.TestCase):
     def setUp(self):
         self.opener = Mock()
         self.opener.open.return_value = response(HEALTH)
-        factory = patch("modules.voice.build_opener", return_value=self.opener)
+        factory = patch("drivers.ai_box.build_opener", return_value=self.opener)
         self.factory = factory.start()
         self.addCleanup(factory.stop)
         self.voice = Voice(backend="ai_box")
@@ -158,7 +158,7 @@ class BoxVoiceTests(unittest.TestCase):
 class LocalVoiceTests(unittest.TestCase):
     def test_local_is_explicit_and_never_contacts_box(self):
         with patch.object(Voice, "_load_asr_model") as loader, \
-                patch("modules.voice.build_opener") as factory:
+                patch("drivers.ai_box.build_opener") as factory:
             voice = Voice(backend="local")
         loader.assert_called_once()
         factory.assert_not_called()

@@ -8,8 +8,8 @@
 
 task1 依赖的模块接口约定：
     Voice.speak(text)              -> None   语音播报
-    Vision.capture()               -> Path   单次采集图像（返回图片文件路径）
-    LLM.identify_image(image)      -> str    视觉大模型理解
+    Camera.capture()                    -> Path   单次采集图像（返回图片文件路径）
+    Interpreter.identify_image(image)   -> str    视觉大模型理解
     Robot.move_to(pose_mm_rad)     -> bool   XYZ毫米、姿态弧度（连接失败返回False）
 """
 
@@ -21,19 +21,19 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import config
-from modules.pose_records import apply_aubo_pose_records
+from runtime.site_data import apply_aubo_pose_records
 
 
-def task1_run(voice, vision, robot, llm):
+def task1_run(voice, camera, robot, interpreter):
     try:
-        return _task1_run(voice, vision, robot, llm)
+        return _task1_run(voice, camera, robot, interpreter)
     except (Exception, SystemExit) as exc:
         print("任务一失败：" + str(exc))
         voice.speak("任务一失败")
         return False
 
 
-def _task1_run(voice, vision, robot, llm):
+def _task1_run(voice, camera, robot, interpreter):
     """任务一主流程。
 
     功能：
@@ -43,9 +43,9 @@ def _task1_run(voice, vision, robot, llm):
 
     输入：
         voice  -- Voice 模块实例，提供语音播报能力
-        vision -- Vision 模块实例，提供图像采集能力
+        camera -- Camera 模块实例，提供图像采集能力
         robot  -- Robot 模块实例，提供机器人运动能力（无臂时自动跳过）
-        llm    -- LLM 模块实例，提供视觉大模型理解能力
+        interpreter -- Interpreter 模块实例，提供视觉大模型理解能力
 
     输出：
         成功返回True，识别失败返回False，主入口据此决定是否播报完成。
@@ -59,12 +59,12 @@ def _task1_run(voice, vision, robot, llm):
 
     # ── 阶段 2：单次采集图像 ──────────────────────────
     # 功能：采集任务卡与现场画面，返回图片文件路径
-    image = vision.capture()
+    image = camera.capture()
 
     # ── 阶段 3：视觉大模型理解 ────────────────────────
     # 功能：识别图像中任务卡内容，完成场景初始化解析
     try:
-        result = llm.identify_image(image=image)
+        result = interpreter.identify_image(image=image)
     except Exception as exc:
         print("大模型识别失败：" + str(exc))
         voice.speak("大模型识别失败")
@@ -78,13 +78,13 @@ def _task1_run(voice, vision, robot, llm):
 if __name__ == "__main__":
     # 独立测试入口：绕过 main.py 的语音唤醒与派发，直接跑任务一流程。
     from modules.voice import Voice
-    from modules.vision import Vision
+    from modules.camera import Camera
     from modules.robot import Robot
-    from modules.llm import LLM
+    from modules.interpreter import Interpreter
 
     task1_run(
         voice=Voice(),
-        vision=Vision(),
+        camera=Camera(),
         robot=Robot(),
-        llm=LLM(),
+        interpreter=Interpreter(),
     )
