@@ -75,7 +75,7 @@ def _build_manual_candidate(offsets, block_offset, tray_offset,
     if actual_pose is None:
         actual_pose = list(block_record["actual_tcp_xy"]) + [0.0] * 4
     view_pose = block_record.get("reference_view_pose", [0.0] * 6)
-    height = block_record.get("block_height_mm", config.TASK2_BLOCK_PHOTO_HEIGHT_MM)
+    height = block_record.get("block_height_mm", config.TASK2_BLOCK_HEIGHT_MM)
     candidate = build_physical_calibration_record(
         block_record["pixel"], actual_pose, view_pose, height,
         evidence={"report": str(Path(report_path).resolve()),
@@ -218,7 +218,8 @@ def _require_single_block_scene(image_path, expected_pixel=None,
     bounds = None
     if board_guard != "off":
         try:
-            bounds = detect_block_board(image)
+            bounds = detect_block_board(
+                image, config.TASK2_BLOCK_BOARD_REGION_SCALE)
         except ValueError as exc:
             if board_guard == "strict":
                 raise
@@ -413,7 +414,7 @@ def _manual_block_anchor(robot, vision, transformer, offsets, run_dir, pick_z,
         "actual_tcp_pose": list(map(float, actual_pose)),
         "reference_view_pose": list(map(float, config.TASK2_BLOCK_VIEW_POSE)),
         "effective_capture_pose": get_task2_block_view_pose(),
-        "block_height_mm": float(config.TASK2_BLOCK_PHOTO_HEIGHT_MM),
+        "block_height_mm": float(config.TASK2_BLOCK_HEIGHT_MM),
         "coarse_xy_offset": list(map(float, offset)),
         "coarse_offset_norm_mm": distance,
         "scene_shift_px": scene_shift,
@@ -455,12 +456,8 @@ def main():
           (sampling_plan["profile"],
            len(sampling_plan["rotation_moves_deg"])))
 
-    block_height = float(config.TASK2_BLOCK_HEIGHT_MM[BLOCK_COLOR])
-    z_delta = block_height - float(config.TASK2_REFERENCE_BLOCK_HEIGHT_MM)
-    # 两个Z按动作语义使用，而不是按区域使用：无论物块在哪个区域，
-    # 吸取始终用pick_z，释放始终用place_z。
-    pick_z = float(config.TASK2_BLOCK_PICK_Z) + z_delta
-    place_z = float(config.TASK2_TRAY_PLACE_Z) + z_delta
+    # 全部物块共用一个真实高度；抓取Z已经在该高度下实测，不再按颜色伪造高度差。
+    pick_z = float(config.TASK2_BLOCK_PICK_Z)
     run_dir = (Path(config.TASK2_OUTPUT_DIR) / "closed_loop_offset_calibration" /
                datetime.now().strftime("%Y%m%d_%H%M%S_%f"))
     run_dir.mkdir(parents=True, exist_ok=False)

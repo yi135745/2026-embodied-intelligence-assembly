@@ -22,8 +22,26 @@ def _clusters(lines, horizontal):
              sum(length for _, length in group)) for group in groups.values()]
 
 
-def detect_block_board(image):
-    """检测近似水平的白板四条边，返回带安全内缩的(x0,y0,x1,y1)。"""
+def _scale_bounds(bounds, image_shape, scale):
+    """以边框中心等比缩放并裁剪到图像范围。"""
+    scale = float(scale)
+    if not np.isfinite(scale) or scale < 1.0 or scale > 1.30:
+        raise ValueError("物块白板识别范围比例必须在[1.0, 1.30]内。")
+    x0, y0, x1, y1 = map(float, bounds)
+    center_x, center_y = (x0 + x1) / 2.0, (y0 + y1) / 2.0
+    half_width = (x1 - x0) * scale / 2.0
+    half_height = (y1 - y0) * scale / 2.0
+    height, width = image_shape[:2]
+    return (
+        max(0, round(center_x - half_width)),
+        max(0, round(center_y - half_height)),
+        min(width - 1, round(center_x + half_width)),
+        min(height - 1, round(center_y + half_height)),
+    )
+
+
+def detect_block_board(image, region_scale=1.0):
+    """检测白板四边，安全内缩后按中心比例扩展物块识别范围。"""
     height, width = image.shape[:2]
     scale = min(1.0, 1024.0 / width)
     small = cv2.resize(image, (round(width * scale), round(height * scale)))
@@ -83,7 +101,7 @@ def detect_block_board(image):
                                                        x1 - inset, y1 - inset))
     if bounds[2] <= bounds[0] or bounds[3] <= bounds[1]:
         raise ValueError("物块白板有效区域为空；禁止抓放。")
-    return bounds
+    return _scale_bounds(bounds, image.shape, region_scale)
 
 
 def valid_block_contour(contour, bounds):

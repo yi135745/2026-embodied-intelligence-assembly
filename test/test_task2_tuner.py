@@ -9,12 +9,21 @@ import numpy as np
 from contracts.task2 import VisionTarget
 from modules.task2_perception import ColorObjectDetector
 from tools.task2.workflow.task2_tuner import (
-    _commit_range, _sample_confirmed_hsv_prototypes,
+    _build_tuning_payload, _commit_range, _sample_confirmed_hsv_prototypes,
     _swap_red_pink_prototypes, save_tuning,
 )
 
 
 class Task2TunerTest(unittest.TestCase):
+    def test_payload_is_snapshot_and_uses_scene_specific_capture(self):
+        ranges = {"蓝色": [[[90, 40, 10], [130, 255, 255]]]}
+        payload = _build_tuning_payload(
+            "tray", ranges, 5, 300, 230100, 23118, 0.0)
+        ranges["蓝色"][0][0][0] = 1
+        self.assertEqual(payload["tray_hsv_ranges"]["蓝色"][0][0][0], 90)
+        self.assertEqual(payload["capture"], {
+            "tray_exposure_time": 23118.0, "tray_gain": 0.0})
+
     def test_commit_supports_multiple_hsv_ranges(self):
         ranges = {"红色": [[[0, 80, 20], [8, 255, 255]],
                            [[175, 80, 20], [179, 255, 255]]]}

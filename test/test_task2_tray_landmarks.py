@@ -3,10 +3,45 @@ from unittest.mock import patch
 
 import numpy as np
 
-from modules.task2_perception import detect_tray_landmarks
+from contracts.task2 import VisionTarget
+from modules.task2_perception import (
+    ColorObjectDetector, TrayLandmark, detect_tray_landmarks,
+)
+
+
+class _Transformer:
+    def pixel_to_robot(self, x, y, _kind):
+        return [float(x), float(y), 1.0, 0.0, 0.0, 0.0]
 
 
 class TrayLandmarkBootstrapTests(unittest.TestCase):
+    def test_formal_targets_keep_color_identity_but_use_geometry_centers(self):
+        image = np.zeros((1000, 1200, 3), dtype=np.uint8)
+        centers = (
+            (200.0, 300.0), (600.0, 300.0), (1000.0, 300.0),
+            (200.0, 700.0), (600.0, 700.0), (1000.0, 700.0),
+        )
+        targets = [
+            VisionTarget("托盘", "颜色%d" % index,
+                         (center[0] + 8.0, center[1] - 5.0), 1000.0, 0.0)
+            for index, center in enumerate(centers)
+        ]
+        landmarks = [
+            TrayLandmark("slot%d" % index, center, 4, 100.0)
+            for index, center in enumerate(centers)
+        ]
+        with patch(
+            "modules.task2_perception.detect_tray_landmarks",
+            return_value=(landmarks, image.copy(), np.zeros(image.shape[:2]), 0.0),
+        ):
+            refined, _annotated = ColorObjectDetector(
+                _Transformer())._refine_tray_centers(image, targets, True)
+
+        self.assertEqual([target.color for target in refined],
+                         [target.color for target in targets])
+        self.assertEqual([target.pixel_center for target in refined], list(centers))
+        self.assertEqual(refined[0].robot_pose[:2], [200.0, 300.0])
+
     def test_color_centers_fill_missing_geometry_in_first_frame(self):
         image = np.zeros((1000, 1200, 3), dtype=np.uint8)
         centers = (

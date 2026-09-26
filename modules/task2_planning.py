@@ -58,10 +58,10 @@ def _finite(value, label):
     return value
 
 
-def _height(color):
-    height = _finite(config.TASK2_BLOCK_HEIGHT_MM[color], color + "高度")
+def _height():
+    height = _finite(config.TASK2_BLOCK_HEIGHT_MM, "物块高度")
     if height <= 0:
-        raise ValueError(color + "高度必须大于0。")
+        raise ValueError("物块高度必须大于0。")
     return height
 
 
@@ -80,9 +80,7 @@ def build_plan(actions, blocks, trays):
             if target.color in mapping:
                 raise ValueError("视觉存在重复颜色：" + target.color)
             mapping[target.color] = target
-    reference = _finite(config.TASK2_REFERENCE_BLOCK_HEIGHT_MM, "参考高度")
-    if reference <= 0:
-        raise ValueError("参考高度必须大于0。")
+    height = _height()
     predicted, plan = {}, []
     for action in actions:
         color = action["source_color"]
@@ -90,8 +88,6 @@ def build_plan(actions, blocks, trays):
             raise ValueError("未识别到来源方块：" + color)
         source = block_map[color]
         pick_pose = _pose(source)
-        height = _height(color)
-        pick_pose[2] += height - reference
         source_angle = source.robot_angle_deg
         if action["target_type"] == "tray":
             target_color = action["target_color"]
@@ -100,7 +96,7 @@ def build_plan(actions, blocks, trays):
             target = tray_map[target_color]
             place_pose = _pose(target)
             # TCP接触顶面的等效Z基准，不是物理托盘表面Z。
-            support_z = place_pose[2] - reference
+            support_z = place_pose[2] - height
             target_angle = target.robot_angle_deg
         else:
             state = predicted[action["target_color"]]

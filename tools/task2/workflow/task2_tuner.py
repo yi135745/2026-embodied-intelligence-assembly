@@ -6,7 +6,7 @@
   python tools/task2/workflow/task2_tuner.py --scene tray
 
 窗口直接显示方块或托盘正式检测器结果。
-按 s 保存，按 v 在正式检测完整时人工确认并保存审计；按 q 退出。方块按1~9、托盘按1~6切换颜色，
+按 s 显式保存，按 v 在正式检测完整时人工确认并保存审计；关闭窗口或按 q/ESC 直接退出且不保存。方块按1~9、托盘按1~6切换颜色，
 按 [ / ] 切换同色HSV区间，按 n 新增、x 删除区间；相机模式按 c 重新拍摄。
 """
 
@@ -138,6 +138,27 @@ def _capture(vision, scene, exposure, gain):
     return vision.capture(output_name=path, exposure_time=float(exposure), gain=float(gain))
 
 
+def _build_tuning_payload(scene, saved_ranges, morph, min_area, max_area,
+                          exposure, gain):
+    """构造可安全缓存的保存快照，避免窗口关闭后再读取轨道条。"""
+    payload = {
+        "%s_hsv_ranges" % scene: json.loads(json.dumps(saved_ranges)),
+        "morph_kernel": int(morph),
+        "min_contour_area": int(min_area),
+        "max_contour_area": int(max_area),
+        "capture": {
+            "%s_exposure_time" % scene: float(exposure),
+            "%s_gain" % scene: float(gain),
+        },
+    }
+    if scene == "block":
+        payload["block_color_prototypes_hsv"] = {
+            color: [list(item) for item in values]
+            for color, values in config.TASK2_BLOCK_COLOR_PROTOTYPES_HSV.items()
+        }
+    return payload
+
+
 def _window_open():
     """窗口被 X 关闭时停止读取轨道条，避免 OpenCV NULL window 异常。"""
     try:
@@ -217,6 +238,7 @@ def main():
     last_capture_settings = (initial_exposure, initial_gain_x10)
     settings_changed_at = float("inf")
     preview_signature = None
+    last_preview_payload = None
     targets, detected, detection_error = [], image.copy(), "尚未运行正式检测"
     cv2.imshow(WINDOW, cv2.resize(image, (640, 480)))
     cv2.waitKey(1)
@@ -254,6 +276,9 @@ def main():
         try:
             _commit_range(saved_ranges, colors[color_index], range_index, low, high)
             _apply_preview_config(args.scene, saved_ranges, morph, min_area, max_area)
+            last_preview_payload = _build_tuning_payload(
+                args.scene, saved_ranges, morph, min_area, max_area,
+                current_capture_settings[0], current_capture_settings[1] / 10.0)
             signature = (json.dumps(saved_ranges, sort_keys=True), morph, min_area,
                          max_area, Path(image_path).stat().st_mtime_ns)
             if signature != preview_signature:
@@ -322,23 +347,7 @@ def main():
             image = cv2.imread(str(image_path))
             settings_changed_at = float("inf")
         elif key in (ord("s"), ord("v")):
-            exposure = cv2.getTrackbarPos("Exposure us", WINDOW)
-            gain = cv2.getTrackbarPos("Gain x10", WINDOW) / 10.0
-            payload = {
-                "%s_hsv_ranges" % args.scene: saved_ranges,
-                "morph_kernel": morph,
-                "min_contour_area": cv2.getTrackbarPos("Min area", WINDOW),
-                "max_contour_area": cv2.getTrackbarPos("Max area/100", WINDOW) * 100,
-                "capture": {
-                    "%s_exposure_time" % args.scene: exposure,
-                    "%s_gain" % args.scene: gain,
-                },
-            }
-            if args.scene == "block":
-                payload["block_color_prototypes_hsv"] = {
-                    color: [list(item) for item in values]
-                    for color, values in config.TASK2_BLOCK_COLOR_PROTOTYPES_HSV.items()
-                }
+            payload = dict(last_preview_payload)
             if key == ord("v"):
                 try:
                     review, review_path = _save_human_review(
@@ -359,6 +368,7 @@ def main():
                     preview_signature = None
                 print("人工肉眼确认记录已保存：" + str(review_path.resolve()))
             save_tuning(payload)
+            last_preview_payload = payload
             print("已保存：" + config.TASK2_TUNING_FILE)
     cv2.destroyAllWindows()
 

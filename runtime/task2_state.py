@@ -35,7 +35,7 @@ def get_task2_block_view_pose(block_pose=None, block_height_mm=None):
     source = config.TASK2_BLOCK_VIEW_POSE if block_pose is None else block_pose
     if source is None:
         raise RuntimeError("尚未加载方块参考平面拍照位。")
-    height = (config.TASK2_BLOCK_PHOTO_HEIGHT_MM if block_height_mm is None
+    height = (config.TASK2_BLOCK_HEIGHT_MM if block_height_mm is None
               else block_height_mm)
     pose = [float(value) for value in source]
     pose[2] += float(height)
@@ -49,7 +49,7 @@ def require_shared_calibration_view_compatibility(block_pose=None, tray_pose=Non
     tray_pose = config.TASK2_TRAY_VIEW_POSE if tray_pose is None else tray_pose
     if block_pose is None or tray_pose is None:
         raise RuntimeError("共用标定矩阵需要方块区和托盘区拍照位。")
-    height = float(config.TASK2_BLOCK_PHOTO_HEIGHT_MM if block_height_mm is None
+    height = float(config.TASK2_BLOCK_HEIGHT_MM if block_height_mm is None
                    else block_height_mm)
     effective_block_z = get_task2_block_view_pose(block_pose, height)[2] - height
     z_diff = abs(effective_block_z - float(tray_pose[2]))

@@ -183,7 +183,8 @@ class ColorObjectDetector:
                     "TASK2_BLOCK_BOARD_GUARD_MODE必须是strict、fallback或off。")
             if board_mode != "off":
                 try:
-                    board_bounds = detect_block_board(image)
+                    board_bounds = detect_block_board(
+                        image, config.TASK2_BLOCK_BOARD_REGION_SCALE)
                 except ValueError as exc:
                     if board_mode == "strict":
                         raise
@@ -231,7 +232,7 @@ class ColorObjectDetector:
             targets.append(target)
             if kind != "方块" or color not in ("红色", "粉色"):
                 box = cv2.boxPoints(rect).astype(np.int32)
-                cv2.drawContours(annotated, [box], 0, (255, 255, 255), 2)
+                cv2.drawContours(annotated, [box], 0, (0, 255, 255), 2)
                 cv2.circle(annotated, (round(cx), round(cy)), 5, (0, 0, 0), -1)
                 cv2.putText(annotated, "C%d" % color_index, (max(0, round(cx) - 35), max(25, round(cy) - 15)),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
@@ -259,6 +260,9 @@ class ColorObjectDetector:
                 prefix = debug_prefix or kind
                 cv2.imwrite(str(debug_path / ("%s_combined_detected.jpg" % prefix)), annotated)
             print("%s已使用HSV覆盖率 + HSV色相 + Lab颜色距离联合识别。" % kind)
+        if kind == "托盘" and targets:
+            targets, annotated = self._refine_tray_centers(
+                image, targets, include_robot_pose)
         if board_bounds is not None:
             x0, y0, x1, y1 = board_bounds
             cv2.rectangle(annotated, (x0, y0), (x1, y1), (0, 255, 255), 3)
@@ -274,6 +278,37 @@ class ColorObjectDetector:
                 if distance < 0.25 * math.sqrt(min(target.area, other.area)):
                     raise ValueError("颜色识别冲突：%s和%s指向同一物块，请调HSV。" % (target.color, other.color))
         return targets, annotated
+
+    def _refine_tray_centers(self, image, targets, include_robot_pose):
+        """颜色负责身份，2×3同心方框几何负责托盘最终中心。"""
+        landmarks, annotated, _edges, _score = detect_tray_landmarks(
+            image, [target.pixel_center for target in targets])
+        color_centers = np.asarray(
+            [target.pixel_center for target in targets], dtype=np.float64)
+        geometry_centers = np.asarray(
+            [landmark.center for landmark in landmarks], dtype=np.float64)
+        distances = np.linalg.norm(
+            color_centers[:, None, :] - geometry_centers[None, :, :], axis=2)
+        rows, columns = linear_sum_assignment(distances)
+        max_distance = 0.08 * min(image.shape[:2])
+        if len(rows) != len(targets) or np.any(distances[rows, columns] > max_distance):
+            raise RuntimeError("托盘颜色中心与2×3方框中心无法可靠对应；请检查曝光和HSV。")
+
+        transformer = self.get_transformer("托盘")
+        landmark_by_target = {int(row): landmarks[int(column)]
+                              for row, column in zip(rows, columns)}
+        refined = []
+        for index, target in enumerate(targets):
+            center = tuple(float(value) for value in landmark_by_target[index].center)
+            robot_pose = (transformer.pixel_to_robot(*center, "托盘")
+                          if include_robot_pose else None)
+            refined.append(VisionTarget(
+                target.kind, target.color, center, target.area, target.angle_deg,
+                robot_pose, target.robot_angle_deg))
+            point = (round(center[0]), round(center[1]))
+            cv2.circle(annotated, point, 8, (0, 255, 255), 2)
+            cv2.circle(annotated, point, 3, (0, 0, 0), -1)
+        return refined, annotated
 
     @staticmethod
     def _needs_fallback(targets, expected_count):
@@ -555,7 +590,7 @@ class ColorObjectDetector:
                                   transformer.rectangle_angle_to_robot(rect))
             targets.append(target)
             box = cv2.boxPoints(rect).astype(np.int32)
-            cv2.drawContours(annotated, [box], 0, (255, 255, 255), 2)
+            cv2.drawContours(annotated, [box], 0, (0, 255, 255), 2)
             cv2.circle(annotated, (round(cx), round(cy)), 5, (0, 0, 0), -1)
             cv2.putText(annotated, "C%d*" % (color_index + 1),
                         (max(0, round(cx) - 35), max(25, round(cy) - 15)),

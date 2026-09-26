@@ -105,8 +105,7 @@ def task2_run(voice, camera, robot, interpreter):
                   "plan": _build_plan(steps, blocks, trays, motion_compensation),
                   "status": "planned",
                   "placed_block_map": {}, "rotation_enabled": config.TASK2_ROTATION_ENABLED,
-                  "height_mm": dict(config.TASK2_BLOCK_HEIGHT_MM),
-                  "reference_height_mm": config.TASK2_REFERENCE_BLOCK_HEIGHT_MM}
+                  "block_height_mm": float(config.TASK2_BLOCK_HEIGHT_MM)}
         log_path = output_dir / ("task2_%s.json" % datetime.now().strftime("%Y%m%d_%H%M%S_%f"))
         log_path.write_text(json.dumps(record, ensure_ascii=False, indent=2), encoding="utf-8")
         print("任务二计划已生成：" + str(log_path))

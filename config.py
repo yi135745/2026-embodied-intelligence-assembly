@@ -244,6 +244,10 @@ TASK2_COLOR_MAX_ASSIGNMENT_COST = 0.65  # 保留省赛暗紫实拍；新三色�
 TASK2_COLOR_BAD_AREA_RATIO = 0.25    # 某轮廓面积低于中位数该比例时视为只识别到边缘
 # strict：边界失败停止；fallback：边界可靠时限区，失败则警告并退回全图形状/颜色；off：不找白板。
 TASK2_BLOCK_BOARD_GUARD_MODE = "fallback"
+# 白板检测框作为物块识别门禁时，以中心等比放大；补偿物块高度造成的透视外扩。
+# 1.0为不放大，1.10为宽高各扩大10%（即每边约增加有效框尺寸的5%）。
+# 极限位置仍被裁切时可试1.12；不建议未经静态图验收直接超过1.15。
+TASK2_BLOCK_BOARD_REGION_SCALE = 1.10
 TASK2_CALIBRATION_FILE = str(RESOURCES_DIR / "visionmaster_task2_calibration.xml")  # VisionMaster兼容标定XML，通过版本工具启用
 TASK2_CALIBRATION_TEMPLATE_FILE = str(RESOURCES_DIR / "visionmaster_task2_template.xml")
 TASK2_CALIBRATION_HISTORY_DIR = str(RESOURCES_DIR / "calibration_history")
@@ -283,18 +287,12 @@ TASK2_TRAY_EXPOSURE_TIME = None
 TASK2_TRAY_GAIN = None
 
 # XY标定原点和XY偏移只保存在data/task2_offsets_v2.json，不在config保留副本。
-TASK2_BLOCK_PICK_Z = 180
-TASK2_TRAY_PLACE_Z = 183
-# 上述抓取/放置Z是在参考高度物块上标定的TCP高度。
-# 任务书写明高度未知，以下30/28只是暂定值；实测高度需与参考Z一起标定。
-TASK2_REFERENCE_BLOCK_HEIGHT_MM = 30.0
-# 【现场必改】物块顶面相对托盘标定参考平面的高度(mm)。
-# 新物理标定启用后：方块实际拍照Z = aubo_poses中的方块参考Z + 本值；托盘Z不变。
-TASK2_BLOCK_PHOTO_HEIGHT_MM = 30.0
-TASK2_BLOCK_HEIGHT_MM = {
-    **{color: 30.0 for color in TASK2_TRAY_COLORS},
-    **{color: 28.0 for color in TASK2_EXTRA_BLOCK_COLORS},
-}
+TASK2_BLOCK_PICK_Z = 178
+TASK2_TRAY_PLACE_Z = 178
+# 【现场必改】全部物块的统一实测高度(mm)。它同时决定方块拍照Z增量和叠放层高。
+# TASK2_BLOCK_PICK_Z/TASK2_TRAY_PLACE_Z是在这一高度下实测的TCP值；
+# 吸盘压缩或“多向下抓2mm”应直接重标抓取Z，不能伪装成另一种物块高度。
+TASK2_BLOCK_HEIGHT_MM = 30.0
 TASK2_ROTATION_ENABLED = True
 # shortest：选择[-45°,45°)最短等价角；positive/negative：利用正方形90°等价，
 # 强制所有非零RZ增量为正/负。学校受限工位使用negative，开阔赛场通常用shortest。
