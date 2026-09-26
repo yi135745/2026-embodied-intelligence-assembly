@@ -257,30 +257,15 @@ TASK2_SHARED_CALIBRATION_MAX_Z_DIFF_MM = 2.0
 TASK2_SHARED_CALIBRATION_MAX_RZ_DIFF_RAD = 0.02
 TASK2_TRAY_CALIBRATION_STEP_MM = 8.0  # 一次九点时相机相邻采样位移；每帧同时取6个托盘中心
 TASK2_CALIBRATION_WORLD_SCALE_MM = 1.0  # 当前VM九点标定矩阵已直接输出mm
-# 闭环偏移始终先做物块/托盘两次人工粗对准；这里只改变后续自动采样数量。
+# 物理标定只做一次方块区人工粗对准；这里只改变后续自动采样数量。
 # quick用于现场快速建立，robust用于学校充分调试。两者写入相同的正式偏移接口。
 TASK2_OFFSET_CALIBRATION_PROFILE = "robust"
 TASK2_OFFSET_CALIBRATION_PLANS = {
     "quick": {
-        "translation_moves_mm": ((30.0, 0.0), (-30.0, 30.0)),
         "rotation_moves_deg": (25.0,),
-        # 同一点两个角度可区分常量释放偏差与旋转偏心；验证样本不参与拟合。
-        "tray_calibration_trials": (("黄色", 0.0), ("黄色", 20.0)),
-        "tray_verification_trials": (("黄色", -20.0), ("蓝色", 0.0)),
     },
     "robust": {
-        "translation_moves_mm": (
-            (30.0, 0.0), (-30.0, 0.0), (0.0, 30.0), (0.0, -30.0),
-        ),
         "rotation_moves_deg": (25.0, -25.0),
-        # 三个空间点加参考点正负转角；若点位秩不足，拟合器自动降阶。
-        "tray_calibration_trials": (
-            ("黄色", 0.0), ("蓝色", 0.0), ("紫色", 0.0),
-            ("黄色", 20.0), ("黄色", -20.0),
-        ),
-        "tray_verification_trials": (
-            ("蓝色", 20.0), ("紫色", -20.0),
-        ),
     },
 }
 TASK2_REQUIRE_ALL_COLORS = True  # 国赛识别9色方块/6色托盘；False仍强制校验指令涉及的目标
@@ -303,6 +288,9 @@ TASK2_TRAY_PLACE_Z = 183
 # 上述抓取/放置Z是在参考高度物块上标定的TCP高度。
 # 任务书写明高度未知，以下30/28只是暂定值；实测高度需与参考Z一起标定。
 TASK2_REFERENCE_BLOCK_HEIGHT_MM = 30.0
+# 【现场必改】物块顶面相对托盘标定参考平面的高度(mm)。
+# 新物理标定启用后：方块实际拍照Z = aubo_poses中的方块参考Z + 本值；托盘Z不变。
+TASK2_BLOCK_PHOTO_HEIGHT_MM = 30.0
 TASK2_BLOCK_HEIGHT_MM = {
     **{color: 30.0 for color in TASK2_TRAY_COLORS},
     **{color: 28.0 for color in TASK2_EXTRA_BLOCK_COLORS},

@@ -1,0 +1,247 @@
+{
+  "schema_version": 3,
+  "updated_at": "2026-09-25T23:58:13",
+  "physical_alignment": {
+    "reference_kind": "block",
+    "pixel_center": [
+      1445.0,
+      905.0
+    ],
+    "aligned_tcp_pose_mm_rad": [
+      0.2517374911676263,
+      -436.51212719034964,
+      192.06710757695868,
+      -3.1415161630645936,
+      0.00023325230536346375,
+      1.5314061079186099
+    ],
+    "reference_view_pose_mm_rad": [
+      -141.6445400915572,
+      -444.8607947520402,
+      436.0507806549106,
+      -3.1415261913838264,
+      0.00014179152180963565,
+      1.5314177780964635
+    ],
+    "block_height_mm": 30.0,
+    "evidence": {
+      "report": "E:\\project_test\\project_all\\output\\task2\\closed_loop_offset_calibration\\20260925_235700_163800\\closed_loop_report.json",
+      "manual_block_alignment": {
+        "reference_color": "红色",
+        "pixel": [
+          1445.0,
+          905.0
+        ],
+        "world_xy": [
+          15.366283825557502,
+          6.837888323157017
+        ],
+        "predicted_xy_without_offset": [
+          -126.27825626599969,
+          -438.0229064288832
+        ],
+        "actual_tcp_xy": [
+          0.2517374911676263,
+          -436.51212719034964
+        ],
+        "actual_tcp_pose": [
+          0.2517374911676263,
+          -436.51212719034964,
+          192.06710757695868,
+          -3.1415161630645936,
+          0.00023325230536346375,
+          1.5314061079186099
+        ],
+        "reference_view_pose": [
+          -141.6445400915572,
+          -444.8607947520402,
+          436.0507806549106,
+          -3.1415261913838264,
+          0.00014179152180963565,
+          1.5314177780964635
+        ],
+        "effective_capture_pose": [
+          -141.6445400915572,
+          -444.8607947520402,
+          466.0507806549106,
+          -3.1415261913838264,
+          0.00014179152180963565,
+          1.5314177780964635
+        ],
+        "block_height_mm": 30.0,
+        "coarse_xy_offset": [
+          126.52999375716732,
+          1.5107792385335301
+        ],
+        "coarse_offset_norm_mm": 126.53901285412489,
+        "scene_shift_px": 0.7071067811865476,
+        "board_guard_audits": [
+          {
+            "mode": "fallback",
+            "status": "fallback",
+            "reason": "物块白板上下边界不可靠；禁止抓放。",
+            "detected_block_count": 1
+          },
+          {
+            "mode": "fallback",
+            "status": "fallback",
+            "reason": "物块白板上下边界不可靠；禁止抓放。",
+            "detected_block_count": 1
+          }
+        ]
+      }
+    }
+  },
+  "motion_compensation": {
+    "model_version": 1,
+    "models": {
+      "block": {
+        "model_version": 1,
+        "mode": "zero_manual_fallback",
+        "reference_robot_xy": [
+          0.2517374911676263,
+          -436.51212719034964
+        ],
+        "constant_bias_mm": [
+          0.0,
+          0.0
+        ],
+        "spatial_residual_matrix": [
+          [
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0
+          ]
+        ],
+        "rotation_center_bias_mm": [
+          0.0,
+          0.0
+        ],
+        "sample_count": 0,
+        "fit_rms_mm": 0.0
+      },
+      "tray": {
+        "model_version": 1,
+        "mode": "zero_manual_fallback",
+        "reference_robot_xy": [
+          0.2517374911676263,
+          -436.51212719034964
+        ],
+        "constant_bias_mm": [
+          0.0,
+          0.0
+        ],
+        "spatial_residual_matrix": [
+          [
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0
+          ]
+        ],
+        "rotation_center_bias_mm": [
+          0.0,
+          0.0
+        ],
+        "sample_count": 0,
+        "fit_rms_mm": 0.0
+      }
+    }
+  },
+  "block_xy_offset": [
+    126.52999375716732,
+    1.5107792385335301
+  ],
+  "tray_xy_offset": [
+    126.52999375716732,
+    1.5107792385335301
+  ],
+  "block_reference_color": "红色",
+  "block_pixel_center": [
+    1445.0,
+    905.0
+  ],
+  "block_predicted_xy": [
+    -126.27825626599969,
+    -438.0229064288832
+  ],
+  "block_actual_xy": [
+    0.2517374911676263,
+    -436.51212719034964
+  ],
+  "closed_loop_calibration": {
+    "created_at": "2026-09-25T23:58:13",
+    "mode": "manual_fallback_zero_motion_compensation",
+    "report": "E:\\project_test\\project_all\\output\\task2\\closed_loop_offset_calibration\\20260925_235700_163800\\closed_loop_report.json",
+    "manual_block_alignment": {
+      "reference_color": "红色",
+      "pixel": [
+        1445.0,
+        905.0
+      ],
+      "world_xy": [
+        15.366283825557502,
+        6.837888323157017
+      ],
+      "predicted_xy_without_offset": [
+        -126.27825626599969,
+        -438.0229064288832
+      ],
+      "actual_tcp_xy": [
+        0.2517374911676263,
+        -436.51212719034964
+      ],
+      "actual_tcp_pose": [
+        0.2517374911676263,
+        -436.51212719034964,
+        192.06710757695868,
+        -3.1415161630645936,
+        0.00023325230536346375,
+        1.5314061079186099
+      ],
+      "reference_view_pose": [
+        -141.6445400915572,
+        -444.8607947520402,
+        436.0507806549106,
+        -3.1415261913838264,
+        0.00014179152180963565,
+        1.5314177780964635
+      ],
+      "effective_capture_pose": [
+        -141.6445400915572,
+        -444.8607947520402,
+        466.0507806549106,
+        -3.1415261913838264,
+        0.00014179152180963565,
+        1.5314177780964635
+      ],
+      "block_height_mm": 30.0,
+      "coarse_xy_offset": [
+        126.52999375716732,
+        1.5107792385335301
+      ],
+      "coarse_offset_norm_mm": 126.53901285412489,
+      "scene_shift_px": 0.7071067811865476,
+      "board_guard_audits": [
+        {
+          "mode": "fallback",
+          "status": "fallback",
+          "reason": "物块白板上下边界不可靠；禁止抓放。",
+          "detected_block_count": 1
+        },
+        {
+          "mode": "fallback",
+          "status": "fallback",
+          "reason": "物块白板上下边界不可靠；禁止抓放。",
+          "detected_block_count": 1
+        }
+      ]
+    },
+    "motion_compensation_forced_zero": true
+  }
+}

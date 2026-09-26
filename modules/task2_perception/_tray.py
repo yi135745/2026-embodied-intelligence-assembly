@@ -140,14 +140,47 @@ def _grid_score(items, image_shape):
     return score, top + bottom
 
 
-def detect_tray_landmarks(image):
-    """返回严格按两行三列排序的六个中心及标注图、边缘图。"""
+def _append_supplemental_centers(clusters, supplemental_centers, image_shape):
+    """把颜色视觉中心作为几何缺口候选；邻近几何中心时始终保留几何结果。"""
+    height, width = image_shape[:2]
+    merge_distance = 0.050 * min(height, width)
+    combined = list(clusters)
+    for center in supplemental_centers:
+        point = np.asarray(center, dtype=np.float64)
+        if point.shape != (2,) or not np.all(np.isfinite(point)):
+            continue
+        if not (0.08 * width <= point[0] <= 0.92 * width and
+                0.08 * height <= point[1] <= 0.92 * height):
+            continue
+        if any(np.linalg.norm(point - item["center"]) <= merge_distance
+               for item in combined):
+            continue
+        combined.append({
+            "center": point,
+            "support": 0,
+            "side": 0.0,
+            "box": None,
+            "source": "color_bootstrap",
+        })
+    return combined
+
+
+def detect_tray_landmarks(image, supplemental_centers=()):
+    """按两行三列建立六槽位；颜色视觉只补几何缺失中心。"""
     if image is None or image.ndim != 3:
         raise ValueError("托盘几何检测需要有效BGR图像。")
     candidates, edges = _square_candidates(image)
-    clusters = _cluster_candidates(candidates, image.shape)
+    geometry_clusters = _cluster_candidates(candidates, image.shape)
     # 组合数量做上限保护；优先保留嵌套边最多、方框较大的候选。
-    clusters = sorted(clusters, key=lambda item: (item["support"], item["side"]), reverse=True)[:14]
+    geometry_clusters = sorted(
+        geometry_clusters,
+        key=lambda item: (item["support"], item["side"]),
+        reverse=True,
+    )[:14]
+    for item in geometry_clusters:
+        item["source"] = "geometry"
+    clusters = _append_supplemental_centers(
+        geometry_clusters, supplemental_centers, image.shape)
     best = None
     for group in combinations(clusters, 6):
         scored = _grid_score(group, image.shape)
@@ -155,8 +188,9 @@ def detect_tray_landmarks(image):
             best = scored
     if best is None:
         raise RuntimeError(
-            "未找到可靠的2×3托盘方框阵列（方形候选%d组）；请检查托盘是否完整入镜、边框是否清晰。" %
-            len(clusters)
+            "未找到可靠的2×3托盘方框阵列（几何候选%d组，颜色视觉补充%d组）；"
+            "请检查托盘是否完整入镜、边框是否清晰。" %
+            (len(geometry_clusters), len(clusters) - len(geometry_clusters))
         )
     score, ordered = best
     # 保守拒绝明显不像规则阵列的结果，避免把台面固定件写进标定数据。
@@ -164,17 +198,26 @@ def detect_tray_landmarks(image):
         raise RuntimeError("托盘2×3阵列几何一致性不足（score=%.3f），拒绝自动标定。" % score)
     landmarks = [
         TrayLandmark(slot, (float(item["center"][0]), float(item["center"][1])),
-                     int(item["support"]), float(item["side"]))
+                     int(item["support"]), float(item["side"]), item["source"])
         for slot, item in zip(SLOTS, ordered)
     ]
     annotated = image.copy()
     for index, (landmark, item) in enumerate(zip(landmarks, ordered), start=1):
-        cv2.drawContours(annotated, [np.rint(item["box"]).astype(np.int32)], 0, (0, 255, 255), 3)
+        if item["box"] is not None:
+            cv2.drawContours(
+                annotated,
+                [np.rint(item["box"]).astype(np.int32)],
+                0,
+                (0, 255, 255),
+                3,
+            )
         center = tuple(round(value) for value in landmark.center)
-        cv2.circle(annotated, center, 8, (0, 0, 255), -1)
-        cv2.putText(annotated, "%d:%s n=%d" % (index, landmark.slot, landmark.support_count),
+        color = (0, 0, 255) if landmark.source == "geometry" else (255, 0, 255)
+        cv2.circle(annotated, center, 8, color, -1)
+        cv2.putText(annotated, "%d:%s %s n=%d" %
+                    (index, landmark.slot, landmark.source, landmark.support_count),
                     (max(0, center[0] - 80), max(30, center[1] - 20)),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.55, color, 2)
     cv2.putText(annotated, "tray grid score=%.4f" % score, (30, 45),
                 cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 2)
     return landmarks, annotated, edges, float(score)
@@ -283,8 +326,8 @@ def detect_tray_landmarks_tracked(image, reference_landmarks, supplemental_cente
     }
 
 
-def detect_tray_landmarks_file(image_path):
+def detect_tray_landmarks_file(image_path, supplemental_centers=()):
     image = cv2.imread(str(image_path))
     if image is None:
         raise RuntimeError("无法读取托盘标定图片：" + str(image_path))
-    return detect_tray_landmarks(image)
+    return detect_tray_landmarks(image, supplemental_centers)

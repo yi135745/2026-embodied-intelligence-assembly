@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "updated_at": "2026-09-26T00:46:42",
+  "updated_at": "2026-09-26T00:45:54",
   "physical_alignment": {
     "reference_kind": "block",
     "pixel_center": [
@@ -84,40 +84,12 @@
           }
         ]
       }
-    },
-    "rotation_trials": [
-      {
-        "before_pixel_center": [
-          1505.9849853515625,
-          942.7815551757812
-        ],
-        "after_pixel_center": [
-          1503.6058349609375,
-          943.6353759765625
-        ],
-        "requested_rotation_deg": 25.0,
-        "command_rotation_deg": 25.0,
-        "observed_rotation_deg": -24.874786376953125
-      },
-      {
-        "before_pixel_center": [
-          1503.6058349609375,
-          943.6353759765625
-        ],
-        "after_pixel_center": [
-          1499.265380859375,
-          940.2973022460938
-        ],
-        "requested_rotation_deg": -25.0,
-        "command_rotation_deg": -25.0,
-        "observed_rotation_deg": 25.12133026123047
-      }
-    ]
+    }
   },
   "motion_compensation": {
     "model_version": 1,
     "models": {
-      "tray": {
+      "block": {
         "model_version": 1,
         "mode": "zero_manual_fallback",
         "reference_robot_xy": [
@@ -145,7 +117,7 @@
         "sample_count": 0,
         "fit_rms_mm": 0.0
       },
-      "block": {
+      "tray": {
         "model_version": 1,
         "mode": "zero_manual_fallback",
         "reference_robot_xy": [
@@ -194,10 +166,9 @@
     -443.86345133312614
   ],
   "closed_loop_calibration": {
-    "created_at": "2026-09-26T00:44:45",
+    "created_at": "2026-09-26T00:45:54",
+    "mode": "manual_fallback_zero_motion_compensation",
     "report": "E:\\project_test\\project_all\\output\\task2\\closed_loop_offset_calibration\\20260926_004445_980130\\closed_loop_report.json",
-    "sampling_profile": "robust",
-    "compensation_model": "adaptive",
     "manual_block_alignment": {
       "reference_color": "红色",
       "pixel": [
@@ -256,71 +227,6 @@
         }
       ]
     },
-    "manual_tray_alignment": null,
-    "translation_summary": {
-      "sample_count": 0,
-      "mode": "not_part_of_physical_offset_calibration"
-    },
-    "motion_compensation": {
-      "model_version": 1,
-      "models": {
-        "tray": {
-          "model_version": 1,
-          "mode": "zero_manual_fallback",
-          "reference_robot_xy": [
-            -4.734488462432624,
-            -443.86345133312614
-          ],
-          "constant_bias_mm": [
-            0.0,
-            0.0
-          ],
-          "spatial_residual_matrix": [
-            [
-              0.0,
-              0.0
-            ],
-            [
-              0.0,
-              0.0
-            ]
-          ],
-          "rotation_center_bias_mm": [
-            0.0,
-            0.0
-          ],
-          "sample_count": 0,
-          "fit_rms_mm": 0.0
-        },
-        "block": {
-          "model_version": 1,
-          "mode": "zero_manual_fallback",
-          "reference_robot_xy": [
-            -4.734488462432624,
-            -443.86345133312614
-          ],
-          "constant_bias_mm": [
-            0.0,
-            0.0
-          ],
-          "spatial_residual_matrix": [
-            [
-              0.0,
-              0.0
-            ],
-            [
-              0.0,
-              0.0
-            ]
-          ],
-          "rotation_center_bias_mm": [
-            0.0,
-            0.0
-          ],
-          "sample_count": 0,
-          "fit_rms_mm": 0.0
-        }
-      }
-    }
+    "motion_compensation_forced_zero": true
   }
 }

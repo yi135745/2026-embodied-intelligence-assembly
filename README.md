@@ -113,7 +113,7 @@ resources/visionmaster_task2_calibration.xml
 data/task2_offsets_v2.json
 ```
 
-`block_xy_offset`、`tray_xy_offset` 只表达坐标锚点；抓取偏心、旋转偏心、释放滑动等进入可选的 `motion_compensation`，不再反向污染坐标偏移。
+人工粗校只记录一次物块像素中心与实际TCP；标定库结合当前公共矩阵派生唯一相机—吸盘偏移供两区共用。旋转前后中心以像素保存，再由矩阵派生毫米偏心；释放滑动仍只进入动作补偿。
 
 规划中：
 
@@ -127,7 +127,7 @@ data/task2_offsets_v2.json
 | --- | --- |
 | `data/aubo_poses.json` | 四个正式点位唯一来源，XYZ=mm、姿态=rad |
 | `data/task2_tuning.json` | 当前相机和光照下的HSV、曝光、增益 |
-| `data/task2_offsets_v2.json` | 两区XY锚点、矩阵绑定和动作补偿 |
+| `data/task2_offsets_v2.json` | 人工物理锚点、物块高度、像素旋转偏心观测和动作补偿 |
 | `resources/visionmaster_task2_calibration.xml` | 方块/托盘唯一公共平面矩阵 |
 | `resources/visionmaster_task2_template.xml` | 生成候选XML的独立结构模板 |
 | `resources/visionmaster_task2_calibration_binding.json` | 正式矩阵指纹和质量摘要 |
@@ -135,7 +135,7 @@ data/task2_offsets_v2.json
 | `resources/calibration_history/` | 正式矩阵历史备份 |
 | `output/` | 图片、掩膜、报告、候选和运行日志；可清理，不是正式状态源 |
 
-启用新公共矩阵后，旧偏移失效是正常行为，必须重新运行闭环偏移工具。不要通过删除绑定或复制旧指纹绕过检查。
+启用新公共矩阵后，标定库会从原始物理锚点重新派生偏移和旋转偏心；无需按先后顺序重做人工粗校，但必须重新完成落点验收。
 
 ## 5. 新工位正式调试流程
 
@@ -169,12 +169,12 @@ python tools/task2/diagnostics/task2_vision_test.py --scene tray
 python tools/task2/workflow/task2_tray_auto_calibrate.py
 ```
 
-托盘区自动走3×3相机位置，每帧最多采集六个托盘中心，一次生成最多54组对应点。候选通过点数、矩阵结构、world RMS和pixel RMS后，人工核对标注图并输入 `yes` 才会备份旧版并启用。
+托盘区自动走3×3相机位置，每帧最多采集六个托盘中心，一次生成最多54组对应点。首帧与后续帧统一调用当前托盘颜色检测器，方框几何优先、HSV/Lab 只补漏检中心，槽位仍由2×3空间拓扑确定。候选通过点数、矩阵结构、world RMS和pixel RMS后，人工核对标注图并输入 `yes` 才会备份旧版并启用。
 
 方块和托盘拍照位允许XY不同，但要求：
 
 ```text
-Z差 ≤ 2 mm
+相机到方块顶面/托盘平面的有效拍摄高度差 ≤ 2 mm
 RZ差 ≤ 0.02 rad
 ```
 
@@ -184,13 +184,13 @@ RZ差 ≤ 0.02 rad
 python tools/task2/workflow/task2_closed_loop_offset_calibrate.py
 ```
 
-程序先要求依次人工粗对准物块区和托盘区，随后自动完成平移、旋转、跨区放置和独立验证。
+程序先要求在物块区完成人工粗校并立即保存零补偿基线，随后只做原地旋转偏心采样；不会做平移，也不会进入托盘区抓放。
 
-每个人工阶段都会立即落盘。需要跳过高级自动采样时可加 `--manual-only`：程序读取两次人工中心对应的 TCP，生成固定 XY 偏移候选，并将综合动作补偿置零；仍需明确输入 `yes` 才会原子启用。
+人工粗校完成后立即原子写入零补偿基线。默认流程和 `--manual-only` 都不加载公共矩阵；后者只是不继续执行原地旋转采样。
 
 未加 `--manual-only` 时，双人工锚点完成后也会暂停选择：回车继续所选自动补偿模型，输入 `manual` 立即以人工固定 XY + 零补偿候选结束并进入启用确认，输入 `q` 只保留候选退出。现场不必为了切换备用方案重新运行人工步骤。
 
-需要与综合模型进行实机对比时，可加 `--compensation-model constant`。该模式沿用同一采样、候选和启用接口，只取跨区落点残差的二维中位数作为固定偏心，空间补偿矩阵与旋转偏心均强制为零；验证抓放会实际使用这份固定补偿。
+`--compensation-model constant` 仅保留为诊断参数；默认无参数流程使用像素旋转观测拟合偏心。
 
 采样模式由 `config.py` 控制：
 

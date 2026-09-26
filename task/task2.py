@@ -22,7 +22,7 @@ from modules.task2_perception import (
     validate_colors,
 )
 from runtime.site_data import apply_aubo_pose_records
-from runtime.task2_state import load_task2_runtime_state
+from runtime.task2_state import get_task2_block_view_pose, load_task2_runtime_state
 from modules.task2_planning import (
     apply_motion_compensation,
     build_plan,
@@ -83,7 +83,10 @@ def task2_run(voice, camera, robot, interpreter):
                     (x["step"], x["source_color"], x["target_color"],
                      "托盘" if x["target_type"] == "tray" else "方块") for x in steps))
         if execute:
-            _move_to_view(robot, config.TASK2_BLOCK_VIEW_POSE, "方块拍照位")
+            block_view_pose = (get_task2_block_view_pose()
+                               if runtime_state.uses_physical_alignment
+                               else config.TASK2_BLOCK_VIEW_POSE)
+            _move_to_view(robot, block_view_pose, "方块拍照位")
         block_image = _capture(camera, output_dir, config.TASK2_BLOCK_CAPTURE_NAME, config.TASK2_BLOCK_DEBUG_IMAGE,
                                config.TASK2_BLOCK_EXPOSURE_TIME, config.TASK2_BLOCK_GAIN)
         blocks, block_debug = detector.detect(block_image, "方块", output_dir, "blocks",

@@ -13,7 +13,9 @@ __all__ = [
     "print_activation_summary", "proposed_block_offset", "proposed_tray_offset",
     "quality_issues_from_report", "rebase_xy_offset",
     "require_calibration_quality", "summarize_rotation_response",
-    "validate_calibration", "write_vm_xml",
+    "validate_calibration", "write_vm_xml", "build_physical_calibration_record",
+    "derive_shared_xy_calibration", "save_physical_calibration",
+    "derive_rotation_center_bias_from_pixels",
 ]
 
 _EXPORT_MODULES = {
@@ -34,6 +36,10 @@ _EXPORT_MODULES = {
     "proposed_tray_offset": "_closed_loop",
     "rebase_xy_offset": "_closed_loop",
     "summarize_rotation_response": "_closed_loop",
+    "build_physical_calibration_record": "_physical",
+    "derive_shared_xy_calibration": "_physical",
+    "derive_rotation_center_bias_from_pixels": "_physical",
+    "save_physical_calibration": "_physical",
 }
 
 

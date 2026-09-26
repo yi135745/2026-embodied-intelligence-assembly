@@ -42,9 +42,13 @@ def main():
         offset_match = False
     else:
         offsets = json.loads(offset_path.read_text(encoding="utf-8"))
-        offset_match = (offsets.get("calibration_xml_sha256") ==
-                        calibration_sha256(matrix_path))
-        print("[%s] 共用矩阵偏移指纹" % ("PASS" if offset_match else "STALE"))
+        if offsets.get("physical_alignment") is not None:
+            offset_match = True
+            print("[PASS] 原始物理锚点可与当前公共矩阵重新组合")
+        else:
+            offset_match = (offsets.get("calibration_xml_sha256") ==
+                            calibration_sha256(matrix_path))
+            print("[%s] 旧版矩阵偏移指纹" % ("PASS" if offset_match else "STALE"))
     if matrix["issues"] or not matrix["quality_known"]:
         print("下一步：重做或恢复共用矩阵，禁止运行偏移闭环。")
     elif not offset_match:

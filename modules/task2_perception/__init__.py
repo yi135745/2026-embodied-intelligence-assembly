@@ -2,6 +2,7 @@
 
 import math
 import json
+import os
 from pathlib import Path
 from typing import List, Optional, Tuple
 from xml.etree import ElementTree
@@ -62,6 +63,25 @@ def load_task2_tuning(path=None) -> bool:
             setattr(config, key, data[name])
     print("已加载任务二调参文件：" + str(tuning_path))
     return True
+
+
+def save_task2_tuning_patch(payload, path=None) -> Path:
+    """合并并原子保存分区调参，避免一个场景覆盖另外两个场景。"""
+    target = Path(path or config.TASK2_TUNING_FILE)
+    existing = json.loads(target.read_text(encoding="utf-8")) if target.exists() else {}
+    capture = {**existing.get("capture", {}), **payload.get("capture", {})}
+    reviews = {**existing.get("human_reviews", {}),
+               **payload.get("human_reviews", {})}
+    existing.update(payload)
+    existing["capture"] = capture
+    if reviews:
+        existing["human_reviews"] = reviews
+    target.parent.mkdir(parents=True, exist_ok=True)
+    temporary = target.with_suffix(target.suffix + ".tmp")
+    temporary.write_text(json.dumps(existing, ensure_ascii=False, indent=2),
+                         encoding="utf-8")
+    os.replace(temporary, target)
+    return target
 
 
 def save_debug_image(path, image) -> None:

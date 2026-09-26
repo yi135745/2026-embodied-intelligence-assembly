@@ -76,7 +76,7 @@
 
 ```text
 公共单应矩阵: pixel -> planar world delta (mm)
-robot XY = zone view origin XY + world delta + zone XY offset
+robot XY = zone view origin XY + world delta + shared camera-tool offset
 robot Z  = config 中的抓取/放置参考 Z
 robot 姿态 = 对应当前拍照位姿态，放置 RZ 再叠加最小等价旋转
 ```
@@ -84,7 +84,7 @@ robot 姿态 = 对应当前拍照位姿态，放置 RZ 再叠加最小等价旋�
 约束：
 
 - 方块和托盘必须通过同一个 `CoordinateTransformer` 和同一正式 XML。
-- 两区拍照位 XY 可以不同；相机 Z 与 RZ 必须在配置容差内。当前实现不校验 RX/RY 同一性，因此改变 RX/RY 仍应视为重新标定风险，不能据此宣称矩阵可复用。
+- 两区拍照位 XY 可以不同；公共矩阵比较的是相机到各自观测平面的有效高度。`aubo_poses.json` 保存参考平面拍照位，方块实际拍照 Z 由现场物块高度派生；RX/RY/RZ 必须保持一致。
 - 正方形按 90° 等价，旋转差归一化到 `[-45°, 45°)`。
 - `TASK2_ROTATION_DIRECTION` 可在等价角中选择最短双向、全正向或全负向；主任务和闭环工具必须调用同一选择函数，日志同时记录请求角与实际命令角。
 - 高度补偿使用同一 TCP 接触定义；`top_tcp_z` 是等效 TCP 顶面高度，不是裸物块物理坐标。
@@ -106,9 +106,9 @@ robot 姿态 = 对应当前拍照位姿态，放置 RZ 再叠加最小等价旋�
 
 ### `data/task2_offsets_v2.json`
 
-- 一个文件同时保存 block/tray 的原点 XY、XY offset 和拍照姿态快照。
-- 只接受一个 `calibration_xml_sha256`，必须与当前正式公共 XML 一致。
-- `block_xy_offset`、`tray_xy_offset` 只表达公共矩阵到两区基座坐标的静态锚定，不得吸收抓取偏心、旋转偏心或释放滑动。
+- 一个文件统一保存人工粗校原始像素、人工对准 TCP、参考拍照位、物块高度和旋转前后像素观测。
+- 原始物理锚点不绑定矩阵指纹；运行时由当前公共矩阵派生唯一相机—吸盘 XY 偏移，并同时用于方块区和托盘区。
+- 旋转偏心正式记录单位为像素；标定库通过当前矩阵派生毫米偏心。抓取偏心、旋转偏心或释放滑动不得写入坐标锚点。
 - 可选 `motion_compensation` 与坐标字段保存在同一正式文件并共享版本链；旧文件没有该字段时等价于零补偿。
 - 规划中的 `robot_pose`/`placed_state.pose` 是标称物体终态；`command_robot_pose` 是扣除预测动作残差后实际下发的 TCP 位姿。叠放推演必须使用标称终态，不能使用已补偿命令重复扣减。
 - 保存 `calibration_world_scale_mm`，阻止单位不明的旧文件被误用。

@@ -9,17 +9,20 @@
 ```powershell
 python tools/setup/aubo_pose_recorder.py
 python tools/task2/workflow/task2_tuner.py
+python tools/task2/workflow/task2_card_capture_tuner.py
 python tools/task2/workflow/task2_tuner.py --scene tray
 python tools/task2/workflow/task2_tray_auto_calibrate.py
 python tools/task2/workflow/task2_closed_loop_offset_calibrate.py
 ```
 
-含义分别是：记录当前工位点位；调方块与托盘视觉参数；用托盘最多54组数据生成并启用唯一公共矩阵；依次人工建立物块区、托盘区绝对锚点，再自动做平移、旋转和跨区抓放闭环。
+调参入口均默认自动安全移动到对应拍照位。`task2_tuner.py` 不带参数时调物块9色；`--scene tray` 调托盘6色；任务卡独立工具只调曝光/增益。物块调参位的Z按现场物块高度自动抬高。
 
-闭环标定在方块人工锚定后写检查点，在托盘锚定后立即写一份可验证的双锚点候选。现场需要保底时运行
-`python tools/task2/workflow/task2_closed_loop_offset_calibrate.py --manual-only`：只生成固定 XY 偏移，综合动作补偿置零，不执行自动抓放采样。默认 `--board-guard fallback` 在白板边界不可靠时改做全画面 HSV 单方块审计，仍保留唯一目标、面积、形状、填充率和复拍位移检查；该选项不改变正式任务门禁。
+托盘九点标定的首帧和后续帧都调用当前托盘颜色检测器：方框几何中心优先，HSV/Lab 结果只补几何漏检中心；六槽位身份仍由 2×3 空间拓扑确定，不按颜色建立对应。
 
-半自动偏移工具不会把旧 `data/task2_offsets_v2.json` 用作计算初值。旧文件存在时仅用于启用前显示和备份，不存在时也可首次创建。唯一公共矩阵必须通过质量门禁并保留正式质量报告；报告只证明相对矩阵质量，不提供托盘绝对零点。方块与托盘拍照位的 Z、RZ 必须在配置容差内，XY允许不同。工具会先完成方块和托盘两次人工XY粗对准，再按 `config.py` 中的 `TASK2_OFFSET_CALIBRATION_PROFILE` 执行 `quick` 或 `robust` 自动采样；两种方案输出同一份候选偏移。
+闭环标定在方块人工锚定后立即写检查点和可验证的物理锚点候选。现场需要保底时运行
+`python tools/task2/workflow/task2_closed_loop_offset_calibrate.py --manual-only`：只记录一次方块区人工物理锚点（像素、TCP、参考拍照位和物块高度），综合动作补偿置零，不执行自动抓放采样。托盘区不再建立第二个人工偏移。默认 `--board-guard fallback` 在白板边界不可靠时改做全画面 HSV 单方块审计，仍保留唯一目标、面积、形状、填充率和复拍位移检查。
+
+物理锚点与托盘九点矩阵可按任意顺序采集，正式运行时由标定库组合。矩阵把像素转换为平面毫米增量；物理锚点提供唯一相机—吸盘绝对平移。旋转试验正式保存旋转前后像素中心，毫米偏心由当前矩阵派生。方块实际拍照Z由参考平面拍照位加现场物块高度得到，托盘拍照位不变。
 
 HSV 调参窗口直接显示正式检测器最终结果，滑条与结果保持在同一窗口；单色掩膜仍在内部参与计算，但不再占用显示区域。数字键切换颜色，`[`/`]` 切换同色多段 HSV，`n` 新增区间，`x` 删除区间，`s` 只保存参数；确认正式检测的颜色和中心均正确后按 `v`，完整性门禁通过才会保存人工肉眼审计，并从每个已确认目标内部提取现场 HSV 原型用于易混颜色分类。审计图片和 JSON 位于 `output/task2/tuning_review/`，正式运行仍只读取 `data/task2_tuning.json`。
 

@@ -97,6 +97,9 @@ def _build_candidate(samples, template, run_dir, view_pose, source_report=None):
         sample["world_point_mm"] = [float(value) for value in world]
         sample["world_error_mm"] = [float(value) for value in world_error]
         sample["pixel_error"] = [float(value) for value in image_error]
+    color_sources = {"color_bootstrap", "hsv_near_predicted_slot"}
+    color_sample_count = sum(
+        item.get("detection_source") in color_sources for item in samples)
     report = {
         "created_at": datetime.now().isoformat(timespec="seconds"),
         **details,
@@ -119,10 +122,13 @@ def _build_candidate(samples, template, run_dir, view_pose, source_report=None):
         "candidate_xml": str(xml_path.resolve()),
         "source_report_for_offline_replay": str(source_report) if source_report else None,
         "color_identity_used_for_correspondence": False,
-        "color_used_for_calibration": False,
+        "color_used_for_calibration": color_sample_count > 0,
+        "color_spatial_supplement_sample_count": color_sample_count,
+        "color_bootstrap_sample_count": sum(
+            item.get("detection_source") == "color_bootstrap" for item in samples),
         "hsv_spatial_fallback_sample_count": sum(
             item.get("detection_source") == "hsv_near_predicted_slot" for item in samples),
-        "requires_new_xy_offset_calibration": True,
+        "requires_physical_alignment_combination": True,
         "six_observations_at_one_pose_share_camera_pose_error": True,
         "samples": samples,
         "excluded_samples": excluded_samples,
@@ -205,22 +211,28 @@ def main():
             actual_camera_pose = robot.get_current_pose()
             prefix = "%02d" % point_index
             raw_path = _capture(vision, run_dir / (prefix + "_raw.jpg"))
+            supplemental_centers = []
+            try:
+                color_targets, _color_annotated = color_detector.detect(
+                    raw_path, "托盘", include_robot_pose=False)
+                supplemental_centers = [target.pixel_center for target in color_targets]
+            except Exception as exc:
+                print("第%d点颜色视觉补充不可用，仅保留几何中心：%s" %
+                      (point_index, exc))
             if reference_landmarks is None:
-                landmarks, annotated, edges, grid_score = detect_tray_landmarks_file(raw_path)
+                landmarks, annotated, edges, grid_score = detect_tray_landmarks_file(
+                    raw_path, supplemental_centers)
                 reference_landmarks = landmarks
+                geometry_count = sum(
+                    landmark.source == "geometry" for landmark in landmarks)
                 tracking = {
-                    "observed_count": 6, "geometry_count": 6, "supplement_count": 0,
+                    "observed_count": 6,
+                    "geometry_count": geometry_count,
+                    "supplement_count": 6 - geometry_count,
                     "common_image_shift_px": [0.0, 0.0], "geometry_match_rms_px": 0.0,
                     "grid_score": grid_score,
                 }
             else:
-                supplemental_centers = []
-                try:
-                    color_targets, _color_annotated = color_detector.detect(
-                        raw_path, "托盘", include_robot_pose=False)
-                    supplemental_centers = [target.pixel_center for target in color_targets]
-                except Exception as exc:
-                    print("第%d点HSV空间补充不可用，仅保留几何中心：%s" % (point_index, exc))
                 landmarks, annotated, edges, tracking = detect_tray_landmarks_tracked(
                     cv2.imread(str(raw_path)), reference_landmarks, supplemental_centers)
                 grid_score = None
@@ -247,7 +259,7 @@ def main():
                     "raw_image": str(Path(raw_path).resolve()),
                     "annotated_image": str(annotated_path.resolve()),
                 })
-            print("第%d点采用%d/6（几何%d，HSV槽位补充%d），累计%d/54。" %
+            print("第%d点采用%d/6（几何%d，颜色视觉补充%d），累计%d/54。" %
                   (point_index, len(landmarks), tracking["geometry_count"],
                    tracking["supplement_count"], len(all_samples)))
 
@@ -259,7 +271,7 @@ def main():
         decision = print_activation_summary(
             "方块/托盘共用九点矩阵", config.TASK2_CALIBRATION_FILE, xml_path,
             config.TASK2_OUTPUT_DIR, report,
-            "唯一XY偏移指纹立即失效，必须重做闭环偏移与落点验收。")
+            "物理锚点保持有效；运行时将用新矩阵重新组合，并须重做落点验收。")
         if decision["issues"]:
             print("候选未通过质量门禁，已禁止覆盖正式共用矩阵。")
             answer = ""
@@ -282,9 +294,7 @@ def main():
             report_path.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
             print("正式方块/托盘共用标定已更新：" + report["activated_xml"])
             print("旧版备份：" + (str(backup) if backup else "无"))
-            print("旧XY偏移已失效；下一步运行"
-                  "tools/task2/workflow/task2_closed_loop_offset_calibrate.py，"
-                  "它不会读取旧偏移作为计算初值。")
+            print("公共矩阵已更新；已记录的原始物理锚点可重新组合，无需按矩阵顺序重做人工粗校。")
         else:
             print("未覆盖正式共用标定XML。")
         completed = True

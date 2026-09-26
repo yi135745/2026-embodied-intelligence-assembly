@@ -2,6 +2,7 @@
 
 import config
 from runtime.site_data import load_aubo_pose_records
+from runtime.task2_state import get_task2_block_view_pose
 from modules.robot import Robot
 
 
@@ -17,6 +18,8 @@ def move_to_scene_view(scene):
     pose = load_aubo_pose_records().get(name)
     if pose is None:
         raise RuntimeError("AUBO位姿记录缺少%s。" % name)
+    if scene == "block":
+        pose = get_task2_block_view_pose(pose)
     print("调试自动前往%s：%s；过渡安全Z：%.3f mm" %
           (name, pose, float(config.ROBOT_SAFE_Z)))
     robot = Robot()

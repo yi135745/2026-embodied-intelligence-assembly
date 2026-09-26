@@ -5,8 +5,8 @@
   python tools/task2/workflow/task2_tuner.py
   python tools/task2/workflow/task2_tuner.py --scene tray
 
-窗口直接显示正式检测器结果。按 s 保存，按 v 在正式检测完整时人工确认并保存
-审计；按 q 退出。方块按1~9、托盘按1~6切换颜色，
+窗口直接显示方块或托盘正式检测器结果。
+按 s 保存，按 v 在正式检测完整时人工确认并保存审计；按 q 退出。方块按1~9、托盘按1~6切换颜色，
 按 [ / ] 切换同色HSV区间，按 n 新增、x 删除区间；相机模式按 c 重新拍摄。
 """
 
@@ -30,6 +30,7 @@ from modules.camera import Camera
 from modules.task2_perception import (
     ColorObjectDetector,
     load_task2_tuning,
+    save_task2_tuning_patch,
     validate_colors,
 )
 
@@ -151,7 +152,7 @@ def _move_to_block_view():
 
 
 def parse_args(argv=None):
-    parser = argparse.ArgumentParser(description="任务二HSV、曝光和增益人工调参")
+    parser = argparse.ArgumentParser(description="任务二方块/托盘HSV、曝光和增益人工调参")
     parser.add_argument("--image", help="使用本地图片")
     parser.add_argument("--camera", action="store_true", help="使用海康相机（已是默认模式）")
     parser.add_argument("--scene", choices=("block", "tray"), default="block")
@@ -364,17 +365,7 @@ def main():
 
 def save_tuning(payload):
     """保存一个分区时保留另一个分区的阈值与曝光。"""
-    path = Path(config.TASK2_TUNING_FILE)
-    existing = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
-    capture = {**existing.get("capture", {}), **payload.get("capture", {})}
-    reviews = {**existing.get("human_reviews", {}),
-               **payload.get("human_reviews", {})}
-    existing.update(payload)
-    existing["capture"] = capture
-    if reviews:
-        existing["human_reviews"] = reviews
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(existing, ensure_ascii=False, indent=2), encoding="utf-8")
+    save_task2_tuning_patch(payload)
 
 
 if __name__ == "__main__":
